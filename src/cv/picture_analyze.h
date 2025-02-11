@@ -1,0 +1,6 @@
+#ifndef PICTURE_ANALYZE_H
+#define PICTURE_ANALYZE_H
+
+
+
+#endif // !PICTURE_ANALYZE_H
