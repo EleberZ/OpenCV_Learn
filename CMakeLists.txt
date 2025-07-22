@@ -157,6 +157,10 @@ execute_process(
 )
 # 翻译文件
 
+#---------------------------资源文件--------------------------------
+qt5_add_resources(qrc_file "${PROJECT_SOURCE_DIR}/res/action.qrc")  
+#资源文件
+
 add_executable(${ProjectName} 
     "${cpp_list}" 
     "${h_list}" 
@@ -172,6 +176,7 @@ target_compile_definitions(${ProjectName} PRIVATE QT_DEPRECATED_WARNINGS)
 target_include_directories(${ProjectName} PRIVATE  
     "${cpp_h_dir}"
     "${lib_h_dir}"
+    "${OpenCV_INCLUDE_DIRS}"
 )
 target_link_directories(${ProjectName} PUBLIC "${PROJECT_SOURCE_DIR}/lib")
 target_link_directories(${ProjectName} PUBLIC "${PROJECT_SOURCE_DIR}/bin")
@@ -185,25 +190,26 @@ target_link_libraries(${ProjectName} PUBLIC
     Qt5::Xml
 )
 
+target_link_libraries(${ProjectName} PRIVATE ${OpenCV_LIBS})
 target_link_libraries(${ProjectName} PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
 # Add libraries to the target  
 if(${PLATFORM} STREQUAL "x64")
     target_link_libraries(${ProjectName} PUBLIC 
-        ${PROJECT_SOURCE_DIR}/lib/DxImageProc.lib
-        ${PROJECT_SOURCE_DIR}/lib/GxIAPI.lib
-        ${PROJECT_SOURCE_DIR}/lib/LTDMC.lib
-        ${PROJECT_SOURCE_DIR}/lib/libYXEngine.a
-        ${PROJECT_SOURCE_DIR}/lib/libopencv_core411.dll.a
-        ${PROJECT_SOURCE_DIR}/lib/libopencv_imgproc411.dll.a
+        #${PROJECT_SOURCE_DIR}/lib/DxImageProc.lib
+        #${PROJECT_SOURCE_DIR}/lib/GxIAPI.lib
+        #${PROJECT_SOURCE_DIR}/lib/LTDMC.lib
+        #${PROJECT_SOURCE_DIR}/lib/libYXEngine.a
+        #${PROJECT_SOURCE_DIR}/lib/libopencv_core411.dll.a
+        #${PROJECT_SOURCE_DIR}/lib/libopencv_imgproc411.dll.a
     )
 elseif(${PLATFORM} STREQUAL "x86")
     target_link_libraries(${ProjectName} PUBLIC 
-        ${PROJECT_SOURCE_DIR}/lib/DxImageProc.lib
-        ${PROJECT_SOURCE_DIR}/lib/GxIAPI.lib
-        ${PROJECT_SOURCE_DIR}/lib/LTDMC32.lib
-        ${PROJECT_SOURCE_DIR}/lib/libYXEngine32.a
-        ${PROJECT_SOURCE_DIR}/lib/libopencv_core411.dll.a
-        ${PROJECT_SOURCE_DIR}/lib/libopencv_imgproc411.dll.a
+        #{PROJECT_SOURCE_DIR}/lib/DxImageProc.lib
+        #${PROJECT_SOURCE_DIR}/lib/GxIAPI.lib
+        #${PROJECT_SOURCE_DIR}/lib/LTDMC32.lib
+        #${PROJECT_SOURCE_DIR}/lib/libYXEngine32.a
+        #${PROJECT_SOURCE_DIR}/lib/libopencv_core411.dll.a
+        #${PROJECT_SOURCE_DIR}/lib/libopencv_imgproc411.dll.a
     )
 endif()
 
