@@ -15,21 +15,16 @@ int picture_analyze::CVMat2QImage(Mat bgrmat, QImage &img)
     {
         return -1;
     }
-    Mat rgb_mat, argb_mat;
     switch( bgrmat.type() )
     {
-    case CV_8UC1:
-        img = QImage((const unsigned char *)bgrmat.data, bgrmat.cols, bgrmat.rows, bgrmat.step, QImage::Format_Grayscale8);
+    case CV_8UC1:       //单通道
+        img = QImage(bgrmat.data, bgrmat.cols, bgrmat.rows, bgrmat.step, QImage::Format_Grayscale8);
         break;
-    case CV_8UC3:
-        cvtColor(bgrmat, rgb_mat, cv::COLOR_BGR2RGB);
-        img = QImage((const unsigned char *)rgb_mat.data, rgb_mat.cols, rgb_mat.rows, rgb_mat.step, QImage::Format_RGB888);
-        //需要处理图像的颜色顺序？
-        //OpenCV是BGR, QImage是RGB
+    case CV_8UC3:       //三通道BGR->RGB
+        img = QImage(bgrmat.data, bgrmat.cols, bgrmat.rows, bgrmat.step, QImage::Format_BGR888);
         break;
-    case CV_8UC4:       //BGRA->RGBA
-        cvtColor(bgrmat, argb_mat, cv::COLOR_BGRA2RGBA);
-        img = QImage((const unsigned char *)bgrmat.data, bgrmat.cols, bgrmat.rows, bgrmat.step, QImage::Format_RGBA8888);
+    case CV_8UC4:       //四通道BGRA->RGBA
+        img = QImage(bgrmat.data, bgrmat.cols, bgrmat.rows, bgrmat.step, QImage::Format_RGBA8888);
         break;
     default:
         break;
@@ -57,3 +52,4 @@ int picture_analyze::QImage2CVMat(QImage img, Mat &mat)
         break;
     }
 }
+
