@@ -14,7 +14,7 @@ OpenCV::OpenCV()
     connect(btn_open, SIGNAL(clicked()), this, SLOT(slotBtnOpenClicked()));
     connect(btn_gray, SIGNAL(clicked()), this, SLOT(slotBtnGrayClicked()));
     connect(btn_reset, SIGNAL(clicked()), this, SLOT(slotBtnColorClicked()));
-    connect(transparency, &QSlider::tickPosition, this, &OpenCV::slotSliderValueChanged);
+    connect(transparency, &QSlider::valueChanged, this, &OpenCV::slotSliderValueChanged);
 }
 
 OpenCV::~OpenCV()
@@ -27,8 +27,8 @@ void OpenCV::initWidget()
     glyt = new QGridLayout(central_wdt);
     grv = new QGraphicsView();
     btn_open = new QPushButton("Open");
-    btn_gray = new QPushButton("Grayscale");
-    btn_reset = new QPushButton("Reset");
+    btn_gray = new QPushButton("Gray_scale");
+    btn_reset = new QPushButton("Origin_scale");
     ledit = new QLineEdit();
     scene = new QGraphicsScene();
     picture = new picture_analyze();
@@ -55,7 +55,10 @@ void OpenCV::slotBtnGrayClicked()
         QMessageBox::warning(this, "Warning", "Please Open Image First!");
         return;
     }
-    cvtColor(color_mat, gray_mat, cv::COLOR_BGR2GRAY);
+    if( origin_mat.channels()!=1 )
+    {
+        cvtColor(origin_mat, gray_mat, cv::COLOR_BGR2GRAY);
+    }
     picture->CVMat2QImage(gray_mat, img_gray);
     pix = QPixmap::fromImage(img_gray);
     scene->addPixmap(pix);
@@ -68,14 +71,30 @@ void OpenCV::slotBtnColorClicked()
         QMessageBox::warning(this, "Warning", "Please Open Image First!");
         return;
     }
-    picture->CVMat2QImage(color_mat, img_color);
+    picture->CVMat2QImage(origin_mat, img_color);
     pix = QPixmap::fromImage(img_color);
     scene->addPixmap(pix);
 }
 
 void OpenCV::slotSliderValueChanged(int value)
 {
-    
+    if( path.isEmpty() )
+    {
+        QMessageBox::warning(this, "Warning", "Please Open Image First!");
+        return;
+    }
+    if( origin_mat.channels()!=4 )
+    {
+        cvtColor(origin_mat, transparent_mat, COLOR_BGR2RGBA);
+    }
+    std::vector<cv::Mat> channels;
+    cv::split(transparent_mat, channels);
+    channels[3] = channels[3]*value/100;
+    cv::merge(channels, transparent_mat);
+    //cv::addWeighted
+    picture->CVMat2QImage(transparent_mat, img_color);
+    pix = QPixmap::fromImage(img_color);
+    scene->addPixmap(pix);
 }
 
 void OpenCV::slotBtnOpenClicked()
@@ -89,8 +108,8 @@ void OpenCV::slotBtnOpenClicked()
         path = select_path;
         ledit->setText(path);
         std::string path2 = path.toStdString();
-        color_mat = cv::imread(path2, cv::IMREAD_COLOR);
-        picture->CVMat2QImage(color_mat, img_color);
+        origin_mat = cv::imread(path2, cv::IMREAD_UNCHANGED);
+        picture->CVMat2QImage(origin_mat, img_color);
         QPixmap pix1 = QPixmap::fromImage(img_color);
         scene->clear();
         scene->addPixmap(pix1);

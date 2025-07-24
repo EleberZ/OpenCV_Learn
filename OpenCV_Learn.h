@@ -23,7 +23,6 @@ public:
 	~OpenCV();
 	void initWidget();
 
-
 private:
 	QGridLayout* glyt;
 	QGraphicsView* grv;
@@ -33,7 +32,7 @@ private:
 	QString path, select_path;
 	QPixmap pix;
 	QImage img_gray, img_color;
-	cv::Mat gray_mat, color_mat;
+	cv::Mat gray_mat, origin_mat, transparent_mat;
 	picture_analyze *picture;
 	QSlider *transparency;
 	
