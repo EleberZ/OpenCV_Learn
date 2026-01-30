@@ -14,6 +14,8 @@ endif()
 
 project (${ProjectName} VERSION 1.0.0 LANGUAGES CXX)
 include ("${PROJECT_SOURCE_DIR}/src/gui/gui.cmake")
+include (FetchContent)
+
 if(${PLATFORM} STREQUAL "x64")
     set(mingw_tools $ENV{QT_X64_MinGW_Tool})
     set(qt_lib_path $ENV{QT_LIB_X64_MinGW})
@@ -74,8 +76,14 @@ set(CMAKE_AUTOUIC ON)
 find_package(Qt5 COMPONENTS Core Gui Widgets Network SerialPort SerialBus Xml REQUIRED)
 find_package(Qt5 COMPONENTS LinguistTools REQUIRED)
 set(GTest_DIR "$ENV{VCPKG_ROOT}/packages/gtest_vcpkg-triplets/share/gtest")
+
 find_package(GTest CONFIG REQUIRED)
-set(OpenCV_DIR "$ENV{OpenCV_INSTALL_PATH}")
+#set(OpenCV_DIR "$ENV{OpenCV_INSTALL_PATH}")
+
+message(STATUS "CMAKE_CXX_COMPILER_ID="${CMAKE_CXX_COMPILER_ID})
+message(STATUS "CMAKE_CXX_COMPILER_VERSION="${CMAKE_CXX_COMPILER_VERSION})
+message(STATUS "CMAKE_SIZEOF_VOID_P="${CMAKE_SIZEOF_VOID_P})
+set(OpenCV_DIR $ENV{OPENCV_MingW_INSTALL}${CMAKE_BUILD_TYPE})
 find_package(OpenCV COMPONENTS REQUIRED)
 
 set(src "${PROJECT_SOURCE_DIR}/src")
@@ -118,43 +126,43 @@ endforeach(source_dir_single ${cpp_h_dir})
 # 源文件路径 
 
 #--------------------------翻译文件--------------------------------
-set(exclude_ts
-    ""
-)
-set(ts_dir
-    ${PROJECT_SOURCE_DIR}
-)
-foreach(ts_files ${ts_dir})
-    file(GLOB ts_file "${ts_files}/*.ts")
-    list(APPEND ts_list "${ts_file}")
-endforeach(ts_files ${ts_dir})
-    list(REMOVE_ITEM ts_list ${exclude_ts})
-
-set(exclude_qm
-    ""
-)
-set(qm_dir
-    ${PROJECT_SOURCE_DIR}
-)
-foreach(qm_files ${qm_dir})
-    file(GLOB qm_file "${qm_files}/*.qm")
-    list(APPEND qm_list "${qm_file}")
-endforeach(qm_files ${qm_dir})
-    list(REMOVE_ITEM qm_list ${exclude_qm})
+#set(exclude_ts
+#    ""
+#)
+#set(ts_dir
+#    ${PROJECT_SOURCE_DIR}
+#)
+#foreach(ts_files ${ts_dir})
+#    file(GLOB ts_file "${ts_files}/*.ts")
+#    list(APPEND ts_list "${ts_file}")
+#endforeach(ts_files ${ts_dir})
+#    list(REMOVE_ITEM ts_list ${exclude_ts})
+#
+#set(exclude_qm
+#    ""
+#)
+#set(qm_dir
+#    ${PROJECT_SOURCE_DIR}
+#)
+#foreach(qm_files ${qm_dir})
+#    file(GLOB qm_file "${qm_files}/*.qm")
+#    list(APPEND qm_list "${qm_file}")
+#endforeach(qm_files ${qm_dir})
+#    list(REMOVE_ITEM qm_list ${exclude_qm})
 
 # 查找 lupdate 和 lrelease 工具
-find_program(LUPDATE_EXECUTABLE lupdate)
-find_program(LRELEASE_EXECUTABLE lrelease)
-
-# 提取翻译字符串生成.ts文件
-execute_process( 
-    COMMAND ${LUPDATE_EXECUTABLE} ${cpp_list} -ts ${CMAKE_SOURCE_DIR}/TMA_CN.ts
-)
-# 编译.ts为.qm
-execute_process( 
-    COMMAND ${LRELEASE_EXECUTABLE} ${CMAKE_SOURCE_DIR}/TMA_CN.ts
-    -qm ${CMAKE_SOURCE_DIR}/TMA_CN.qm
-)
+#find_program(LUPDATE_EXECUTABLE lupdate)
+#find_program(LRELEASE_EXECUTABLE lrelease)
+#
+## 提取翻译字符串生成.ts文件
+#execute_process( 
+#    COMMAND ${LUPDATE_EXECUTABLE} ${cpp_list} -ts ${CMAKE_SOURCE_DIR}/TMA_CN.ts
+#)
+## 编译.ts为.qm
+#execute_process( 
+#    COMMAND ${LRELEASE_EXECUTABLE} ${CMAKE_SOURCE_DIR}/TMA_CN.ts
+#    -qm ${CMAKE_SOURCE_DIR}/TMA_CN.qm
+#)
 # 翻译文件
 
 #---------------------------资源文件--------------------------------
