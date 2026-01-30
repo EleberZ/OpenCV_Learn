@@ -1,88 +1,11 @@
-﻿{
+{
     "version": 3,
     "configurePresets": [
         {
-            "name": "windows-base",
-            "hidden": true,
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "installDir": "${sourceDir}/out/install/${presetName}",
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Windows"
-            }
-        },
-        {
-            "name": "x64-debug",
-            "displayName": "x64 Debug",
-            "inherits": "windows-base",
-            "architecture": {
-                "value": "x64",
-                "strategy": "external"
-            },
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "PLATFORM": "x64"
-            },
-            "vendor": {
-                "microsoft.com/VisualStudioSettings/CMake/1.0": {
-                    "intelliSenseMode": "linux-gcc-x64"
-                }
-            },
-            "generator": "MinGW Makefiles"
-        },
-        {
-            "name": "x64-release",
-            "displayName": "x64 Release",
-            "inherits": "x64-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "PLATFORM": "x64"
-            },
-            "vendor": {
-                "microsoft.com/VisualStudioSettings/CMake/1.0": {
-                    "intelliSenseMode": "linux-gcc-x64"
-                }
-            }
-        },
-        {
-            "name": "x86-debug",
-            "displayName": "x86 Debug",
-            "inherits": "windows-base",
-            "architecture": {
-                "value": "x86",
-                "strategy": "external"
-            },
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "PLATFORM": "x32"
-            },
-            "vendor": {
-                "microsoft.com/VisualStudioSettings/CMake/1.0": {
-                    "intelliSenseMode": "linux-gcc-x86"
-                }
-            },
-            "generator": "MinGW Makefiles"
-        },
-        {
-            "name": "x86-release",
-            "displayName": "x86 Release",
-            "inherits": "x86-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "PLATFORM": "x32"
-            },
-            "vendor": {
-                "microsoft.com/VisualStudioSettings/CMake/1.0": {
-                    "intelliSenseMode": "linux-gcc-x86"
-                }
-            }
-        },
-        {
             "name": "linux-debug",
             "displayName": "Linux Debug",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "installDir": "${sourceDir}/out/install/${presetName}",
+            "description": "面向适用于 Linux 的 Windows 子系统(WSL)或远程 Linux 系统。",
+            "installDir": "${sourceDir}/cmake/install/${presetName}",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug"
             },
@@ -100,8 +23,8 @@
         {
             "name": "macos-debug",
             "displayName": "macOS Debug",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "installDir": "${sourceDir}/out/install/${presetName}",
+            "description": "以远程 macOS 系统为目标。",
+            "installDir": "${sourceDir}/cmake/install/${presetName}",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug"
             },
@@ -114,6 +37,234 @@
                 "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
                     "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
                 }
+            }
+        },
+        {
+            "name": "windows-base",
+            "description": "面向具有 Visual Studio 开发环境的 Windows。",
+            "hidden": true,
+            "installDir": "${sourceDir}/cmake/install/${presetName}",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "PLATFORM": "x64",
+                "CMAKE_BUILD_PARALLEL_LEVEL": "12",
+                "CMAKE_CXX_STANDARD": "11",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+                "CMAKE_CXX_COMPILER": "$env{QT_X64_MinGW_Tool}/bin/g++.exe",
+                "CMAKE_C_COMPILER": "$env{QT_X64_MinGW_Tool}/bin/gcc.exe",
+                "CMAKE_MAKE_PROGRAM": "$env{QT_X64_MinGW_Tool}/bin/mingw32-make.exe",
+                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+                "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/vcpkg",
+                "VCPKG_TARGET_TRIPLET": "vcpkg-triplets",
+                //"OpenCV_DIR": "$env{OPENCV_MingW_INSTALL}${CMAKE_BUILD_TYPE}"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+                    "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
+                }
+            },
+            "generator": "MinGW Makefiles"
+        },
+        {
+            "name": "x64-debug",
+            "displayName": "x64 Debug",
+            "description": "使用 Visual Studio 开发环境定向到 Windows (64 位)。(Debug)",
+            "inherits": "windows-base",
+            "binaryDir": "${sourceDir}/cmake/build/X64-Debug",
+            "architecture": {
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "PLATFORM": "x64",
+                "CMAKE_SIZEOF_VOID_P": "8",
+                "CMAKE_BUILD_PARALLEL_LEVEL": "12",
+                "CMAKE_CXX_STANDARD": "11",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+                "CMAKE_CXX_COMPILER": "$env{QT_X64_MinGW_Tool}/bin/g++.exe",
+                "CMAKE_C_COMPILER": "$env{QT_X64_MinGW_Tool}/bin/gcc.exe",
+                "CMAKE_MAKE_PROGRAM": "$env{QT_X64_MinGW_Tool}/bin/mingw32-make.exe",
+                "CMAKE_CXX_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc -static-libstdc++", // 编码+静态运行时（避免依赖MinGW DLL）
+                "CMAKE_C_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc"
+            },
+            "environment": {
+                "PATH": "$env{QT_X64_MinGW_Tool}/bin;$env{VCPKG_ROOT}/installed/x86-mingw-dynamic/bin;$env{Path}",
+                "INCLUDE": "$env{QT_X64_MinGW_Tool}/include;$env:{INCLUDE}",
+                "LIB": "$env{QT_X64_MinGW_Tool}/lib;$env:{LIB}"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "intelliSenseMode": "linux-gcc-x64"
+                }
+            },
+            "generator": "MinGW Makefiles"
+        },
+        {
+            "name": "x64-release",
+            "displayName": "x64 Release",
+            "description": "使用 Visual Studio 开发环境定向到 Windows (64 位)。(RelWithDebInfo)",
+            "inherits": "x64-debug",
+            "binaryDir": "${sourceDir}/cmake/build/X64-Release",
+            "cacheVariables": {
+                "CMAKE_VERBOSE_MAKEFILE": "ON", // 强制输出详细构建日志
+                "CMAKE_TRY_COMPILE_VERBOSE_FLAG": "ON", // 强制 try_compile 输出详细日志
+                "CMAKE_BUILD_TYPE": "Release",
+                "PLATFORM": "x64",
+                "CMAKE_SIZEOF_VOID_P": "8",
+                "CMAKE_BUILD_PARALLEL_LEVEL": "12",
+                "CMAKE_CXX_STANDARD": "11",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+                "CMAKE_CXX_COMPILER": "$env{QT_X64_MinGW_Tool}/bin/g++.exe",
+                "CMAKE_C_COMPILER": "$env{QT_X64_MinGW_Tool}/bin/gcc.exe",
+                "CMAKE_MAKE_PROGRAM": "$env{QT_X64_MinGW_Tool}/bin/mingw32-make.exe",
+                "CMAKE_CXX_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc -static-libstdc++", // 编码+静态运行时（避免依赖MinGW DLL）
+                "CMAKE_C_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc"
+                // 2. vcpkg 修正（匹配 MinGW x86 架构）
+                //"VCPKG_TARGET_TRIPLET": "x86-mingw-dynamic", // 规范命名：架构-工具链-链接方式（需确保自定义triplet匹配）
+                //"VCPKG_HOST_TRIPLET": "x86-mingw-dynamic", // 可选，确保主机和目标triplet一致
+                //"VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{QT_X86_MinGW_Tool}/share/cmake/mingw.toolchain.cmake" // 可选，关联MinGW工具链
+            },
+            "environment": {
+                "PATH": "$env{QT_X64_MinGW_Tool}/bin;$env{VCPKG_ROOT}/installed/x86-mingw-dynamic/bin;$env{Path}",
+                "INCLUDE": "$env{QT_X64_MinGW_Tool}/include;$env:{INCLUDE}",
+                "LIB": "$env{QT_X64_MinGW_Tool}/lib;$env:{LIB}"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "intelliSenseMode": "linux-gcc-x64"
+                }
+            },
+            "generator": "MinGW Makefiles"
+        },
+        {
+            "name": "x86-debug",
+            "displayName": "x86 Debug",
+            "description": "用 Visual Studio 开发环境定向到 Windows (32 位)。(Debug)",
+            "inherits": "windows-base",
+            "binaryDir": "${sourceDir}/cmake/build/X86-Debug",
+            "architecture": {
+                "value": "x86",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "PLATFORM": "x86",
+                "CMAKE_SIZEOF_VOID_P": "4",
+                "CMAKE_BUILD_PARALLEL_LEVEL": "12",
+                "CMAKE_CXX_STANDARD": "11",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+                "CMAKE_CXX_COMPILER": "$env{QT_X86_MinGW_Tool}/bin/g++.exe",
+                "CMAKE_C_COMPILER": "$env{QT_X86_MinGW_Tool}/bin/gcc.exe",
+                "CMAKE_MAKE_PROGRAM": "$env{QT_X86_MinGW_Tool}/bin/mingw32-make.exe",
+                "CMAKE_CXX_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc -static-libstdc++", // 编码+静态运行时（避免依赖MinGW DLL）
+                "CMAKE_C_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc"
+            },
+            //可选：环境变量隔离（避免MSVC干扰）
+            "environment": {
+                "PATH": "$env{QT_X86_MinGW_Tool}/bin;$env{VCPKG_ROOT}/installed/x86-mingw-dynamic/bin;$env{Path}",
+                "INCLUDE": "$env{QT_X86_MinGW_Tool}/include;$env:{INCLUDE}",
+                "LIB": "$env{QT_X86_MinGW_Tool}/lib;$env:{LIB}"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "intelliSenseMode": "linux-gcc-x86"
+                }
+            },
+            "generator": "MinGW Makefiles"
+        },
+        {
+            "name": "x86-release",
+            "displayName": "x86 Release",
+            "description": "用 Visual Studio 开发环境定向到 Windows (32 位)。(RelWithDebInfo)",
+            "inherits": "x86-debug",
+            "binaryDir": "${sourceDir}/cmake/build/X86-Release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "PLATFORM": "x86",
+                "CMAKE_SIZEOF_VOID_P": "4",
+                "CMAKE_BUILD_PARALLEL_LEVEL": "12",
+                "CMAKE_CXX_STANDARD": "11",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+                "CMAKE_CXX_COMPILER": "$env{QT_X86_MinGW_Tool}/bin/g++.exe",
+                "CMAKE_C_COMPILER": "$env{QT_X86_MinGW_Tool}/bin/gcc.exe",
+                "CMAKE_MAKE_PROGRAM": "$env{QT_X86_MinGW_Tool}/bin/mingw32-make.exe",
+                "CMAKE_CXX_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc -static-libstdc++", // 编码+静态运行时（避免依赖MinGW DLL）
+                "CMAKE_C_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc"
+            },
+            //可选：环境变量隔离（避免MSVC干扰）
+            "environment": {
+                "PATH": "$env{QT_X86_MinGW_Tool}/bin;$env{VCPKG_ROOT}/installed/x86-mingw-dynamic/bin;$env{Path}",
+                "INCLUDE": "$env{QT_X86_MinGW_Tool}/include;$env:{INCLUDE}",
+                "LIB": "$env{QT_X86_MinGW_Tool}/lib;$env:{LIB}"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "intelliSenseMode": "linux-gcc-x86"
+                }
+            },
+            "generator": "MinGW Makefiles"
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "X64-debug-build",
+            "description": "Build the project in Debug mode for x64",
+            "displayName": "x64 Debug Build",
+            "inheritConfigureEnvironment": true,
+            "targets": [ "all" ],
+            "verbose": true,
+            "jobs": 14,
+            "configurePreset": "x64-debug"
+        },
+        {
+            "name": "X64-release-build",
+            "description": "Build the project in Release mode for x64",
+            "displayName": "x64 Release Build",
+            "inheritConfigureEnvironment": true,
+            "targets": [ "all" ],
+            "verbose": true,
+            "jobs": 14,
+            "configurePreset": "x64-release"
+        },
+        {
+            "name": "X86-debug-build",
+            "description": "Build the project in Debug mode for x86",
+            "displayName": "x86 Debug Build",
+            "inheritConfigureEnvironment": true,
+            "targets": [ "all" ],
+            "verbose": true,
+            "jobs": 14,
+            "configurePreset": "x86-debug"
+        },
+        {
+            "name": "X86-release-build",
+            "description": "Build the project in Release mode for x86",
+            "displayName": "x86 Release Build",
+            "inheritConfigureEnvironment": true,
+            "targets": [ "all" ],
+            "verbose": true,
+            "jobs": 14,
+            "configurePreset": "x86-release"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "test1-debug",
+            "displayName": "Test1 Debug",
+            "description": "Run the test1 in Debug mode",
+            "configurePreset": "x64-debug",
+            "output": {
+                "outputLogFile": "../cmake/test_output.log",
+                "verbosity": "verbose",
+                "debug": true,
+                "outputOnFailure": true,
+                "maxFailedTestOutputSize": 1024,
+                "shortProgress": true
             }
         }
     ]

@@ -1,10 +1,12 @@
 ﻿# CMakeList.txt: OpenCV_Learn 的 CMake 项目，在此处包括源代码并定义
 # 项目特定的逻辑。
 #
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.22)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(ProjectName "OpenCV_Learn")
+set(ProjectName "OpenCV_Learn_${PLATFORM}_${CMAKE_BUILD_TYPE}")
+
 
 # 如果支持，请为 MSVC 编译器启用热重载。
 if (POLICY CMP0141)
@@ -14,10 +16,13 @@ endif()
 
 project (${ProjectName} VERSION 1.0.0 LANGUAGES CXX)
 include ("${PROJECT_SOURCE_DIR}/src/gui/gui.cmake")
-if(${PLATFORM} STREQUAL "x64")
+include (FetchContent)
+include (import_dll.cmake)
+
+if(${CMAKE_SIZEOF_VOID_P} EQUAL 8)
     set(mingw_tools $ENV{QT_X64_MinGW_Tool})
     set(qt_lib_path $ENV{QT_LIB_X64_MinGW})
-elseif(${PLATFORM} STREQUAL "x86")
+elseif(${CMAKE_SIZEOF_VOID_P} EQUAL 4)
     set(mingw_tools $ENV{QT_X86_MinGW_Tool})
     set(qt_lib_path $ENV{QT_LIB_X86_MinGW})
 endif()
@@ -33,7 +38,7 @@ set(CMAKE_GENERATOR	"MinGW Makefiles")
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_PREFIX_PATH "${qt_lib_path}")
 
-if(${PLATFORM} STREQUAL "x64")
+if(${CMAKE_SIZEOF_VOID_P} EQUAL 8)
     find_library(SELF_DLL YXEngine
         "${PROJECT_SOURCE_DIR}/bin/YXEngine.dll"
         "${PROJECT_SOURCE_DIR}/bin/LTDMC.dll"
@@ -42,7 +47,7 @@ if(${PLATFORM} STREQUAL "x64")
         "${PROJECT_SOURCE_DIR}/lib/YXEngine.a"
         "${PROJECT_SOURCE_DIR}/lib/LTDMC.a"
     )
-elseif(${PLATFORM} STREQUAL "x86")
+elseif(${CMAKE_SIZEOF_VOID_P} EQUAL 4)
     find_library(SELF_DLL YXEngine
         "${PROJECT_SOURCE_DIR}/bin/YXEngine32.dll"
         "${PROJECT_SOURCE_DIR}/bin/LTDMC32.dll"
@@ -59,9 +64,9 @@ elseif(${CMAKE_BUILD_TYPE} STREQUAL "Release")
 endif()
 # Enable C++11  
 add_definitions(-DHAS_INCLUDE_CHRONO)
-set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/bin")
 set(PROJECT_BINARY_DIR "${PROJECT_SOURCE_DIR}/cmake/build/X64-Debug")
 set(LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/cmake/build/X64-Debug/install")
+set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin") 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_BUILD_PARALLEL_LEVEL 12)		#用多少线来构建makefile
@@ -71,12 +76,17 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt5 COMPONENTS Core Gui Widgets Network SerialPort SerialBus Xml REQUIRED)
-find_package(Qt5 COMPONENTS LinguistTools REQUIRED)
-set(GTest_DIR "$ENV{VCPKG_ROOT}/packages/gtest_vcpkg-triplets/share/gtest")
-find_package(GTest CONFIG REQUIRED)
-set(OpenCV_DIR "$ENV{OpenCV_INSTALL_PATH}")
-find_package(OpenCV COMPONENTS REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Widgets Network SerialPort SerialBus Xml REQUIRED CONFIG)
+find_package(Qt5 COMPONENTS LinguistTools REQUIRED CONFIG)
+find_package(OpenCV REQUIRED CONFIG)
+#set(GTest_DIR "$ENV{VCPKG_ROOT}/packages/gtest_vcpkg-triplets/share/gtest")
+#find_package(GTest CONFIG REQUIRED)
+
+message(STATUS "CMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "CMAKE_CXX_COMPILER_VERSION=${CMAKE_CXX_COMPILER_VERSION}")
+message(STATUS "CMAKE_SIZEOF_VOID_P=${CMAKE_SIZEOF_VOID_P}")
+message(STATUS "OpenCV_DIR=${OpenCV_DIR}")
+#set(OpenCV_DIR $ENV{OPENCV_MingW_INSTALL}${CMAKE_BUILD_TYPE})
 
 set(src "${PROJECT_SOURCE_DIR}/src")
 set(src_cv "${src}/cv")
@@ -118,43 +128,43 @@ endforeach(source_dir_single ${cpp_h_dir})
 # 源文件路径 
 
 #--------------------------翻译文件--------------------------------
-set(exclude_ts
-    ""
-)
-set(ts_dir
-    ${PROJECT_SOURCE_DIR}
-)
-foreach(ts_files ${ts_dir})
-    file(GLOB ts_file "${ts_files}/*.ts")
-    list(APPEND ts_list "${ts_file}")
-endforeach(ts_files ${ts_dir})
-    list(REMOVE_ITEM ts_list ${exclude_ts})
-
-set(exclude_qm
-    ""
-)
-set(qm_dir
-    ${PROJECT_SOURCE_DIR}
-)
-foreach(qm_files ${qm_dir})
-    file(GLOB qm_file "${qm_files}/*.qm")
-    list(APPEND qm_list "${qm_file}")
-endforeach(qm_files ${qm_dir})
-    list(REMOVE_ITEM qm_list ${exclude_qm})
+#set(exclude_ts
+#    ""
+#)
+#set(ts_dir
+#    ${PROJECT_SOURCE_DIR}
+#)
+#foreach(ts_files ${ts_dir})
+#    file(GLOB ts_file "${ts_files}/*.ts")
+#    list(APPEND ts_list "${ts_file}")
+#endforeach(ts_files ${ts_dir})
+#    list(REMOVE_ITEM ts_list ${exclude_ts})
+#
+#set(exclude_qm
+#    ""
+#)
+#set(qm_dir
+#    ${PROJECT_SOURCE_DIR}
+#)
+#foreach(qm_files ${qm_dir})
+#    file(GLOB qm_file "${qm_files}/*.qm")
+#    list(APPEND qm_list "${qm_file}")
+#endforeach(qm_files ${qm_dir})
+#    list(REMOVE_ITEM qm_list ${exclude_qm})
 
 # 查找 lupdate 和 lrelease 工具
-find_program(LUPDATE_EXECUTABLE lupdate)
-find_program(LRELEASE_EXECUTABLE lrelease)
-
-# 提取翻译字符串生成.ts文件
-execute_process( 
-    COMMAND ${LUPDATE_EXECUTABLE} ${cpp_list} -ts ${CMAKE_SOURCE_DIR}/TMA_CN.ts
-)
-# 编译.ts为.qm
-execute_process( 
-    COMMAND ${LRELEASE_EXECUTABLE} ${CMAKE_SOURCE_DIR}/TMA_CN.ts
-    -qm ${CMAKE_SOURCE_DIR}/TMA_CN.qm
-)
+#find_program(LUPDATE_EXECUTABLE lupdate)
+#find_program(LRELEASE_EXECUTABLE lrelease)
+#
+## 提取翻译字符串生成.ts文件
+#execute_process( 
+#    COMMAND ${LUPDATE_EXECUTABLE} ${cpp_list} -ts ${CMAKE_SOURCE_DIR}/TMA_CN.ts
+#)
+## 编译.ts为.qm
+#execute_process( 
+#    COMMAND ${LRELEASE_EXECUTABLE} ${CMAKE_SOURCE_DIR}/TMA_CN.ts
+#    -qm ${CMAKE_SOURCE_DIR}/TMA_CN.qm
+#)
 # 翻译文件
 
 #---------------------------资源文件--------------------------------
@@ -180,7 +190,8 @@ target_include_directories(${ProjectName} PRIVATE
 )
 target_link_directories(${ProjectName} PUBLIC "${PROJECT_SOURCE_DIR}/lib")
 target_link_directories(${ProjectName} PUBLIC "${PROJECT_SOURCE_DIR}/bin")
-target_link_libraries(${ProjectName} PUBLIC 
+target_link_libraries(${ProjectName} PRIVATE
+    #Qt5库
     Qt5::Core 
     Qt5::Gui 
     Qt5::Widgets 
@@ -188,13 +199,14 @@ target_link_libraries(${ProjectName} PUBLIC
     Qt5::SerialPort 
     Qt5::SerialBus 
     Qt5::Xml
+    #OpenCV库
+    OpenCV
+    #OpenCV::Imgproc
 )
-
-target_link_libraries(${ProjectName} PRIVATE ${OpenCV_LIBS})
-target_link_libraries(${ProjectName} PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
+#target_link_libraries(${ProjectName} PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
 # Add libraries to the target  
-if(${PLATFORM} STREQUAL "x64")
-    target_link_libraries(${ProjectName} PUBLIC 
+if(${CMAKE_SIZEOF_VOID_P} EQUAL 8)
+    target_link_libraries(${ProjectName} PRIVATE 
         #${PROJECT_SOURCE_DIR}/lib/DxImageProc.lib
         #${PROJECT_SOURCE_DIR}/lib/GxIAPI.lib
         #${PROJECT_SOURCE_DIR}/lib/LTDMC.lib
@@ -202,8 +214,8 @@ if(${PLATFORM} STREQUAL "x64")
         #${PROJECT_SOURCE_DIR}/lib/libopencv_core411.dll.a
         #${PROJECT_SOURCE_DIR}/lib/libopencv_imgproc411.dll.a
     )
-elseif(${PLATFORM} STREQUAL "x86")
-    target_link_libraries(${ProjectName} PUBLIC 
+elseif(${CMAKE_SIZEOF_VOID_P} EQUAL 4)
+    target_link_libraries(${ProjectName} PRIVATE 
         #{PROJECT_SOURCE_DIR}/lib/DxImageProc.lib
         #${PROJECT_SOURCE_DIR}/lib/GxIAPI.lib
         #${PROJECT_SOURCE_DIR}/lib/LTDMC32.lib
@@ -212,6 +224,15 @@ elseif(${PLATFORM} STREQUAL "x86")
         #${PROJECT_SOURCE_DIR}/lib/libopencv_imgproc411.dll.a
     )
 endif()
+
+###         Debugger         ###
+if(${CMAKE_SIZEOF_VOID_P} EQUAL 4)
+    set(GDB_PATH "$ENV{QT_X86_MinGW_Tool}")
+elseif(${CMAKE_SIZEOF_VOID_P} EQUAL 8)
+    set(GDB_PATH "$ENV{QT_X64_MinGW_Tool}")
+endif()
+    find_program($ENV{Path} gdb)
+#         Debugger         #
 
 add_test(AllTestIn ${ProjectName} ${ProjectName})
 
