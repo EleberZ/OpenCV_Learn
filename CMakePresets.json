@@ -20,6 +20,7 @@
                 }
             }
         },
+
         {
             "name": "macos-debug",
             "displayName": "macOS Debug",
@@ -60,8 +61,7 @@
                 "CMAKE_MAKE_PROGRAM": "$env{QT_X64_MinGW_Tool}/bin/mingw32-make.exe",
                 "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
                 "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/vcpkg",
-                "VCPKG_TARGET_TRIPLET": "vcpkg-triplets",
-                //"OpenCV_DIR": "$env{OPENCV_MingW_INSTALL}${CMAKE_BUILD_TYPE}"
+                "VCPKG_TARGET_TRIPLET": "vcpkg-triplets"
             },
             "vendor": {
                 "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
@@ -70,6 +70,7 @@
             },
             "generator": "MinGW Makefiles"
         },
+
         {
             "name": "x64-debug",
             "displayName": "x64 Debug",
@@ -89,20 +90,20 @@
                 "CMAKE_CXX_COMPILER": "$env{QT_X64_MinGW_Tool}/bin/g++.exe",
                 "CMAKE_C_COMPILER": "$env{QT_X64_MinGW_Tool}/bin/gcc.exe",
                 "CMAKE_MAKE_PROGRAM": "$env{QT_X64_MinGW_Tool}/bin/mingw32-make.exe",
-                "CMAKE_CXX_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc -static-libstdc++", // 编码+静态运行时（避免依赖MinGW DLL）
+                "CMAKE_CXX_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc -static-libstdc++",
                 "CMAKE_C_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc"
             },
             "environment": {
-                "PATH": "$env{QT_X64_MinGW_Tool}/bin;$env{VCPKG_ROOT}/installed/x86-mingw-dynamic/bin;$env{Path}",
-                "INCLUDE": "$env{QT_X64_MinGW_Tool}/include;$env:{INCLUDE}",
-                "LIB": "$env{QT_X64_MinGW_Tool}/lib;$env:{LIB}"
+                "PATH": "$env{QT_X64_MinGW_Tool}/bin;$env{VCPKG_ROOT}/installed/x86-mingw-dynamic/bin;",
+                "INCLUDE": "$env{QT_X64_MinGW_Tool}/include;",
+                "LIB": "$env{QT_X64_MinGW_Tool}/lib;"
             },
             "vendor": {
                 "microsoft.com/VisualStudioSettings/CMake/1.0": {
                     "intelliSenseMode": "linux-gcc-x64"
                 }
             },
-            "generator": "MinGW Makefiles"
+            "generator":"MinGW Makefiles"
         },
         {
             "name": "x64-release",
@@ -111,8 +112,8 @@
             "inherits": "x64-debug",
             "binaryDir": "${sourceDir}/cmake/build/X64-Release",
             "cacheVariables": {
-                "CMAKE_VERBOSE_MAKEFILE": "ON", // 强制输出详细构建日志
-                "CMAKE_TRY_COMPILE_VERBOSE_FLAG": "ON", // 强制 try_compile 输出详细日志
+                "CMAKE_VERBOSE_MAKEFILE": "ON",
+                "CMAKE_TRY_COMPILE_VERBOSE_FLAG": "ON",
                 "CMAKE_BUILD_TYPE": "Release",
                 "PLATFORM": "x64",
                 "CMAKE_SIZEOF_VOID_P": "8",
@@ -122,17 +123,13 @@
                 "CMAKE_CXX_COMPILER": "$env{QT_X64_MinGW_Tool}/bin/g++.exe",
                 "CMAKE_C_COMPILER": "$env{QT_X64_MinGW_Tool}/bin/gcc.exe",
                 "CMAKE_MAKE_PROGRAM": "$env{QT_X64_MinGW_Tool}/bin/mingw32-make.exe",
-                "CMAKE_CXX_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc -static-libstdc++", // 编码+静态运行时（避免依赖MinGW DLL）
+                "CMAKE_CXX_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc -static-libstdc++",
                 "CMAKE_C_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc"
-                // 2. vcpkg 修正（匹配 MinGW x86 架构）
-                //"VCPKG_TARGET_TRIPLET": "x86-mingw-dynamic", // 规范命名：架构-工具链-链接方式（需确保自定义triplet匹配）
-                //"VCPKG_HOST_TRIPLET": "x86-mingw-dynamic", // 可选，确保主机和目标triplet一致
-                //"VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{QT_X86_MinGW_Tool}/share/cmake/mingw.toolchain.cmake" // 可选，关联MinGW工具链
             },
             "environment": {
-                "PATH": "$env{QT_X64_MinGW_Tool}/bin;$env{VCPKG_ROOT}/installed/x86-mingw-dynamic/bin;$env{Path}",
-                "INCLUDE": "$env{QT_X64_MinGW_Tool}/include;$env:{INCLUDE}",
-                "LIB": "$env{QT_X64_MinGW_Tool}/lib;$env:{LIB}"
+                "PATH": "$env{QT_X64_MinGW_Tool}/bin;$env{VCPKG_ROOT}/installed/x86-mingw-dynamic/bin;",
+                "INCLUDE": "$env{QT_X64_MinGW_Tool}/include;",
+                "LIB": "$env{QT_X64_MinGW_Tool}/lib;"
             },
             "vendor": {
                 "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -161,14 +158,13 @@
                 "CMAKE_CXX_COMPILER": "$env{QT_X86_MinGW_Tool}/bin/g++.exe",
                 "CMAKE_C_COMPILER": "$env{QT_X86_MinGW_Tool}/bin/gcc.exe",
                 "CMAKE_MAKE_PROGRAM": "$env{QT_X86_MinGW_Tool}/bin/mingw32-make.exe",
-                "CMAKE_CXX_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc -static-libstdc++", // 编码+静态运行时（避免依赖MinGW DLL）
+                "CMAKE_CXX_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc -static-libstdc++",
                 "CMAKE_C_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc"
             },
-            //可选：环境变量隔离（避免MSVC干扰）
             "environment": {
-                "PATH": "$env{QT_X86_MinGW_Tool}/bin;$env{VCPKG_ROOT}/installed/x86-mingw-dynamic/bin;$env{Path}",
-                "INCLUDE": "$env{QT_X86_MinGW_Tool}/include;$env:{INCLUDE}",
-                "LIB": "$env{QT_X86_MinGW_Tool}/lib;$env:{LIB}"
+                "PATH": "$env{QT_X86_MinGW_Tool}/bin;$env{VCPKG_ROOT}/installed/x86-mingw-dynamic/bin;",
+                "INCLUDE": "$env{QT_X86_MinGW_Tool}/include;",
+                "LIB": "$env{QT_X86_MinGW_Tool}/lib;"
             },
             "vendor": {
                 "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -193,14 +189,13 @@
                 "CMAKE_CXX_COMPILER": "$env{QT_X86_MinGW_Tool}/bin/g++.exe",
                 "CMAKE_C_COMPILER": "$env{QT_X86_MinGW_Tool}/bin/gcc.exe",
                 "CMAKE_MAKE_PROGRAM": "$env{QT_X86_MinGW_Tool}/bin/mingw32-make.exe",
-                "CMAKE_CXX_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc -static-libstdc++", // 编码+静态运行时（避免依赖MinGW DLL）
+                "CMAKE_CXX_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc -static-libstdc++",
                 "CMAKE_C_FLAGS": "-fexec-charset=utf-8 -finput-charset=utf-8 -static-libgcc"
             },
-            //可选：环境变量隔离（避免MSVC干扰）
             "environment": {
-                "PATH": "$env{QT_X86_MinGW_Tool}/bin;$env{VCPKG_ROOT}/installed/x86-mingw-dynamic/bin;$env{Path}",
-                "INCLUDE": "$env{QT_X86_MinGW_Tool}/include;$env:{INCLUDE}",
-                "LIB": "$env{QT_X86_MinGW_Tool}/lib;$env:{LIB}"
+                "PATH": "$env{QT_X86_MinGW_Tool}/bin;$env{VCPKG_ROOT}/installed/x86-mingw-dynamic/bin;",
+                "INCLUDE": "$env{QT_X86_MinGW_Tool}/include;",
+                "LIB": "$env{QT_X86_MinGW_Tool}/lib;"
             },
             "vendor": {
                 "microsoft.com/VisualStudioSettings/CMake/1.0": {
@@ -216,7 +211,9 @@
             "description": "Build the project in Debug mode for x64",
             "displayName": "x64 Debug Build",
             "inheritConfigureEnvironment": true,
-            "targets": [ "all" ],
+            "targets": [
+                "all"
+            ],
             "verbose": true,
             "jobs": 14,
             "configurePreset": "x64-debug"
@@ -226,7 +223,9 @@
             "description": "Build the project in Release mode for x64",
             "displayName": "x64 Release Build",
             "inheritConfigureEnvironment": true,
-            "targets": [ "all" ],
+            "targets": [
+                "all"
+            ],
             "verbose": true,
             "jobs": 14,
             "configurePreset": "x64-release"
@@ -236,7 +235,9 @@
             "description": "Build the project in Debug mode for x86",
             "displayName": "x86 Debug Build",
             "inheritConfigureEnvironment": true,
-            "targets": [ "all" ],
+            "targets": [
+                "all"
+            ],
             "verbose": true,
             "jobs": 14,
             "configurePreset": "x86-debug"
@@ -246,7 +247,9 @@
             "description": "Build the project in Release mode for x86",
             "displayName": "x86 Release Build",
             "inheritConfigureEnvironment": true,
-            "targets": [ "all" ],
+            "targets": [
+                "all"
+            ],
             "verbose": true,
             "jobs": 14,
             "configurePreset": "x86-release"

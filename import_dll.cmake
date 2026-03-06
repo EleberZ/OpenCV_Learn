@@ -24,6 +24,13 @@
             target_link_directories(${target_name} PUBLIC "${lib_dir}")
             target_link_libraries(${target_name} PRIVATE  "${lib_name}")
         endif()
+        
+        get_target_property(target_output_dir ${target_name} RUNTIME_OUTPUT_DIRECTORY)
+        if(NOT target_output_dir)
+            # 未显式设置输出目录时，使用默认路径
+            set(target_output_dir "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}")
+        endif()
+
     endif(WIN32)
     
     #遍历库
@@ -57,7 +64,7 @@ function(import_library target_name lib_name include_dir lib_dir)
         target_link_libraries(${target_name} PRIVATE 
             debug "${lib_name}${dll_suffix}"
             optimized "${lib_name}"
-        )
+        ) 
     else()
         # 非Windows系统直接链接
         target_link_directories(${target_name} PUBLIC "${lib_dir}")
@@ -67,11 +74,7 @@ function(import_library target_name lib_name include_dir lib_dir)
     # 4. 复制DLL到目标输出目录（仅Windows系统）
     if(WIN32)
         # 获取目标的输出目录（自动适配Debug/Release/RelWithDebInfo等）
-        get_target_property(target_output_dir ${target_name} RUNTIME_OUTPUT_DIRECTORY)
-        if(NOT target_output_dir)
-            # 未显式设置输出目录时，使用默认路径
-            set(target_output_dir "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}")
-        endif()
+
 
         # 构造DLL文件名
         set(dll_filename "${lib_name}${dll_suffix}.dll")
@@ -92,17 +95,5 @@ function(import_library target_name lib_name include_dir lib_dir)
     endif()
 endfunction()
 
-# ------------------------------------------------------------------------------
-# 使用示例
-# ------------------------------------------------------------------------------
-# 1. 创建可执行目标
-add_executable(MyApp main.cpp)
 
-# 2. 引入示例库（以OpenCV为例，替换为你的库路径）
-set(OPENCV_INCLUDE "F:/Opencv/qt_mingw_install/Release/include/opencv2")
-set(OPENCV_LIB_DIR "F:/Opencv/qt_mingw_install/Release")
 
-# Debug版本（带d后缀）
-import_library(MyApp OpenCV ${OPENCV_INCLUDE} ${OPENCV_LIB_DIR} d)
-# Release版本（无后缀，省略第5个参数）
-# import_library(MyApp opencv_world480 ${OPENCV_INCLUDE} ${OPENCV_LIB_DIR})
