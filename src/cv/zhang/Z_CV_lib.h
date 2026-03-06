@@ -35,7 +35,13 @@ public:
     @param: func - 指向操作函数的指针，操作函数的参数用于接收输入Mat矩阵，
         该函数将被应用于每个元素
     */
+    template <typename srcT, typename dstT, typename Func>
+    void traverseMat(const cv::Mat& src_mat, cv::Mat& dst_mat, Func&& func);
+    template <typename srcT, typename dstT>
+    void traverseMat(const cv::Mat& mat, void (*func)(srcT, dstT));
+    void traverseMat(const cv::Mat& mat, std::function<void()> func);
 
+    /************************   day1   ************************/
 
     template<typename srcT, typename dstT, typename Func>
     struct has_return_compatible
@@ -60,66 +66,67 @@ public:
             std::is_convertible_v<std::invoke_result<F(const srcT&)>::type, dstT>::type;
 
 #endif    
-    };
+};
 
 
-    template <typename srcT, typename dstT, typename Func>
+template <typename srcT, typename dstT, typename Func>
     inline std::enable_if<has_return_compatible<srcT, dstT, Func>::value, void>
         traverseMat(const cv::Mat& src_mat, cv::Mat& dst_mat, Func&& func)
+{
+    // 检查
+    static_assert();
+    CV_Assert(!src_mat.empty() 
+        && src_mat.type() == cv::DataType<srcT>::type
+        && dst_mat.type() == cv::DataType<dstT>::type);
+
+    dst_mat.create(src_mat.size(), src_mat.type());
+    int cols = src_mat.cols;
+    int rows = src_mat.rows;
+    if (src_mat.isContinuous())
     {
-        // 检查
-        CV_Assert(!src_mat.empty()
-            && src_mat.type() == cv::DataType<srcT>::type
-            && dst_mat.type() == cv::DataType<dstT>::type);
+        cols *= rows;
+        rows = 1;
+    }
 
-        dst_mat.create(src_mat.size(), src_mat.type());
-        int cols = src_mat.cols;
-        int rows = src_mat.rows;
-        if (src_mat.isContinuous())
+    // 遍历每个元素并应用操作函数
+    for (int i = 0; i < rows; i++)
+    {
+        const srcT* src_rowPtr = src_mat.ptr<srcT>(i);
+        dstT* dst_rowPtr = dst_mat.ptr<dstT>(i);
+        for (int j = 0; j < cols; j++)
         {
-            cols *= rows;
-            rows = 1;
-        }
-
-        // 遍历每个元素并应用操作函数
-        for (int i = 0; i < rows; i++)
-        {
-            const srcT* src_rowPtr = src_mat.ptr<srcT>(i);
-            dstT* dst_rowPtr = dst_mat.ptr<dstT>(i);
-            for (int j = 0; j < cols; j++)
-            {
-                std::forward<Func>(func)(src_rowPtr[j], dst_rowPtr[j]);
-            }
+            std::forward<Func>(func)(src_rowPtr[j], dst_rowPtr[j]);
         }
     }
+}
 
     template <typename srcT, typename dstT>
     void traverseMat(const cv::Mat& mat, void (*func)(srcT, dstT))
+{
+    CV_Assert(!src_mat.empty()
+        && src_mat.type() == cv::DataType<srcT>::type
+        && dst_mat.type() == cv::DataType<dstT>::type);
+
+    dst_mat.create(src_mat.size(), src_mat.type());
+    int cols = src_mat.cols;
+    int rows = src_mat.rows;
+    if (src_mat.isContinuous())
     {
-        CV_Assert(!src_mat.empty()
-            && src_mat.type() == cv::DataType<srcT>::type
-            && dst_mat.type() == cv::DataType<dstT>::type);
+        cols *= rows;
+        rows = 1;
+    }
 
-        dst_mat.create(src_mat.size(), src_mat.type());
-        int cols = src_mat.cols;
-        int rows = src_mat.rows;
-        if (src_mat.isContinuous())
+    // 遍历每个元素并应用操作函数
+    for (int i = 0; i < rows; i++)
+    {
+        const srcT* src_rowPtr = src_mat.ptr<srcT>(i);
+        dstT* dst_rowPtr = dst_mat.ptr<dstT>(i);
+        for (int j = 0; j < cols; j++)
         {
-            cols *= rows;
-            rows = 1;
-        }
-
-        // 遍历每个元素并应用操作函数
-        for (int i = 0; i < rows; i++)
-        {
-            const srcT* src_rowPtr = src_mat.ptr<srcT>(i);
-            dstT* dst_rowPtr = dst_mat.ptr<dstT>(i);
-            for (int j = 0; j < cols; j++)
-            {
-                func(src_rowPtr[j], dst_rowPtr[j]);
-            }
+            func(src_rowPtr[j], dst_rowPtr[j]);
         }
     }
+}
 
     
     void image_grayscale(const cv::Mat& src_mat, cv::Mat& dst_mat); //灰度化
