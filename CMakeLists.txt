@@ -32,7 +32,6 @@ find_program(CMAKE_MAKE_PROGRAM "${mingw_tools}/bin/mingw32-make.exe")
 find_program(CMAKE_RC_COMPILER "${mingw_tools}/bin/windres.exe")
 find_program(LUPDATE_EXECUTABLE "${qt_lib_path}/bin/lupdate.exe")
 find_program(LRELEASE_EXECUTABLE "${qt_lib_path}/bin/lrelease.exe")
-message(WARNING ${CMAKE_CXX_COMPILER})
 
 set(CMAKE_GENERATOR	"MinGW Makefiles")
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -76,6 +75,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+set(OpenCV_DIR $ENV{OPENCV_MingW_INSTALL}${CMAKE_BUILD_TYPE})
+
 find_package(Qt5 COMPONENTS Core Gui Widgets Network SerialPort SerialBus Xml REQUIRED CONFIG)
 find_package(Qt5 COMPONENTS LinguistTools REQUIRED CONFIG)
 find_package(OpenCV REQUIRED CONFIG)
@@ -85,16 +86,16 @@ find_package(OpenCV REQUIRED CONFIG)
 message(STATUS "CMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "CMAKE_CXX_COMPILER_VERSION=${CMAKE_CXX_COMPILER_VERSION}")
 message(STATUS "CMAKE_SIZEOF_VOID_P=${CMAKE_SIZEOF_VOID_P}")
-message(STATUS "OpenCV_DIR=${OpenCV_DIR}")
-#set(OpenCV_DIR $ENV{OPENCV_MingW_INSTALL}${CMAKE_BUILD_TYPE})
 
 set(src "${PROJECT_SOURCE_DIR}/src")
 set(src_cv "${src}/cv")
+set(src_cv_zhang "${src_cv}/zhang")
 set(src_gui "${src}/gui")
 
 set(cpp_h_dir
     ${PROJECT_SOURCE_DIR}
     ${src_cv}
+    ${src_cv_zhang}
     ${gui_cpp_h_dir}
     ${src_processflow}
     ${src_task}
@@ -181,9 +182,15 @@ add_executable(${ProjectName}
 )  
 # 将生成.qm作为依赖
 
-set_target_properties(${ProjectName} PROPERTIES WIN32_EXECUTABLE true)
+set_target_properties(${ProjectName} PROPERTIES 
+    WIN32_EXECUTABLE true
+    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${PROJECT_SOURCE_DIR}/bin"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_SOURCE_DIR}/bin"
+)
+
 target_compile_definitions(${ProjectName} PRIVATE QT_DEPRECATED_WARNINGS)  
-target_include_directories(${ProjectName} PRIVATE  
+target_include_directories(${ProjectName} PRIVATE 
     "${cpp_h_dir}"
     "${lib_h_dir}"
     "${OpenCV_INCLUDE_DIRS}"
@@ -200,7 +207,7 @@ target_link_libraries(${ProjectName} PRIVATE
     Qt5::SerialBus 
     Qt5::Xml
     #OpenCV库
-    OpenCV
+    ${OpenCV_LIBS}
     #OpenCV::Imgproc
 )
 #target_link_libraries(${ProjectName} PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)

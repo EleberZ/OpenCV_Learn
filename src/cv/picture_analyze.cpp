@@ -17,13 +17,13 @@ int picture_analyze::CVMat2QImage(Mat bgrmat, QImage &img)
     }
     switch( bgrmat.type() )
     {
-    case CV_8UC1:       //单通道
+    case CV_8UC1:       //锟斤拷通锟斤拷
         img = QImage(bgrmat.data, bgrmat.cols, bgrmat.rows, bgrmat.step, QImage::Format_Grayscale8);
         break;
-    case CV_8UC3:       //三通道BGR->RGB
+    case CV_8UC3:       //锟斤拷通锟斤拷BGR->RGB
         img = QImage(bgrmat.data, bgrmat.cols, bgrmat.rows, bgrmat.step, QImage::Format_BGR888);
         break;
-    case CV_8UC4:       //四通道BGRA->RGBA
+    case CV_8UC4:       //锟斤拷通锟斤拷BGRA->RGBA
         img = QImage(bgrmat.data, bgrmat.cols, bgrmat.rows, bgrmat.step, QImage::Format_RGBA8888);
         break;
     default:

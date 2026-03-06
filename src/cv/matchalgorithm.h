@@ -3,6 +3,7 @@
 #include <QString>
 #include "opencv2/opencv.hpp"
 //#include "YXEngine_global.h"
+#include "opencv2/core.hpp"
 
 class /*YXENGINE_EXPORT*/ MatchAlgorithm
 {
