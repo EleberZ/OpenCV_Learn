@@ -13,6 +13,7 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QSlider>
+#include "Z_CV_lib.h"
 // TODO: 在此处引用程序需要的其他标头。
 
 class OpenCV: public QMainWindow
@@ -35,6 +36,7 @@ private:
 	cv::Mat gray_mat, origin_mat, transparent_mat;
 	picture_analyze *picture;
 	QSlider *transparency;
+	Z_CV_lib* z_cv_lib;
 	
 private slots:
 	void slotBtnOpenClicked();

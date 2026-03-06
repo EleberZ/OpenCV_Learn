@@ -10,7 +10,7 @@ OpenCV::OpenCV()
     setWindowTitle("Zhang Graphics Open");
     resize(800, 600);
     initWidget();
-    
+    z_cv_lib = new Z_CV_lib();
     connect(btn_open, SIGNAL(clicked()), this, SLOT(slotBtnOpenClicked()));
     connect(btn_gray, SIGNAL(clicked()), this, SLOT(slotBtnGrayClicked()));
     connect(btn_reset, SIGNAL(clicked()), this, SLOT(slotBtnColorClicked()));
@@ -57,7 +57,8 @@ void OpenCV::slotBtnGrayClicked()
     }
     if( origin_mat.channels()!=1 )
     {
-        cvtColor(origin_mat, gray_mat, cv::COLOR_BGR2GRAY);
+        //cvtColor(origin_mat, gray_mat, cv::COLOR_BGR2GRAY);
+        z_cv_lib->BGRToGrayScala(origin_mat, gray_mat, COLOR_BGR2BGRA);
     }
     picture->CVMat2QImage(gray_mat, img_gray);
     pix = QPixmap::fromImage(img_gray);

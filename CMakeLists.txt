@@ -2,7 +2,7 @@
 # 项目特定的逻辑。
 #
 cmake_minimum_required (VERSION 3.22)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(ProjectName "OpenCV_Learn")
 set(ProjectName "OpenCV_Learn_${PLATFORM}_${CMAKE_BUILD_TYPE}")
@@ -89,6 +89,7 @@ message(STATUS "CMAKE_SIZEOF_VOID_P=${CMAKE_SIZEOF_VOID_P}")
 
 set(src "${PROJECT_SOURCE_DIR}/src")
 set(src_cv "${src}/cv")
+set(src_cv_matcher "${src_cv}/Matcher")
 set(src_cv_zhang "${src_cv}/zhang")
 set(src_gui "${src}/gui")
 
@@ -96,6 +97,7 @@ set(cpp_h_dir
     ${PROJECT_SOURCE_DIR}
     ${src_cv}
     ${src_cv_zhang}
+    ${src_cv_matcher}
     ${gui_cpp_h_dir}
     ${src_processflow}
     ${src_task}
