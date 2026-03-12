@@ -36,9 +36,6 @@ protected:
     Mat drawMatchResult() const;
     double getBestSore()const;
     Point getBestMatchLoc()const;
-
-    
-
 private:
 
 };

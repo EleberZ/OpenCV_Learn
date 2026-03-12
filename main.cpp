@@ -11,6 +11,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    //a.setStyle("Fusion");
     QTranslator appTrans;
     QSettings set("Zhang", "Language");
     int type = set.value("type").toInt();

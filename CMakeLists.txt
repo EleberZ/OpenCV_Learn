@@ -3,6 +3,7 @@
 #
 cmake_minimum_required (VERSION 3.22)
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(ProjectName "OpenCV_Learn")
 set(ProjectName "OpenCV_Learn_${PLATFORM}_${CMAKE_BUILD_TYPE}")
@@ -35,7 +36,7 @@ find_program(LRELEASE_EXECUTABLE "${qt_lib_path}/bin/lrelease.exe")
 
 set(CMAKE_GENERATOR	"MinGW Makefiles")
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_PREFIX_PATH "${qt_lib_path}")
+list(APPEND CMAKE_PREFIX_PATH "${qt_lib_path}" "$ENV{OPENCV_MingW_INSTALL}/$<CONFIG>")
 
 if(${CMAKE_SIZEOF_VOID_P} EQUAL 8)
     find_library(SELF_DLL YXEngine
@@ -91,18 +92,27 @@ set(src "${PROJECT_SOURCE_DIR}/src")
 set(src_cv "${src}/cv")
 set(src_cv_matcher "${src_cv}/Matcher")
 set(src_cv_zhang "${src_cv}/zhang")
+set(src_cv_calibration "${src_cv}/calibration")
 set(src_gui "${src}/gui")
+set(src_gui_job "${src_gui}/job")
+set(src_gui_main "${src_gui}/main")
+set(src_gui_zhang "${src_gui}/zhang")
 
 set(cpp_h_dir
     ${PROJECT_SOURCE_DIR}
     ${src_cv}
     ${src_cv_zhang}
     ${src_cv_matcher}
+    ${src_cv_calibration}
     ${gui_cpp_h_dir}
     ${src_processflow}
     ${src_task}
     ${src_tma}
     ${src_peripherals}
+    ${src_gui}
+    ${src_gui_job}
+    ${src_gui_main}
+    ${src_gui_zhang}
 )
 
 set(lib_h_dir
@@ -234,6 +244,8 @@ elseif(${CMAKE_SIZEOF_VOID_P} EQUAL 4)
     )
 endif()
 
+#copy_target_dlls(TARGET ${ProjectName})
+
 ###         Debugger         ###
 if(${CMAKE_SIZEOF_VOID_P} EQUAL 4)
     set(GDB_PATH "$ENV{QT_X86_MinGW_Tool}")
@@ -241,7 +253,7 @@ elseif(${CMAKE_SIZEOF_VOID_P} EQUAL 8)
     set(GDB_PATH "$ENV{QT_X64_MinGW_Tool}")
 endif()
     find_program($ENV{Path} gdb)
-#         Debugger         #
+#         Debugger          #
 
 add_test(AllTestIn ${ProjectName} ${ProjectName})
 

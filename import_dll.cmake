@@ -1,99 +1,77 @@
-﻿function(import_lib target_name lib_name)
-    set(dll_suffix "${ARGV4}")
+﻿cmake_minimum_required(VERSION 3.20)
 
-    if(NOT TARGET ${target_name})
-        message(FATAL_ERROR "${target_name} lib is not exist！")
-    endif()
-    if(NOT EXISTS "${include_dir}")
-        message(FATAL_ERROR "${include_dir} header_dir is not exist！")
-    endif()
-    if(NOT EXISTS "${lib_dir}")
-        message(FATAL_ERROR "${lib_dir} header_dir is not exist！")
+# ===================== 通用复制DLL函数 =====================
+# 函数名：copy_target_dlls
+# 参数说明：
+#   TARGET          必选：目标可执行文件/库的名称（如 MyApp）
+#   LIBRARIES       可选：需要复制DLL的库列表（如 OpenCV::Core Qt6::Widgets，默认所有已导入的库）
+#   BIN_DIR         可选：DLL复制的目标路径（默认：目标的输出目录 $<TARGET_FILE_DIR:${TARGET}>）
+function(copy_target_dlls)
+    # 解析函数参数
+    set(options "")
+    set(oneValueArgs TARGET BIN_DIR)
+    set(multiValueArgs LIBRARIES)
+    cmake_parse_arguments(ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    if(NOT DEFINED ARGS_TARGET)
+        message(FATAL_ERROR "copy_target_dlls 函数必须指定 TARGET 参数！")
     endif()
 
-    target_include_directories(${target_name} PUBLIC "${include_dir}")
+    if(NOT WIN32)
+        message(STATUS "非Windows系统，跳过DLL复制逻辑")
+        return()
+    endif()
 
-    if (WIN32)
-        if(MSVC)
-            target_link_directories(${target_name} PUBLIC "${lib_dir}")
-            target_link_libraries(${target_name} PRIVATE 
-                debug "${lib_name}"
-                optimized "${lib_name}"
-            )
-        elseif(MINGW)
-            target_link_directories(${target_name} PUBLIC "${lib_dir}")
-            target_link_libraries(${target_name} PRIVATE  "${lib_name}")
+    # 确定DLL目标路径（默认：目标可执行文件的输出目录）
+    if(DEFINED ARGS_BIN_DIR)
+        set(target_bin_dir "${ARGS_BIN_DIR}/$<CONFIG>")
+    else()
+        set(target_bin_dir "$<TARGET_FILE_DIR:${ARGS_TARGET}>")
+    endif()
+
+    # 确定需要处理的库列表（未指定则取目标链接的所有库）
+    if(DEFINED ARGS_LIBRARIES)
+        set(libraries ${ARGS_LIBRARIES})
+    else()
+        # 获取目标链接的所有库
+        get_target_property(linked_libs ${ARGS_TARGET} LINK_LIBRARIES)
+        if(NOT linked_libs)
+            message(STATUS "目标 ${ARGS_TARGET} 未链接任何库，跳过DLL复制")
+            return()
         endif()
-        
-        get_target_property(target_output_dir ${target_name} RUNTIME_OUTPUT_DIRECTORY)
-        if(NOT target_output_dir)
-            # 未显式设置输出目录时，使用默认路径
-            set(target_output_dir "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}")
-        endif()
+        set(libraries ${linked_libs})
+    endif()
 
-    endif(WIN32)
-    
-    #遍历库
-    foreach(lib IN ${lib_name})
+    # 遍历库列表，提取DLL路径并添加复制命令
+    foreach(lib ${libraries})
+        # 跳过非目标类型的库（如普通字符串、别名）
         if(NOT TARGET ${lib})
-            message(WARNING "库${lib}不是有效目标，跳过dll复制")
             continue()
         endif()
-    endforeach(lib)
 
-endfunction()
-
-
-# ------------------------------------------------------------------------------
-# 通用引入库函数：引入库并自动复制DLL到目标路径
-# 参数说明：
-#   target_name: 要链接库的目标程序名（如可执行文件、动态库）
-#   lib_name: 库的名称（用于查找库文件，如 "opencv_world480"）
-#   include_dir: 库的头文件目录（绝对路径/相对路径）
-#   lib_dir: 库的二进制文件目录（包含.lib/.dll，绝对路径/相对路径）
-#   [可选] dll_suffix: DLL文件名后缀（如 Debug 下的 "d"，默认空）
-# ------------------------------------------------------------------------------
-function(import_library target_name lib_name include_dir lib_dir)
-    # 2. 添加头文件目录（PUBLIC：让依赖该目标的其他目标也能访问）
-    target_include_directories(${target_name} PUBLIC "${include_dir}")
-
-    # 3. 链接库文件（区分Windows/MSVC的Debug/Release）
-    if(MSVC)
-        # 多配置编译（Debug/Release）自动匹配库后缀
-        target_link_directories(${target_name} PUBLIC "${lib_dir}")
-        target_link_libraries(${target_name} PRIVATE 
-            debug "${lib_name}${dll_suffix}"
-            optimized "${lib_name}"
-        ) 
-    else()
-        # 非Windows系统直接链接
-        target_link_directories(${target_name} PUBLIC "${lib_dir}")
-        target_link_libraries(${target_name} PRIVATE "${lib_name}")
-    endif()
-
-    # 4. 复制DLL到目标输出目录（仅Windows系统）
-    if(WIN32)
-        # 获取目标的输出目录（自动适配Debug/Release/RelWithDebInfo等）
-
-
-        # 构造DLL文件名
-        set(dll_filename "${lib_name}${dll_suffix}.dll")
-        set(dll_source "${lib_dir}/${dll_filename}")
-
-        # 验证DLL文件是否存在
-        if(EXISTS "${dll_source}")
-            # 配置复制命令（POST_BUILD：编译后执行）
-            add_custom_command(TARGET ${target_name} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${dll_source}"
-                "${target_output_dir}/"
-                COMMENT "复制DLL: ${dll_filename} -> ${target_output_dir}"
-            )
-        else()
-            message(WARNING "未找到DLL文件：${dll_source}，跳过复制")
+        # 获取库的类型（仅处理 SHARED_LIBRARY/IMPORTED_SHARED_LIBRARY 类型）
+        get_target_property(lib_type ${lib} TYPE)
+        if(NOT "${lib_type}" MATCHES "SHARED_LIBRARY")
+            message(STATUS "库 ${lib} 不是动态库，跳过DLL复制")
+            continue()
         endif()
-    endif()
+
+        # 核心：获取不同配置下的DLL路径（IMPORTED_LOCATION_<CONFIG>）
+        # 生成器表达式自动匹配 Debug/Release
+        set(dll_path "$<TARGET_FILE:${lib}>")
+
+        # 添加构建后复制命令
+        add_custom_command(TARGET ${ARGS_TARGET} POST_BUILD
+            # 复制DLL到目标bin目录（覆盖已存在的旧DLL）
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                ${dll_path}
+                ${target_bin_dir}
+            # 打印日志（方便调试）
+            COMMENT "Copying DLL: ${dll_path} -> ${target_bin_dir}"
+        )
+    endforeach()
+
+    # 提示：创建bin目录（避免路径不存在）
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Debug")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Release")
 endfunction()
-
-
-

@@ -44,9 +44,9 @@ private:
 private:
     template<typename F>
     static auto test(int) ->
-        std::bool_constant<std::is_convertible_v<std::invoke_result_t<F, const srcT&>, dstT>>;
+        typename std::bool_constant<std::is_convertible_v<std::invoke_result_t<F, const srcT&>, dstT>>;
     template<typename F>
-    static auto test(...)->std::false_type {}
+    static auto test(...) -> std::false_type { return false; }
 #endif
 public:
     static constexpr bool value = decltype(test<Func>(0))::value;

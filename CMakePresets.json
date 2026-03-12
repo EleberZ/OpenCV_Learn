@@ -58,7 +58,7 @@
                 "CMAKE_CXX_STANDARD_REQUIRED": "ON",
                 "CMAKE_CXX_COMPILER": "$env{QT_X64_MinGW_Tool}/bin/g++.exe",
                 "CMAKE_C_COMPILER": "$env{QT_X64_MinGW_Tool}/bin/gcc.exe",
-                "CMAKE_MAKE_PROGRAM": "$env{QT_X64_MinGW_Tool}/bin/mingw32-make.exe",
+                "CMAKE_MAKE_PROGRAM": "$env{QT_X64_MinGW_Tool}/bin/mingw32-make.exe"
                 //"CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
                 //"VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/vcpkg",
                 //"VCPKG_TARGET_TRIPLET": "x64-mingw-dynamic"
