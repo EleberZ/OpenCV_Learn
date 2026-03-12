@@ -91,18 +91,25 @@ set(src "${PROJECT_SOURCE_DIR}/src")
 set(src_cv "${src}/cv")
 set(src_cv_matcher "${src_cv}/Matcher")
 set(src_cv_zhang "${src_cv}/zhang")
+set(src_cv_calibration "${src_cv}/calibration")
 set(src_gui "${src}/gui")
+set(src_gui_job "${src_gui}/job")
+set(src_gui_main "${src_gui}/main")
 
 set(cpp_h_dir
     ${PROJECT_SOURCE_DIR}
     ${src_cv}
     ${src_cv_zhang}
     ${src_cv_matcher}
+    ${src_cv_calibration}
     ${gui_cpp_h_dir}
     ${src_processflow}
     ${src_task}
     ${src_tma}
     ${src_peripherals}
+    ${src_gui}
+    ${src_gui_job}
+    ${src_gui_main}
 )
 
 set(lib_h_dir

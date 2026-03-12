@@ -27,6 +27,7 @@ void TemplateMatcher::initTemplateMatcher()
     m_templateW = m_templateGray.cols;
 }
 
+
 Mat TemplateMatcher::drawMatchResult() const
 {
     Mat resultImage = m_srcImage.clone();
