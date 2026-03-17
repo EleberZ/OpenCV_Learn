@@ -24,14 +24,14 @@ OpenCV::OpenCV(QWidget* parent)
     m_Output_dockWdt = initDockWidget("Output>>>>");
     m_Strip_dockWdt = initDockWidget("Strip>>>>");
 
-    addDockWidget(Qt::LeftDockWidgetArea, m_WorkPosition_dockWdt);
-    addDockWidget(Qt::RightDockWidgetArea, m_CameraConfig_dockWdt);
-    addDockWidget(Qt::BottomDockWidgetArea, m_Output_dockWdt);
-    addDockWidget(Qt::BottomDockWidgetArea, m_Strip_dockWdt);
+    //addDockWidget(Qt::LeftDockWidgetArea, m_WorkPosition_dockWdt);
+    //addDockWidget(Qt::RightDockWidgetArea, m_CameraConfig_dockWdt);
+    //addDockWidget(Qt::BottomDockWidgetArea, m_Output_dockWdt);
+    //addDockWidget(Qt::BottomDockWidgetArea, m_Strip_dockWdt);
 
-    tabifyDockWidget(m_WorkPosition_dockWdt, m_WorkPosition_dockWdt);
-    tabifyDockWidget(m_CameraConfig_dockWdt, m_CameraConfig_dockWdt);
-    tabifyDockWidget(m_Output_dockWdt, m_Strip_dockWdt);
+    //tabifyDockWidget(m_WorkPosition_dockWdt, m_WorkPosition_dockWdt);
+    //tabifyDockWidget(m_CameraConfig_dockWdt, m_CameraConfig_dockWdt);
+    //tabifyDockWidget(m_Output_dockWdt, m_Strip_dockWdt);
 
     //QDockWidget* m_leftDockWrapper = new QDockWidget(this);
     //m_leftDockWrapper->setFeatures(QDockWidget::DockWidgetFeature::DockWidgetVerticalTitleBar);
@@ -56,19 +56,19 @@ OpenCV::OpenCV(QWidget* parent)
     //m_DockTab_Bottom->addDockTab("Output>>>>", m_Output_dockWdt);
     //m_DockTab_Bottom->addDockTab("Strip>>>>", m_Strip_dockWdt);
 
-    //initPlaceHoldeDocks(LeftArea);
-    //initPlaceHoldeDocks(RightArea);
-    //initPlaceHoldeDocks(BottomArea);
+    initPlaceHoldeDocks(LeftArea);
+    initPlaceHoldeDocks(RightArea);
+    initPlaceHoldeDocks(BottomArea);
 
-    //setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::West);
-    //setTabPosition(Qt::RightDockWidgetArea, QTabWidget::East);
-    //setTabPosition(Qt::BottomDockWidgetArea, QTabWidget::South);
+    setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::West);
+    setTabPosition(Qt::RightDockWidgetArea, QTabWidget::East);
+    setTabPosition(Qt::BottomDockWidgetArea, QTabWidget::South);
 
     // ========== 3. 示例：为四个区域分别添加单个Dock（验证单个标签） ==========
-    //addDockToArea(m_WorkPosition_dockWdt, LeftArea, "");
-    //addDockToArea(m_CameraConfig_dockWdt, RightArea, "");
-    //addDockToArea(m_Output_dockWdt, BottomArea, "");
-    //addDockToArea(m_Strip_dockWdt, BottomArea, "");
+    addDockToArea(m_WorkPosition_dockWdt, LeftArea, "");
+    addDockToArea(m_CameraConfig_dockWdt, RightArea, "");
+    addDockToArea(m_Output_dockWdt, BottomArea, "");
+    addDockToArea(m_Strip_dockWdt, BottomArea, "");
 
     z_cv_lib = new Z_CV_lib();
     connect(btn_open, SIGNAL(clicked()), this, SLOT(slotBtnOpenClicked()));
@@ -160,11 +160,13 @@ QDockWidget* OpenCV::initPlaceHoldeDocks(DockArea area)
 {
     QDockWidget* dock = new QDockWidget(this);
     //dock->setVisible(false); // 隐藏占位
+    dock->setWidget(new QWidget());
     dock->setMinimumSize(0, 0);
     dock->setMaximumSize(0, 0);
     dock->setEnabled(false);
     dock->setStyleSheet("background-color: transparent; border: none;");
     m_placeHolderDocks[area] = dock;
+    return dock;
 }
 
 QDockWidget* OpenCV::initDockWidget(QString name)
@@ -214,6 +216,33 @@ void OpenCV::addDockToArea(QDockWidget* dock, DockArea area, const QString& cont
 
     dockList.append(dock);
     dock->setAllowedAreas(static_cast<Qt::DockWidgetArea>(area)); 
+
+    QTabBar* tabBar = findChild<QTabBar*>();
+    if (tabBar)
+    {
+        tabBar->setTabEnabled(0, false);
+        tabBar->setStyleSheet(R"(
+            /* 目标Dock的标签（索引0）正常显示 */
+            QTabBar::tab:index(0) {
+                padding: 8px 16px;
+                background: #f0f0f0;
+                border-radius: 4px 4px 0 0;
+            }
+            QTabBar::tab:index(0):selected {
+                background: #ffffff;
+                border: 1px solid #1989fa;
+            }
+            /* 空Dock的标签（索引1）完全隐藏 */
+            QTabBar::tab:index(1) {
+                width: 0px;    /* 宽度为0 */
+                height: 0px;   /* 高度为0 */
+                padding: 0px;  /* 内边距为0 */
+                margin: 0px;   /* 外边距为0 */
+                opacity: 0;    /* 完全透明 */
+            }
+        )");
+        tabBar->setCurrentIndex(1);
+    }
 }
 
 void OpenCV::slotBtnGrayClicked()

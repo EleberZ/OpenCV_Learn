@@ -71,20 +71,19 @@ ZDockTabContainer::~ZDockTabContainer()
 
 void ZDockTabContainer::addDockTab(const QString& text, QDockWidget* widget) 
 {
-    if (!widget || containsDock(dock)
+    if (!widget)
     {
-
+        return;
     }
     int tabindex = m_tabbar->addTab(text);
-        m_stackedWidget->addWidget(widget);
-        widget->setStyleSheet(
+    m_stackedWidget->addWidget(widget);
+    widget->setStyleSheet(
         "QWidget{"
             "background-color:#f0f0f0;"
         "}"
     );
+    m_dockMap[text] = widget;
     m_tabbar->setCurrentIndex(tabindex);
-
-
 }
 
 void ZDockTabContainer::removeDockTab(const QString& text, QWidget* widget)
@@ -93,6 +92,11 @@ void ZDockTabContainer::removeDockTab(const QString& text, QWidget* widget)
     int index = stack_wdt->indexOf(widget);
     m_stackedWidget->removeWidget(widget);
     m_tabbar->removeTab(index);
+}
+
+void ZDockTabContainer::containDock(const QDockWidget& dock)
+{
+    //return m_dockConnections.contains(dock);
 }
 
 bool ZDockTabContainer::eventFilter(QObject* obj, QEvent* event)
