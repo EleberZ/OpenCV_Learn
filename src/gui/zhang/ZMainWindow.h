@@ -9,7 +9,6 @@ class ZMainWindow :public QMainWindow
 public:
     explicit ZMainWindow(QMainWindow* parent =nullptr);
     void addDockWidget(Qt::DockWidgetArea area, QDockWidget *dockwidget);
-
     QTabBar* m_tabbar;
 };
 

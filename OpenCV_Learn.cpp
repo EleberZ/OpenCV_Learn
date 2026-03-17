@@ -24,51 +24,19 @@ OpenCV::OpenCV(QWidget* parent)
     m_Output_dockWdt = initDockWidget("Output>>>>");
     m_Strip_dockWdt = initDockWidget("Strip>>>>");
 
-    addDockWidget(Qt::LeftDockWidgetArea, m_WorkPosition_dockWdt);
-    addDockWidget(Qt::RightDockWidgetArea, m_CameraConfig_dockWdt);
-    addDockWidget(Qt::BottomDockWidgetArea, m_Output_dockWdt);
-    addDockWidget(Qt::BottomDockWidgetArea, m_Strip_dockWdt);
+    initPlaceHoldeDocks(LeftArea);
+    initPlaceHoldeDocks(RightArea);
+    initPlaceHoldeDocks(BottomArea);
 
-    tabifyDockWidget(m_WorkPosition_dockWdt, m_WorkPosition_dockWdt);
-    tabifyDockWidget(m_CameraConfig_dockWdt, m_CameraConfig_dockWdt);
-    tabifyDockWidget(m_Output_dockWdt, m_Strip_dockWdt);
-
-    //QDockWidget* m_leftDockWrapper = new QDockWidget(this);
-    //m_leftDockWrapper->setFeatures(QDockWidget::DockWidgetFeature::DockWidgetVerticalTitleBar);
-    //addDockWidget(Qt::LeftDockWidgetArea, m_leftDockWrapper);
-    //QDockWidget *m_RightDockWrapper = new QDockWidget(this);
-    //m_RightDockWrapper->setFeatures(QDockWidget::DockWidgetFeature::DockWidgetVerticalTitleBar);
-    //addDockWidget(Qt::RightDockWidgetArea, m_RightDockWrapper);
-    //QDockWidget *m_BottomDockWrapper = new QDockWidget(this);
-    //m_BottomDockWrapper->setFeatures(QDockWidget::DockWidgetFeature::DockWidgetVerticalTitleBar);
-    //addDockWidget(Qt::BottomDockWidgetArea, m_BottomDockWrapper);
-
-    //m_leftDockWrapper->setWidget(m_DockTab_Left);
-    //m_leftDockWrapper->setTitleBarWidget(new QWidget(m_leftDockWrapper));
-    //m_leftDockWrapper->setTitleBarWidget(new QWidget(m_leftDockWrapper));
-    //m_RightDockWrapper->setWidget(m_DockTab_Right);
-    //m_RightDockWrapper->setTitleBarWidget(new QWidget(m_leftDockWrapper));
-    //m_BottomDockWrapper->setWidget(m_DockTab_Bottom);
-    //m_BottomDockWrapper->setTitleBarWidget(new QWidget(m_leftDockWrapper));
-
-    //m_DockTab_Left->addDockTab("WorkPositon>>>>", m_WorkPosition_dockWdt);
-    //m_DockTab_Right->addDockTab("CameraSetup>>>>", m_CameraConfig_dockWdt);
-    //m_DockTab_Bottom->addDockTab("Output>>>>", m_Output_dockWdt);
-    //m_DockTab_Bottom->addDockTab("Strip>>>>", m_Strip_dockWdt);
-
-    //initPlaceHoldeDocks(LeftArea);
-    //initPlaceHoldeDocks(RightArea);
-    //initPlaceHoldeDocks(BottomArea);
-
-    //setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::West);
-    //setTabPosition(Qt::RightDockWidgetArea, QTabWidget::East);
-    //setTabPosition(Qt::BottomDockWidgetArea, QTabWidget::South);
+    setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::West);
+    setTabPosition(Qt::RightDockWidgetArea, QTabWidget::East);
+    setTabPosition(Qt::BottomDockWidgetArea, QTabWidget::South);
 
     // ========== 3. 示例：为四个区域分别添加单个Dock（验证单个标签） ==========
-    //addDockToArea(m_WorkPosition_dockWdt, LeftArea, "");
-    //addDockToArea(m_CameraConfig_dockWdt, RightArea, "");
-    //addDockToArea(m_Output_dockWdt, BottomArea, "");
-    //addDockToArea(m_Strip_dockWdt, BottomArea, "");
+    addDockToArea(m_CameraConfig_dockWdt, RightArea, "");
+    addDockToArea(m_WorkPosition_dockWdt, LeftArea, "");
+    addDockToArea(m_Output_dockWdt, BottomArea, "");
+    addDockToArea(m_Strip_dockWdt, BottomArea, "");
 
     z_cv_lib = new Z_CV_lib();
     connect(btn_open, SIGNAL(clicked()), this, SLOT(slotBtnOpenClicked()));
@@ -136,14 +104,14 @@ void OpenCV::initMDIWidget()
     m_subWin_camera1 = new QMdiSubWindow(this);
     m_mdiArea->addSubWindow(m_subWin_camera1);
 
-    QMenu* fileMenu = menuBar()->addMenu("文件");
+    QMenu* fileMenu = menuBar()->addMenu(tr("File"));
     fileMenu->addAction("加载作业", this, SLOT(slot_LoadJob()));
     
-    QMenu* cameraMenu = menuBar()->addMenu("设置");
+    QMenu* cameraMenu = menuBar()->addMenu(tr("Configure"));
     cameraMenu->addAction("相机设置", this, SLOT(slot_CameraConfig()));
     cameraMenu->addAction("网络设置", this, SLOT(slot_NetworkConfig()));
     
-    QMenu* winMenu = menuBar()->addMenu("窗口");
+    QMenu* winMenu = menuBar()->addMenu(tr("WindowView"));
     winMenu->addAction(tr("WorkPosition"), this, SLOT(slot_Win_WorkPosition()));
     winMenu->addAction(tr("CameraSetup"), this, SLOT(slot_Win_CameraConfig()));
     winMenu->addAction(tr("Output"), this, SLOT(slot_Win_Output()));
@@ -160,11 +128,13 @@ QDockWidget* OpenCV::initPlaceHoldeDocks(DockArea area)
 {
     QDockWidget* dock = new QDockWidget(this);
     //dock->setVisible(false); // 隐藏占位
+    dock->setWidget(new QWidget());
     dock->setMinimumSize(0, 0);
     dock->setMaximumSize(0, 0);
     dock->setEnabled(false);
     dock->setStyleSheet("background-color: transparent; border: none;");
     m_placeHolderDocks[area] = dock;
+    return dock;
 }
 
 QDockWidget* OpenCV::initDockWidget(QString name)
@@ -193,6 +163,7 @@ QDockWidget* OpenCV::initDockWidget(QString name)
 
 void OpenCV::addDockToArea(QDockWidget* dock, DockArea area, const QString& contentText)
 {
+    QTabBar* tabBar;
     QWidget* contentWidget = new QWidget();
     QVBoxLayout* layout = new QVBoxLayout(contentWidget);
     layout->addWidget(new QLabel(contentText));
@@ -214,6 +185,27 @@ void OpenCV::addDockToArea(QDockWidget* dock, DockArea area, const QString& cont
 
     dockList.append(dock);
     dock->setAllowedAreas(static_cast<Qt::DockWidgetArea>(area)); 
+
+
+    QList<QTabBar*> list_tabBar = findChildren<QTabBar*>();
+    for (QTabBar* tabBar : list_tabBar)
+    {
+        if (tabBar)
+        {
+            tabBar->setTabEnabled(0, false);
+            tabBar->setStyleSheet(R"(
+                /* 空Dock的标签完全隐藏 */
+                QTabBar::tab:disabled {
+                    width: 0px;    /* 宽度为0 */
+                    height: 0px;   /* 高度为0 */
+                    padding: 0px;  /* 内边距为0 */
+                    margin: 0px;   /* 外边距为0 */
+                    opacity: 0;    /* 完全透明 */
+                }
+            )");
+            tabBar->setCurrentIndex(1);
+        }
+    }
 }
 
 void OpenCV::slotBtnGrayClicked()

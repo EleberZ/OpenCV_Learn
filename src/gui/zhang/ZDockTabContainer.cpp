@@ -1,4 +1,4 @@
-#include "ZDockTabContainer.h"
+ï»¿#include "ZDockTabContainer.h"
 #include <QVBoxLayout>
 #include <QMimeData>
 #include <QDragEnterEvent>
@@ -7,7 +7,7 @@
 ZDockTabContainer::ZDockTabContainer(int layout, QWidget* parent)
     :QWidget(parent), m_tabbar(nullptr), m_stackedWidget(nullptr)
 {
-    setAcceptDrops(true);    //dockÍÏ×§½ÓÊÕ
+    setAcceptDrops(true);    //dockæ‹–æ‹½æŽ¥æ”¶
 
     m_tabbar = new QTabBar(this);
     m_tabbar->setExpanding(false);
@@ -71,20 +71,19 @@ ZDockTabContainer::~ZDockTabContainer()
 
 void ZDockTabContainer::addDockTab(const QString& text, QDockWidget* widget) 
 {
-    if (!widget || containsDock(dock)
+    if (!widget)
     {
-
+        return;
     }
     int tabindex = m_tabbar->addTab(text);
-        m_stackedWidget->addWidget(widget);
-        widget->setStyleSheet(
+    m_stackedWidget->addWidget(widget);
+    widget->setStyleSheet(
         "QWidget{"
             "background-color:#f0f0f0;"
         "}"
     );
+    m_dockMap[text] = widget;
     m_tabbar->setCurrentIndex(tabindex);
-
-
 }
 
 void ZDockTabContainer::removeDockTab(const QString& text, QWidget* widget)
@@ -93,6 +92,11 @@ void ZDockTabContainer::removeDockTab(const QString& text, QWidget* widget)
     int index = stack_wdt->indexOf(widget);
     m_stackedWidget->removeWidget(widget);
     m_tabbar->removeTab(index);
+}
+
+void ZDockTabContainer::containDock(const QDockWidget& dock)
+{
+    //return m_dockConnections.contains(dock);
 }
 
 bool ZDockTabContainer::eventFilter(QObject* obj, QEvent* event)
@@ -138,7 +142,7 @@ void ZDockTabContainer::dragEnterEvent(QDragEnterEvent* event)
     if (mimeData->hasFormat("application/x-dockwidget"))
     {
         //QDockWidget *dock = qobject_cast<QDockWidget*>();
-        //ÔÊÐí·ÅÏÂ
+        //å…è®¸æ”¾ä¸‹
         event->acceptProposedAction();
         update();
     }

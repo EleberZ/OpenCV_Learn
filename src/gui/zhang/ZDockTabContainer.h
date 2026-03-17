@@ -3,6 +3,7 @@
 
 #include <QDockWidget>
 #include <QTabBar>
+#include <QMap>
 #include <QStackedWidget>
 
 class ZDockTabContainer:public QWidget
@@ -11,8 +12,9 @@ class ZDockTabContainer:public QWidget
 public:
 	explicit ZDockTabContainer(int layout, QWidget *parent= nullptr);
 	~ZDockTabContainer();
-	void addDockTab(const QString &text, QDockWidget * widget);
+	void addDockTab(const QString &text, QDockWidget * dock);
 	void removeDockTab(const QString &text, QWidget *widget);
+	void containDock(const QDockWidget& dock);
 
 protected:
 	bool eventFilter(QObject* obj, QEvent* event) override;
@@ -35,7 +37,10 @@ private:
 	QString m_containerName;
 	QDockWidget* m_draggingDock = nullptr;
 	bool m_isDragOver = false; 
-	QMap<QDockWidget*, QMetaObject::Connection> m_dockConnections; 
+	//QMap<QDockWidget*, QMetaObject::Connection> m_dockConnections; 
+
+	QMap<int, QDockWidget*> m_index_dockMap;
+	QMap<QString, QDockWidget*> m_dockMap;
 };
 
 
