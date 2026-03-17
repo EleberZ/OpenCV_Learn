@@ -11,6 +11,8 @@ ZDockTabContainer::ZDockTabContainer(int layout, QWidget* parent)
 
     m_tabbar = new QTabBar(this);
     m_tabbar->setExpanding(false);
+    m_tabbar->setMovable(true);
+    m_tabbar->installEventFilter(this);
     m_tabbar->setStyleSheet(
         "QTabBar::tab{"
             "background-color:#f0f0f0;"
@@ -54,7 +56,6 @@ ZDockTabContainer::ZDockTabContainer(int layout, QWidget* parent)
         tab_vlyt->setSpacing(0);
         tab_vlyt->addWidget(m_stackedWidget,0,0,8,1);
         tab_vlyt->addWidget(m_tabbar,0,1,1,1);
-
     }
     break;
     default:
@@ -68,16 +69,22 @@ ZDockTabContainer::~ZDockTabContainer()
 {
 }
 
-void ZDockTabContainer::addDockTab(const QString& text, QWidget* widget)
+void ZDockTabContainer::addDockTab(const QString& text, QDockWidget* widget) 
 {
+    if (!widget || containsDock(dock)
+    {
+
+    }
     int tabindex = m_tabbar->addTab(text);
-    m_stackedWidget->addWidget(widget);
-    widget->setStyleSheet(
+        m_stackedWidget->addWidget(widget);
+        widget->setStyleSheet(
         "QWidget{"
             "background-color:#f0f0f0;"
         "}"
     );
     m_tabbar->setCurrentIndex(tabindex);
+
+
 }
 
 void ZDockTabContainer::removeDockTab(const QString& text, QWidget* widget)
@@ -130,8 +137,10 @@ void ZDockTabContainer::dragEnterEvent(QDragEnterEvent* event)
     const QMimeData* mimeData = event->mimeData();
     if (mimeData->hasFormat("application/x-dockwidget"))
     {
+        //QDockWidget *dock = qobject_cast<QDockWidget*>();
         //ÔÊÐí·ÅÏÂ
         event->acceptProposedAction();
+        update();
     }
     else
     {

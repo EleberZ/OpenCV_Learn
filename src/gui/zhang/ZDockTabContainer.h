@@ -11,7 +11,7 @@ class ZDockTabContainer:public QWidget
 public:
 	explicit ZDockTabContainer(int layout, QWidget *parent= nullptr);
 	~ZDockTabContainer();
-	void addDockTab(const QString &text, QWidget *widget);
+	void addDockTab(const QString &text, QDockWidget * widget);
 	void removeDockTab(const QString &text, QWidget *widget);
 
 protected:
