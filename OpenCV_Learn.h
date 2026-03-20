@@ -1,4 +1,4 @@
-﻿// OpenCV_Learn.h: 标准系统包含文件的包含文件
+// OpenCV_Learn.h: 标准系统包含文件的包含文件
 // 或项目特定的包含文件。
 #pragma once
 
@@ -42,8 +42,7 @@ public:
 	QDockWidget* initDockWidget(QString name);
 	void addDockToArea(QDockWidget* dock, DockArea area, const QString& contentText);
 
-
-
+    QSize WidgetShowAndHide(QWidget* widget, QSize size);
 private:
 	QGridLayout* glyt;
 	QGraphicsView* grv;

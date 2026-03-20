@@ -1,4 +1,4 @@
-﻿#include "OpenCV_Learn.h"
+#include "OpenCV_Learn.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <opencv2/core.hpp>
@@ -7,9 +7,11 @@
 #include <QMenuBar>
 #include <QListWidget>
 #include <QApplication>
+#include <QInputDialog>
+#include <QToolButton>
+#include <QSpacerItem>
 
-
-OpenCV::OpenCV(QWidget* parent)
+OpenCV::OpenCV(QWidget *parent)
     : QMainWindow(parent)
 {
     setWindowTitle("Zhang Graphics Open");
@@ -104,16 +106,16 @@ void OpenCV::initMDIWidget()
     m_subWin_camera1 = new QMdiSubWindow(this);
     m_mdiArea->addSubWindow(m_subWin_camera1);
 
-    QMenu* cameraMenu = menuBar()->addMenu(tr("Configure"));
+    QMenu *cameraMenu = menuBar()->addMenu(tr("Configure"));
     cameraMenu->addAction("相机设置", this, SLOT(slot_CameraConfig()));
     cameraMenu->addAction("网络设置", this, SLOT(slot_NetworkConfig()));
 
-    QMenu* fileMenu = menuBar()->addMenu(tr("File"));
+    QMenu *fileMenu = menuBar()->addMenu(tr("File"));
     fileMenu->addAction("新建作业", this, SLOT(slot_NewJob()));
     fileMenu->addAction("加载作业", this, SLOT(slot_LoadJob()));
-    
-    
-    QMenu* winMenu = menuBar()->addMenu(tr("WindowView"));
+
+
+    QMenu *winMenu = menuBar()->addMenu(tr("WindowView"));
     winMenu->addAction(tr("WorkPosition"), this, SLOT(slot_Win_WorkPosition()));
     winMenu->addAction(tr("CameraSetup"), this, SLOT(slot_Win_CameraConfig()));
     winMenu->addAction(tr("Output"), this, SLOT(slot_Win_Output()));
@@ -121,14 +123,14 @@ void OpenCV::initMDIWidget()
 
 void OpenCV::initDockTabContainer()
 {
-    m_DockTab_Bottom = new ZDockTabContainer(0,this);
-    m_DockTab_Left = new ZDockTabContainer(1,this);
-    m_DockTab_Right = new ZDockTabContainer(2,this);
+    m_DockTab_Bottom = new ZDockTabContainer(0, this);
+    m_DockTab_Left = new ZDockTabContainer(1, this);
+    m_DockTab_Right = new ZDockTabContainer(2, this);
 }
 
-QDockWidget* OpenCV::initPlaceHoldeDocks(DockArea area)
+QDockWidget *OpenCV::initPlaceHoldeDocks(DockArea area)
 {
-    QDockWidget* dock = new QDockWidget(this);
+    QDockWidget *dock = new QDockWidget(this);
     //dock->setVisible(false); // 隐藏占位
     dock->setWidget(new QWidget());
     dock->setMinimumSize(0, 0);
@@ -139,12 +141,38 @@ QDockWidget* OpenCV::initPlaceHoldeDocks(DockArea area)
     return dock;
 }
 
-QDockWidget* OpenCV::initDockWidget(QString name)
+QDockWidget *OpenCV::initDockWidget(QString name)
 {
-    QDockWidget * WorkPosition_dockWdt = new QDockWidget(name, this);
+    QDockWidget *WorkPosition_dockWdt = new QDockWidget(name, this);
+
+    QWidget *titleBar = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(titleBar);
+    layout->setContentsMargins(5, 0, 5, 0); // 紧凑一点
+    layout->setSpacing(5);
+    QLabel *titleLabel = new QLabel(name, this);
+    titleLabel->setStyleSheet("font-weight: bold;");
+
+    QToolButton *m_toggleBtn = new QToolButton(this);
+    m_toggleBtn->setArrowType(Qt::DownArrow);
+    m_toggleBtn->setFixedSize(16, 16);
+    m_toggleBtn->setStyleSheet("QToolButton { border: none; } QToolButton:hover { background-color: #ccc; }");
+
+    QSpacerItem *spacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    layout->addWidget(titleLabel);
+    layout->addItem(spacer);
+    layout->addWidget(m_toggleBtn);
+
+    titleBar->setLayout(layout);
+    WorkPosition_dockWdt->setTitleBarWidget(titleBar);
+    connect(m_toggleBtn, &QToolButton::clicked, this, [WorkPosition_dockWdt]()
+        {
+
+        }
+    );
+
     //addDockWidget(Qt::RightDockWidgetArea, m_WorkPosition_dockWdt);
-    WorkPosition_dockWdt->setFeatures(QDockWidget::DockWidgetClosable 
-        |QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable );
+    WorkPosition_dockWdt->setFeatures(QDockWidget::DockWidgetClosable
+        | QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
     WorkPosition_dockWdt->setFixedWidth(200);
     WorkPosition_dockWdt->setAcceptDrops(true);
     WorkPosition_dockWdt->setStyleSheet(R"(
@@ -163,34 +191,34 @@ QDockWidget* OpenCV::initDockWidget(QString name)
     return WorkPosition_dockWdt;
 }
 
-void OpenCV::addDockToArea(QDockWidget* dock, DockArea area, const QString& contentText)
+void OpenCV::addDockToArea(QDockWidget *dock, DockArea area, const QString &contentText)
 {
-    QTabBar* tabBar;
-    QWidget* contentWidget = new QWidget();
-    QVBoxLayout* layout = new QVBoxLayout(contentWidget);
+    QTabBar *tabBar;
+    QWidget *contentWidget =  new QWidget();
+    QVBoxLayout *layout = new QVBoxLayout(contentWidget);
     layout->addWidget(new QLabel(contentText));
     dock->setWidget(contentWidget);
 
-    QDockWidget* placeHolder = m_placeHolderDocks[area];
-    QList<QDockWidget*>& dockList = m_areaDockLists[area];
+    QDockWidget *placeHolder = m_placeHolderDocks[area];
+    QList<QDockWidget *> &dockList = m_areaDockLists[area];
 
-    if (dockList.isEmpty()) 
+    if (dockList.isEmpty())
     {
         this->addDockWidget(static_cast<Qt::DockWidgetArea>(area), placeHolder);
         this->tabifyDockWidget(placeHolder, dock);
-        dock->raise();
+        //dock->raise();
     }
-    else 
+    else
     {
         this->tabifyDockWidget(dockList.first(), dock);
     }
 
     dockList.append(dock);
-    dock->setAllowedAreas(static_cast<Qt::DockWidgetArea>(area)); 
+    dock->setAllowedAreas(static_cast<Qt::DockWidgetArea>(area));
 
 
-    QList<QTabBar*> list_tabBar = findChildren<QTabBar*>();
-    for (QTabBar* tabBar : list_tabBar)
+    QList<QTabBar *> list_tabBar = findChildren<QTabBar *>();
+    for (QTabBar *tabBar : list_tabBar)
     {
         if (tabBar)
         {
@@ -210,14 +238,30 @@ void OpenCV::addDockToArea(QDockWidget* dock, DockArea area, const QString& cont
     }
 }
 
+QSize OpenCV::WidgetShowAndHide(QWidget *widget, QSize size)
+{
+    QSize temp;
+    temp = widget->size();
+    if (temp.height()==0
+        &&temp.width()==0)
+    {
+        widget->setFixedSize(size);
+    }
+    else
+    {
+        widget->setFixedSize(0,0);
+    }
+    return temp;
+}
+
 void OpenCV::slotBtnGrayClicked()
 {
-    if( path.isEmpty() )
+    if (path.isEmpty())
     {
         QMessageBox::warning(this, "Warning", "Please Open Image First!");
         return;
     }
-    if( origin_mat.channels()!=1 )
+    if (origin_mat.channels() != 1)
     {
         cvtColor(origin_mat, gray_mat, cv::COLOR_BGR2GRAY);
         //z_cv_lib->BGRToGrayScala(origin_mat, gray_mat, COLOR_BGR2BGRA);
@@ -229,7 +273,7 @@ void OpenCV::slotBtnGrayClicked()
 
 void OpenCV::slotBtnColorClicked()
 {
-    if( path.isEmpty() )
+    if (path.isEmpty())
     {
         QMessageBox::warning(this, "Warning", "Please Open Image First!");
         return;
@@ -241,18 +285,18 @@ void OpenCV::slotBtnColorClicked()
 
 void OpenCV::slotSliderValueChanged(int value)
 {
-    if( path.isEmpty() )
+    if (path.isEmpty())
     {
         QMessageBox::warning(this, "Warning", "Please Open Image First!");
         return;
     }
-    if( origin_mat.channels()!=4 )
+    if (origin_mat.channels() != 4)
     {
         cvtColor(origin_mat, transparent_mat, COLOR_BGR2RGBA);
     }
     std::vector<cv::Mat> channels;
     cv::split(transparent_mat, channels);
-    channels[3] = channels[3]*value/100;
+    channels[3] = channels[3] * value / 100;
     cv::merge(channels, transparent_mat);
     //cv::addWeighted
     picture->CVMat2QImage(transparent_mat, img_color);
@@ -282,9 +326,23 @@ void OpenCV::slot_NetworkConfig()
 
 void OpenCV::slot_NewJob()
 {
+    bool input_ok;
     QString job_path = QApplication::applicationDirPath() + "/job/";
-    QProcessDialog dlg(this);
-    QFile file( )
+    QString job_file = QInputDialog::getText(this, "New Job", "Job Name", QLineEdit::Normal, "", &input_ok);
+    if (!input_ok)
+    {
+        return;
+    }
+    if (job_file.isEmpty())
+    {
+        QMessageBox::warning(this, "Warning", tr("Job File Name Can't be Empty!"));
+    }
+    else
+    {
+        QString job_file_path = job_path + job_file + ".job";
+        QFile file(job_file_path);
+
+    }
 }
 void OpenCV::slot_LoadJob()
 {
@@ -318,7 +376,7 @@ void OpenCV::slotBtnOpenClicked()
     select_path = dlg.getOpenFileName(this, "Open Image", "",
         "Image Files(*.png *.jpg *.bmp)");
 
-    if( !select_path.isEmpty() )
+    if (!select_path.isEmpty())
     {
         path = select_path;
         ledit->setText(path);
