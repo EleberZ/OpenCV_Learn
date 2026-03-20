@@ -92,6 +92,7 @@ private slots:
 	void slot_cascadeSubWindow();
 	void slot_CameraConfig();
 	void slot_NetworkConfig();
+	void slot_NewJob();
 	void slot_LoadJob();
 	void slot_Win_WorkPosition();
 	void slot_Win_Output();

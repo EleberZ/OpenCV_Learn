@@ -104,14 +104,12 @@ void OpenCV::initMDIWidget()
     m_subWin_camera1 = new QMdiSubWindow(this);
     m_mdiArea->addSubWindow(m_subWin_camera1);
 
+    QMenu* fileMenu = menuBar()->addMenu(tr("File"));
+    fileMenu->addAction("加载作业", this, SLOT(slot_LoadJob()));
+    
     QMenu* cameraMenu = menuBar()->addMenu(tr("Configure"));
     cameraMenu->addAction("相机设置", this, SLOT(slot_CameraConfig()));
     cameraMenu->addAction("网络设置", this, SLOT(slot_NetworkConfig()));
-
-    QMenu* fileMenu = menuBar()->addMenu(tr("File"));
-    fileMenu->addAction("新建作业", this, SLOT(slot_NewJob()));
-    fileMenu->addAction("加载作业", this, SLOT(slot_LoadJob()));
-    
     
     QMenu* winMenu = menuBar()->addMenu(tr("WindowView"));
     winMenu->addAction(tr("WorkPosition"), this, SLOT(slot_Win_WorkPosition()));
@@ -280,12 +278,6 @@ void OpenCV::slot_NetworkConfig()
 {
 }
 
-void OpenCV::slot_NewJob()
-{
-    QString job_path = QApplication::applicationDirPath() + "/job/";
-    QProcessDialog dlg(this);
-    QFile file( )
-}
 void OpenCV::slot_LoadJob()
 {
     QString job_path = QApplication::applicationDirPath() + "/job/";
