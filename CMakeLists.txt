@@ -1,4 +1,4 @@
-﻿# CMakeList.txt: OpenCV_Learn 的 CMake 项目，在此处包括源代码并定义
+# CMakeList.txt: OpenCV_Learn 的 CMake 项目，在此处包括源代码并定义
 # 项目特定的逻辑。
 #
 cmake_minimum_required (VERSION 3.22)
@@ -36,7 +36,7 @@ find_program(LRELEASE_EXECUTABLE "${qt_lib_path}/bin/lrelease.exe")
 
 set(CMAKE_GENERATOR	"MinGW Makefiles")
 set(CMAKE_CXX_EXTENSIONS OFF)
-list(APPEND CMAKE_PREFIX_PATH "${qt_lib_path}" "$ENV{OPENCV_MingW_INSTALL}/$<CONFIG>")
+list(APPEND CMAKE_PREFIX_PATH "${qt_lib_path}/lib/cmake/Qt5" "$ENV{OPENCV_MingW_INSTALL}/${CMAKE_BUILD_TYPE}")
 
 if(${CMAKE_SIZEOF_VOID_P} EQUAL 8)
     find_library(SELF_DLL YXEngine
@@ -76,7 +76,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-set(OpenCV_DIR $ENV{OPENCV_MingW_INSTALL}${CMAKE_BUILD_TYPE})
+#set(Qt5_DIR ${qt_lib_path}/lib/cmake/Qt5)
+#set(OpenCV_DIR $ENV{OPENCV_MingW_INSTALL}${CMAKE_BUILD_TYPE})
 
 find_package(Qt5 COMPONENTS Core Gui Widgets Network SerialPort SerialBus Xml REQUIRED CONFIG)
 find_package(Qt5 COMPONENTS LinguistTools REQUIRED CONFIG)
@@ -87,6 +88,7 @@ find_package(OpenCV REQUIRED CONFIG)
 message(STATUS "CMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "CMAKE_CXX_COMPILER_VERSION=${CMAKE_CXX_COMPILER_VERSION}")
 message(STATUS "CMAKE_SIZEOF_VOID_P=${CMAKE_SIZEOF_VOID_P}")
+message(STATUS "OpenCV_DIR=$ENV{OPENCV_MingW_INSTALL}/$<CONFIG>")
 
 set(src "${PROJECT_SOURCE_DIR}/src")
 set(src_cv "${src}/cv")
@@ -244,7 +246,7 @@ elseif(${CMAKE_SIZEOF_VOID_P} EQUAL 4)
     )
 endif()
 
-#copy_target_dlls(TARGET ${ProjectName})
+copy_target_dlls(TARGET ${ProjectName})
 
 ###         Debugger         ###
 if(${CMAKE_SIZEOF_VOID_P} EQUAL 4)

@@ -3,7 +3,7 @@
 
 #include <opencv2/core.hpp>
 #include <QImage>
- 
+
 using namespace cv;
 
 /*
@@ -76,16 +76,16 @@ cv::Mat QImageToMat(const QImage& image) {
 class picture_analyze
 {
 public:
-	picture_analyze();
-	~picture_analyze();
-	int CVMat2QImage(Mat mat, QImage& pixmap);
-	int QImage2CVMat(QImage pixmap, Mat& mat);
+    picture_analyze();
+    ~picture_analyze();
+    int CVMat2QImage(Mat mat, QImage &pixmap);
+    int QImage2CVMat(QImage pixmap, Mat &mat);
 
 
 
 
 private:
-	Mat rgbmat;
+    Mat rgbmat;
 };
 
 #endif // !PICTURE_ANALYZE_H
