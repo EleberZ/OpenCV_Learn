@@ -10,6 +10,7 @@
 #include <QInputDialog>
 #include <QToolButton>
 #include <QSpacerItem>
+#include <QFile>
 
 OpenCV::OpenCV(QWidget *parent)
     : QMainWindow(parent)
@@ -40,6 +41,7 @@ OpenCV::OpenCV(QWidget *parent)
     addDockToArea(m_Output_dockWdt, BottomArea, "");
     addDockToArea(m_Strip_dockWdt, BottomArea, "");
 
+    initTabBar();
     z_cv_lib = new Z_CV_lib();
     connect(btn_open, SIGNAL(clicked()), this, SLOT(slotBtnOpenClicked()));
     connect(btn_gray, SIGNAL(clicked()), this, SLOT(slotBtnGrayClicked()));
@@ -106,6 +108,7 @@ void OpenCV::initMDIWidget()
     m_subWin_camera1 = new QMdiSubWindow(this);
     m_mdiArea->addSubWindow(m_subWin_camera1);
 
+
     QMenu *cameraMenu = menuBar()->addMenu(tr("Configure"));
     cameraMenu->addAction("相机设置", this, SLOT(slot_CameraConfig()));
     cameraMenu->addAction("网络设置", this, SLOT(slot_NetworkConfig()));
@@ -119,6 +122,12 @@ void OpenCV::initMDIWidget()
     winMenu->addAction(tr("WorkPosition"), this, SLOT(slot_Win_WorkPosition()));
     winMenu->addAction(tr("CameraSetup"), this, SLOT(slot_Win_CameraConfig()));
     winMenu->addAction(tr("Output"), this, SLOT(slot_Win_Output()));
+
+    QMenuBar *menubar = new QMenuBar(this);
+    menubar->addMenu(cameraMenu);
+    menubar->addMenu(fileMenu);
+    menubar->addMenu(winMenu);
+    setMenuBar(menubar);
 }
 
 void OpenCV::initDockTabContainer()
@@ -126,6 +135,33 @@ void OpenCV::initDockTabContainer()
     m_DockTab_Bottom = new ZDockTabContainer(0, this);
     m_DockTab_Left = new ZDockTabContainer(1, this);
     m_DockTab_Right = new ZDockTabContainer(2, this);
+}
+
+void OpenCV::initTabBar()
+{
+    QList<QTabBar *> list_tabBar = findChildren<QTabBar *>();
+    for (QTabBar *tabBar : list_tabBar)
+    {
+        if (tabBar)
+        {
+            tabBar->setTabEnabled(0, false);
+            tabBar->setStyleSheet(R"(
+                /* 空Dock的标签完全隐藏 */
+                QTabBar::tab:disabled {
+                    width: 0px;    /* 宽度为0 */
+                    height: 0px;   /* 高度为0 */
+                    padding: 0px;  /* 内边距为0 */
+                    margin: 0px;   /* 外边距为0 */
+                    opacity: 0;    /* 完全透明 */
+                }
+            )");
+            tabBar->setCurrentIndex(1);
+        }
+        //connect(tabBar, &QTabBar::tabBarClicked, this, [tabBar](int index)
+        //    {
+        //    }
+        //);
+    }
 }
 
 QDockWidget *OpenCV::initPlaceHoldeDocks(DockArea area)
@@ -173,7 +209,6 @@ QDockWidget *OpenCV::initDockWidget(QString name)
     //addDockWidget(Qt::RightDockWidgetArea, m_WorkPosition_dockWdt);
     WorkPosition_dockWdt->setFeatures(QDockWidget::DockWidgetClosable
         | QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
-    WorkPosition_dockWdt->setFixedWidth(200);
     WorkPosition_dockWdt->setAcceptDrops(true);
     WorkPosition_dockWdt->setStyleSheet(R"(
         QDockWidget{
@@ -217,25 +252,7 @@ void OpenCV::addDockToArea(QDockWidget *dock, DockArea area, const QString &cont
     dock->setAllowedAreas(static_cast<Qt::DockWidgetArea>(area));
 
 
-    QList<QTabBar *> list_tabBar = findChildren<QTabBar *>();
-    for (QTabBar *tabBar : list_tabBar)
-    {
-        if (tabBar)
-        {
-            tabBar->setTabEnabled(0, false);
-            tabBar->setStyleSheet(R"(
-                /* 空Dock的标签完全隐藏 */
-                QTabBar::tab:disabled {
-                    width: 0px;    /* 宽度为0 */
-                    height: 0px;   /* 高度为0 */
-                    padding: 0px;  /* 内边距为0 */
-                    margin: 0px;   /* 外边距为0 */
-                    opacity: 0;    /* 完全透明 */
-                }
-            )");
-            tabBar->setCurrentIndex(1);
-        }
-    }
+
 }
 
 QSize OpenCV::WidgetShowAndHide(QWidget *widget, QSize size)
@@ -341,7 +358,7 @@ void OpenCV::slot_NewJob()
     {
         QString job_file_path = job_path + job_file + ".job";
         QFile file(job_file_path);
-
+        emit sglNewJob(job_file_path);
     }
 }
 void OpenCV::slot_LoadJob()

@@ -11,7 +11,6 @@ class ZDockWidget : public QDockWidget
     Q_OBJECT
 public:
     explicit ZDockWidget(const QString &title, QWidget *parent = nullptr);
-    ~ZDockWidget();
     void setWidget(QWidget *widget);
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;

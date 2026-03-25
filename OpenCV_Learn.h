@@ -22,6 +22,7 @@
 #include "ZDockTabContainer.h"
 
 
+
 class OpenCV: public QMainWindow
 {
 	Q_OBJECT
@@ -37,50 +38,15 @@ public:
 	void initWidget();
 	void initMDIWidget();
 	void initDockTabContainer();
+    void initTabBar();
 	QDockWidget* initPlaceHoldeDocks(DockArea area);
 	void initPlaceHoldeDocks();
 	QDockWidget* initDockWidget(QString name);
 	void addDockToArea(QDockWidget* dock, DockArea area, const QString& contentText);
 
     QSize WidgetShowAndHide(QWidget* widget, QSize size);
-private:
-	QGridLayout* glyt;
-	QGraphicsView* grv;
-	QPushButton* btn_open,*btn_gray,*btn_reset;
-	QLineEdit *ledit;
-	QGraphicsScene* scene;
-	QString path, select_path;
-	QPixmap pix;
-	QImage img_gray, img_color;
-	cv::Mat gray_mat, origin_mat, transparent_mat;
-	picture_analyze *picture;
-	QSlider *transparency;
-	Z_CV_lib* z_cv_lib;
-	OutputWidget* output_wdt;
-    QMdiArea* m_mdiArea;
-	QDockWidget* m_WorkPosition_dockWdt;
-	QDockWidget* m_CameraConfig_dockWdt;
-	QDockWidget* m_Output_dockWdt;
-	QDockWidget* m_Strip_dockWdt;
-	QDockWidget* m_1_dockWdt;
-	QDockWidget* m_2_dockWdt;
-	QDockWidget* m_3_dockWdt;
-	QDockWidget* m_4_dockWdt;
-	QStringList m_strlist_dockWdt;
-
-
-	QHash<int, QDockWidget> m_dockWidgetHash;
-	QHash<int, QMdiSubWindow> m_subWinHash;
-	QMdiSubWindow *m_subWin_camera1, *m_subWin_camera2;
-
-	// 存储各区域的占位Dock（key：停靠区域，value：占位Dock）
-	QMap<DockArea, QDockWidget*> m_placeHolderDocks;
-	// 存储各区域的业务Dock列表（key：停靠区域，value：Dock列表）
-	QMap<DockArea, QList<QDockWidget*>> m_areaDockLists;
-	ZDockTabContainer* m_DockTab_Left;
-	ZDockTabContainer* m_DockTab_Right;
-	ZDockTabContainer* m_DockTab_Bottom;
-	
+signals:
+    void sglNewJob(QString job_file);
 private slots:
 	void slotBtnOpenClicked();
 	void slotBtnGrayClicked();
@@ -96,5 +62,43 @@ private slots:
 	void slot_Win_WorkPosition();
 	void slot_Win_Output();
 	void slot_Win_CameraConfig();
+
+private:
+    QGridLayout *glyt;
+    QGraphicsView *grv;
+    QPushButton *btn_open, *btn_gray, *btn_reset;
+    QLineEdit *ledit;
+    QGraphicsScene *scene;
+    QString path, select_path;
+    QPixmap pix;
+    QImage img_gray, img_color;
+    cv::Mat gray_mat, origin_mat, transparent_mat;
+    picture_analyze *picture;
+    QSlider *transparency;
+    Z_CV_lib *z_cv_lib;
+    OutputWidget *output_wdt;
+    QMdiArea *m_mdiArea;
+    QDockWidget *m_WorkPosition_dockWdt;
+    QDockWidget *m_CameraConfig_dockWdt;
+    QDockWidget *m_Output_dockWdt;
+    QDockWidget *m_Strip_dockWdt;
+    QDockWidget *m_1_dockWdt;
+    QDockWidget *m_2_dockWdt;
+    QDockWidget *m_3_dockWdt;
+    QDockWidget *m_4_dockWdt;
+    QStringList m_strlist_dockWdt;
+
+
+    QHash<int, QDockWidget> m_dockWidgetHash;
+    QHash<int, QMdiSubWindow> m_subWinHash;
+    QMdiSubWindow *m_subWin_camera1, *m_subWin_camera2;
+
+    // 存储各区域的占位Dock（key：停靠区域，value：占位Dock）
+    QMap<DockArea, QDockWidget *> m_placeHolderDocks;
+    // 存储各区域的业务Dock列表（key：停靠区域，value：Dock列表）
+    QMap<DockArea, QList<QDockWidget *>> m_areaDockLists;
+    ZDockTabContainer *m_DockTab_Left;
+    ZDockTabContainer *m_DockTab_Right;
+    ZDockTabContainer *m_DockTab_Bottom;
 
 };
