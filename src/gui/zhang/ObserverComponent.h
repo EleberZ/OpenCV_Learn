@@ -12,7 +12,7 @@ public:
     ObserverComponent();
     void notify();
     void notify(const std::string);
-    void attach(const std::string key, std::shared_ptr<ObserverImp>);
+    void attach(const std::string key, std::shared_ptr<ObserverImp> observer);
     std::shared_ptr<ObserverImp> detach(const std::string key);
 private:
     std::map<std::string, std::shared_ptr<ObserverImp>> m_observers;

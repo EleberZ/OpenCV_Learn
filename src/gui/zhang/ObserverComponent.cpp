@@ -8,12 +8,20 @@ void ObserverComponent::notify()
 {
 }
 
-void ObserverComponent::notify(const std::string)
+void ObserverComponent::notify(const std::string key)
 {
+    auto iter = m_observers.find(key);
+    iter->second->update();
+
 }
 
-void ObserverComponent::attach(const std::string key, std::shared_ptr<ObserverImp>)
+void ObserverComponent::attach(const std::string key, std::shared_ptr<ObserverImp> observer)
 {
+    if (!observer)
+    {
+        return;
+    }
+    m_observers.emplace(key, observer);
 }
 
 std::shared_ptr<ObserverImp> ObserverComponent::detach(const std::string key)

@@ -2,26 +2,29 @@
 // 或项目特定的包含文件。
 #pragma once
 
+#include "JobBlock.h"
+#include "JobConfig.h"
+#include "JobController.h"
+#include "JobEditModel.h"
+#include "JobTree.h"
 #include "picture_analyze.h"
+#include "Z_CV_lib.h"
+#include "ZDockTabContainer.h"
 #include <iostream>
+#include <output_widget.h>
+#include <QDockWidget>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGridLayout>
-#include <QLineEdit>
-#include <QMainWindow>
-#include <QPushButton>
-#include <QSlider>
-#include "Z_CV_lib.h"
-#include <output_widget.h>
-#include <QMdiArea>
-#include <QMdiSubWindow>
-#include <QDockWidget>
 #include <QHash>
 #include <QLabel>
-#include "ZDockTabContainer.h"
-
-
+#include <QLineEdit>
+#include <QMainWindow>
+#include <QMdiArea>
+#include <QMdiSubWindow>
+#include <QPushButton>
+#include <QSlider>
 
 class OpenCV: public QMainWindow
 {
@@ -39,6 +42,7 @@ public:
 	void initMDIWidget();
 	void initDockTabContainer();
     void initTabBar();
+    void initJob();
 	QDockWidget* initPlaceHoldeDocks(DockArea area);
 	void initPlaceHoldeDocks();
 	QDockWidget* initDockWidget(QString name);
@@ -47,6 +51,8 @@ public:
     QSize WidgetShowAndHide(QWidget* widget, QSize size);
 signals:
     void sglNewJob(QString job_file);
+    void sglLoadJob(QString job_file);
+    void sglSaveJob();
 private slots:
 	void slotBtnOpenClicked();
 	void slotBtnGrayClicked();
@@ -59,6 +65,7 @@ private slots:
 	void slot_NetworkConfig();
 	void slot_NewJob();
 	void slot_LoadJob();
+	void slot_SaveJob();
 	void slot_Win_WorkPosition();
 	void slot_Win_Output();
 	void slot_Win_CameraConfig();
@@ -101,4 +108,9 @@ private:
     ZDockTabContainer *m_DockTab_Right;
     ZDockTabContainer *m_DockTab_Bottom;
 
+    JobController *m_jobController;
+    JobBlock *m_jobBlock;
+    JobConfig *m_jobConfig;
+    JobTree *m_jobTree;
+    std::shared_ptr<JobEditModel> m_jobEditModel;
 };

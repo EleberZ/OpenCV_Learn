@@ -10,12 +10,12 @@ class JobEditModelImp : public QObject
     Q_OBJECT
 public:
     explicit JobEditModelImp(QObject *parent = nullptr);
-    //virtual void attach(std::shared_ptr<JobEditViewImp> view, QString view_name) = 0;
-    //virtual std::shared_ptr<JobEditViewImp> detach(QString view_name) = 0;
-    //virtual void notify(std::shared_ptr<JobEditViewImp> view) = 0;
-    //virtual void notify(QString view_name) = 0;
-    //virtual void notify() = 0;
+    virtual void setJobFilepath(QString filepath)= 0 ;
+    virtual QString getJobFilepath() = 0;
+    virtual void NewJobFile(QString filepath) = 0;  
+    virtual void loadJobFile(QString filepath) = 0; 
+    virtual void saveJobFile() = 0;
+
 protected:
-    std::map<QString, std::shared_ptr<JobEditViewImp>> m_views;
 };
 #endif // JOB_EDIT_MODELIMP_H

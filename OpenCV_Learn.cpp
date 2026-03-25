@@ -42,6 +42,8 @@ OpenCV::OpenCV(QWidget *parent)
     addDockToArea(m_Strip_dockWdt, BottomArea, "");
 
     initTabBar();
+    initJob();
+
     z_cv_lib = new Z_CV_lib();
     connect(btn_open, SIGNAL(clicked()), this, SLOT(slotBtnOpenClicked()));
     connect(btn_gray, SIGNAL(clicked()), this, SLOT(slotBtnGrayClicked()));
@@ -69,6 +71,7 @@ OpenCV::OpenCV(QWidget *parent)
                 padding: 8px;
             }
         )");
+
 }
 
 OpenCV::~OpenCV()
@@ -108,7 +111,6 @@ void OpenCV::initMDIWidget()
     m_subWin_camera1 = new QMdiSubWindow(this);
     m_mdiArea->addSubWindow(m_subWin_camera1);
 
-
     QMenu *cameraMenu = menuBar()->addMenu(tr("Configure"));
     cameraMenu->addAction("相机设置", this, SLOT(slot_CameraConfig()));
     cameraMenu->addAction("网络设置", this, SLOT(slot_NetworkConfig()));
@@ -116,18 +118,19 @@ void OpenCV::initMDIWidget()
     QMenu *fileMenu = menuBar()->addMenu(tr("File"));
     fileMenu->addAction("新建作业", this, SLOT(slot_NewJob()));
     fileMenu->addAction("加载作业", this, SLOT(slot_LoadJob()));
-
+    fileMenu->addAction("保存作业", this, SLOT(slot_SaveJob()));
 
     QMenu *winMenu = menuBar()->addMenu(tr("WindowView"));
     winMenu->addAction(tr("WorkPosition"), this, SLOT(slot_Win_WorkPosition()));
     winMenu->addAction(tr("CameraSetup"), this, SLOT(slot_Win_CameraConfig()));
     winMenu->addAction(tr("Output"), this, SLOT(slot_Win_Output()));
-
-    QMenuBar *menubar = new QMenuBar(this);
-    menubar->addMenu(cameraMenu);
-    menubar->addMenu(fileMenu);
-    menubar->addMenu(winMenu);
-    setMenuBar(menubar);
+    menuBar()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    menuBar()->setFixedSize(200, 40);
+    //QMenuBar *menubar = new QMenuBar(this);
+    //menubar->addMenu(cameraMenu);
+    //menubar->addMenu(fileMenu);
+    //menubar->addMenu(winMenu);
+    //setMenuBar(menubar);
 }
 
 void OpenCV::initDockTabContainer()
@@ -162,6 +165,24 @@ void OpenCV::initTabBar()
         //    }
         //);
     }
+}
+
+void OpenCV::initJob()
+{
+    m_jobController = new JobController();
+    m_jobBlock = new JobBlock(this);
+    m_jobConfig = new JobConfig(this);
+    m_jobTree = new JobTree(this);
+    m_jobEditModel = std::make_shared<JobEditModel>(this);
+
+    m_jobController->setView(m_jobBlock);
+    m_jobController->setView(m_jobConfig);
+    m_jobController->setView(m_jobTree);
+    m_jobController->setModel(m_jobEditModel);
+
+    connect(this, &OpenCV::sglNewJob, m_jobEditModel.get(), &JobEditModel::slotNewJob);
+    connect(this, &OpenCV::sglLoadJob, m_jobEditModel.get(), &JobEditModel::slotLoadJob);
+    connect(this, &OpenCV::sglSaveJob, m_jobEditModel.get(), &JobEditModel::slotSaveJob);
 }
 
 QDockWidget *OpenCV::initPlaceHoldeDocks(DockArea area)
@@ -228,7 +249,6 @@ QDockWidget *OpenCV::initDockWidget(QString name)
 
 void OpenCV::addDockToArea(QDockWidget *dock, DockArea area, const QString &contentText)
 {
-    QTabBar *tabBar;
     QWidget *contentWidget =  new QWidget();
     QVBoxLayout *layout = new QVBoxLayout(contentWidget);
     layout->addWidget(new QLabel(contentText));
@@ -369,7 +389,13 @@ void OpenCV::slot_LoadJob()
     {
         return;
     }
+    emit sglLoadJob(job_file_path);
     //TODO:加载作业
+}
+
+void OpenCV::slot_SaveJob()
+{
+    emit sglSaveJob();
 }
 
 void OpenCV::slot_Win_WorkPosition()

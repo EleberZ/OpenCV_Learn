@@ -8,12 +8,12 @@ using namespace std;
 
 enum class MatchMethod
 {
-    TM_CCOEFF_NORMED,    // น้าปปฏฯเนุฯตสýฦฅลไฃจอฦผ๖ฃฉ
-    TM_CCORR_NORMED,     // น้าปปฏฯเนุฦฅลไ
-    TM_SQDIFF_NORMED,    // น้าปปฏฦฝทฝฒ๎ฦฅลไ
-    TM_CCOEFF,           // ทวน้าปปฏฯเนุฯตสýฦฅลไ
-    TM_CCORR,            // ทวน้าปปฏฯเนุฦฅลไ
-    TM_SQDIFF            // ทวน้าปปฏฦฝทฝฒ๎ฦฅลไ
+    TM_CCOEFF_NORMED,    // ๅฝ’ไธ€ๅ–็ธๅ…ณ็ณปๆ•ฐๅน้…๏ผๆจ่๏ผ
+    TM_CCORR_NORMED,     // ๅฝ’ไธ€ๅ–็ธๅ…ณๅน้…
+    TM_SQDIFF_NORMED,    // ๅฝ’ไธ€ๅ–ๅนณๆ–นๅทฎๅน้…
+    TM_CCOEFF,           // ้ๅฝ’ไธ€ๅ–็ธๅ…ณ็ณปๆ•ฐๅน้…
+    TM_CCORR,            // ้ๅฝ’ไธ€ๅ–็ธๅ…ณๅน้…
+    TM_SQDIFF            // ้ๅฝ’ไธ€ๅ–ๅนณๆ–นๅทฎๅน้…
 };
 
 class TemplateMatcher

@@ -1,69 +1,89 @@
 #include "JobEditModel.h"
+#include <QXmlStreamReader>
+#include <QXmlStreamWriter>
+#include <QDomDocument>
+#include <qfileinfo.h>
 
 JobEditModel::JobEditModel(QObject *parent)
 {
+    m_job_file = nullptr;
 }
 
 void JobEditModel::setJobFilepath(QString filepath)
 {
+    m_filepath = filepath;
 }
 
 QString JobEditModel::getJobFilepath()
 {
-    return QString();
+    return m_filepath;
+}
+
+void JobEditModel::NewJobFile(QString filepath)
+{
+    m_filepath = filepath;
+    QFileInfo fileInfo(filepath);
+    m_job_xml.clear();
+    QDomElement rootElement = m_job_xml.createElement(fileInfo.baseName());
+    m_job_xml.appendChild(rootElement);
 }
 
 void JobEditModel::saveJobFile()
 {
+    QFile file(m_filepath);
+    if (!file.open(QIODevice::ReadWrite))
+    {
+        return;
+    }
+    QTextStream out(&file);
+    m_job_xml.save(out, 4);
 }
 
-void JobEditModel::loadJobFile()
+void JobEditModel::loadJobFile(QString filepath)
 {
+    QFileInfo info(filepath);
+    QFile file;
+    if (!info.exists())
+    {
+        return;
+    }
+    if (!file.open(QIODevice::ReadWrite))
+    {
+        return;
+    }
+    if (!m_job_xml.setContent(&file))
+    {
+        file.close();
+        return;
+    }
 }
 
-//void JobEditModel::attach(std::shared_ptr<JobEditViewImp> view, QString view_name)
-//{
-//    m_views.emplace(view_name, view);
-//}
-//
-//std::shared_ptr<JobEditViewImp> JobEditModel::detach(QString view_name)
-//{
-//    auto iter = m_views.find(view_name);
-//    if (iter == m_views.end())
-//    {
-//        return nullptr;
-//    }
-//    else
-//    {
-//        m_views.erase(iter);
-//    }
-//    return iter->second;
-//}
-//
-//void JobEditModel::notify(std::shared_ptr<JobEditViewImp> view)
-//{
-//    view->updateWidget();
-//}
-//
-//void JobEditModel::notify(QString view_name)
-//{
-//    auto iter = m_views.find(view_name);
-//    iter->second->updateWidget();
-//}
-//
-//
-//void JobEditModel::notify()
-//{
-//    for (auto tmp : m_views)
-//    {
-//        tmp.second->updateWidget();
-//    }
-//}
-
-void JobEditModel::slotNewJob()
+void JobEditModel::slotNewJob(QString filepath)
 {
+    NewJobFile(filepath);
+    loadJobFile(filepath);
 }
 
 void JobEditModel::slotSaveJob()
 {
+    saveJobFile();
+}
+
+void JobEditModel::slotLoadJob(QString filepath)
+{
+    loadJobFile(filepath);
+}
+
+std::unique_ptr<QFile> JobEditModel::openFileIfExists(QString filepath)
+{
+    QFileInfo info(filepath);
+    if (!info.exists())
+    {
+        return nullptr;
+    }
+    auto file = std::make_unique<QFile>(filepath);
+    if (file.get()->open(QIODevice::ReadWrite))
+    {
+        return file;
+    }
 }

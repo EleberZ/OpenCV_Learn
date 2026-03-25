@@ -9,8 +9,11 @@ class JobEditViewImp:public QWidget
     Q_OBJECT
 public:
     explicit JobEditViewImp(QWidget *parent = nullptr);
-    virtual ~JobEditViewImp() = default;
+    //virtual ~JobEditViewImp() = default;
     virtual void updateWidget() = 0;
+    virtual void initWidget() = 0;
+public slots:
+    virtual void slotNotifyJobEditView() = 0;
 private:
 
 };
