@@ -31,18 +31,6 @@ void JobEditModel::NewJobFile(QString filepath)
     QDomElement rootElement = m_job_xml.createElement(fileInfo.baseName());
     m_job_xml.appendChild(xmlDecl);
     m_job_xml.appendChild(rootElement);
-    // qDebug()<<m_job_xml.toString();
-}
-
-void JobEditModel::saveJobFile()
-{
-    QFile file(m_filepath);
-    if (!file.open(QIODevice::ReadWrite))
-    {
-        return;
-    }
-    QTextStream out(&file);
-    m_job_xml.save(out, 4);
 }
 
 void JobEditModel::loadJobFile(QString filepath)
@@ -64,20 +52,31 @@ void JobEditModel::loadJobFile(QString filepath)
     }
 }
 
+void JobEditModel::saveJobFile()
+{
+    QFile file(m_filepath);
+    if (!file.open(QIODevice::ReadWrite))
+    {
+        return;
+    }
+    QTextStream out(&file);
+    m_job_xml.save(out, 4);
+}
+
 void JobEditModel::slotNewJob(QString filepath)
 {
     NewJobFile(filepath);
     loadJobFile(filepath);
 }
 
-void JobEditModel::slotSaveJob()
-{
-    saveJobFile();
-}
-
 void JobEditModel::slotLoadJob(QString filepath)
 {
     loadJobFile(filepath);
+}
+
+void JobEditModel::slotSaveJob()
+{
+    saveJobFile();
 }
 
 std::unique_ptr<QFile> JobEditModel::openFileIfExists(QString filepath)
@@ -92,4 +91,9 @@ std::unique_ptr<QFile> JobEditModel::openFileIfExists(QString filepath)
     {
         return file;
     }
+}
+
+void JobEditModel::addBlock(int index, QString mask_picture_path, QString output_picture_path)
+{
+    
 }

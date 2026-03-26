@@ -8,7 +8,9 @@
 
 struct BlockData
 {
-    QString name;
+    ROIData roi_data;
+    QString m_temp_picture_path;
+    QString m_mask_picture_path;
     double xpos;
     double ypos;
 };
@@ -16,12 +18,17 @@ struct BlockData
 enum ShapeEnum
 {
     Circle,
-    Mask
+    Rectangle,
 };
 struct ROIData
 {
     double width;
     double height;
+    int stride;
+    int threshold;
+    int overlapThreshold;
+    int max_match_count;
+    
 };
 
 struct ShapeData
@@ -30,7 +37,6 @@ struct ShapeData
     double radius;
     double width;
 };
-
 
 class JobEditModel : public JobEditModelImp
 {
@@ -57,10 +63,14 @@ public slots:
     void slotLoadJob(QString filepath);
 private:
     std::unique_ptr<QFile> openFileIfExists(QString filepath);
+    void addBlock(int index, QString mask_picture_path, 
+        QString output_picture_path);
+private:
     QString m_filepath; //被加载之后将路径保存在这个位置
     std::unique_ptr<QFile> m_job_file;
     QTextStream m_job_stream;
     QDomDocument m_job_xml;
+    std::vector<BlockData> block_data;
 };
 
 #endif // JOB_EDIT_MODEL_H
