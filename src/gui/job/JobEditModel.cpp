@@ -2,7 +2,8 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <QDomDocument>
-#include <qfileinfo.h>
+// #include <QDebug>
+#include <QfileInfo>
 
 JobEditModel::JobEditModel(QObject *parent)
 {
@@ -24,8 +25,13 @@ void JobEditModel::NewJobFile(QString filepath)
     m_filepath = filepath;
     QFileInfo fileInfo(filepath);
     m_job_xml.clear();
+    QDomProcessingInstruction xmlDecl = m_job_xml.createProcessingInstruction(
+        "xml", "version='1.0' encoding='UTF-8'"
+    );
     QDomElement rootElement = m_job_xml.createElement(fileInfo.baseName());
+    m_job_xml.appendChild(xmlDecl);
     m_job_xml.appendChild(rootElement);
+    // qDebug()<<m_job_xml.toString();
 }
 
 void JobEditModel::saveJobFile()
