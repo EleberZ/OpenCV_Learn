@@ -4,7 +4,7 @@
 #include <vector>
 
 /*
-¾Åµã±ê¶¨Çó½âµÄÊÇÒ»¸ö2¡Á3 µÄ·ÂÉä±ä»»¾ØÕó
+ä¹ç‚¹æ ‡å®šæ±‚è§£çš„æ˜¯ä¸€ä¸ª2Ã—3 çš„ä»¿å°„å˜æ¢çŸ©é˜µ
 
 */
 
@@ -26,11 +26,11 @@ public:
 
 private:
 
-	bool addCalibPoint(const Point2D& pixl_point, Point2D& mechanical_point);		//Ìí¼Ó±ê¶¨µã
-	bool calibrate();		//Çó½â·ÂÉä±ä»»¾ØÕó
-    std::vector<Point2D> m_pixl_points;		//ÏñËØ×ø±êµã
-    std::vector<Point2D> m_mechanical_points;	//»úĞµ×ø±êµã
-	std::vector<double> m_target_matrix;		//·ÂÉä±ä»»¾ØÕó(X, Y·½ÏòµÄËõ·ÅÏµÊı, X,YµÄĞı×ªÓë¼ôÇĞÏµÊı£¬ X,Y·½ÏòµÄÆ½ÒÆ)
+	bool addCalibPoint(const Point2D& pixl_point, Point2D& mechanical_point);		//æ·»åŠ æ ‡å®šç‚¹
+	bool calibrate();		//æ±‚è§£ä»¿å°„å˜æ¢çŸ©é˜µ
+    std::vector<Point2D> m_pixl_points;		//åƒç´ åæ ‡ç‚¹
+    std::vector<Point2D> m_mechanical_points;	//æœºæ¢°åæ ‡ç‚¹
+	std::vector<double> m_target_matrix;		//ä»¿å°„å˜æ¢çŸ©é˜µ(X, Yæ–¹å‘çš„ç¼©æ”¾ç³»æ•°, X,Yçš„æ—‹è½¬ä¸å‰ªåˆ‡ç³»æ•°ï¼Œ X,Yæ–¹å‘çš„å¹³ç§»)
 	bool isCalibrated;		
 };
 

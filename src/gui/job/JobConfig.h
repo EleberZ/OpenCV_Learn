@@ -2,13 +2,18 @@
 #define JOB_CONFIG_H
 
 #include<QWidget>
+#include "JobEditViewImp.h"
 
-class JobConfig : public QWidget
+class JobConfig : public JobEditViewImp
 {
     Q_OBJECT
 public:
     explicit JobConfig(QWidget *parent = nullptr);
-    void initWidget();
+    // 通过 JobEditViewImp 继承
+    void initWidget()override;
+    void updateWidget()override;
+public slots:
+    void slotNotifyJobEditView()override;
 private:
 
 };

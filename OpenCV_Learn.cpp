@@ -8,7 +8,9 @@
 #include <QListWidget>
 #include <QApplication>
 #include <QInputDialog>
-
+#include <QToolButton>
+#include <QSpacerItem>
+#include <QFile>
 
 OpenCV::OpenCV(QWidget *parent)
     : QMainWindow(parent)
@@ -39,6 +41,9 @@ OpenCV::OpenCV(QWidget *parent)
     addDockToArea(m_Output_dockWdt, BottomArea, "");
     addDockToArea(m_Strip_dockWdt, BottomArea, "");
 
+    initTabBar();
+    initJob();
+
     z_cv_lib = new Z_CV_lib();
     connect(btn_open, SIGNAL(clicked()), this, SLOT(slotBtnOpenClicked()));
     connect(btn_gray, SIGNAL(clicked()), this, SLOT(slotBtnGrayClicked()));
@@ -66,6 +71,7 @@ OpenCV::OpenCV(QWidget *parent)
                 padding: 8px;
             }
         )");
+
 }
 
 OpenCV::~OpenCV()
@@ -112,12 +118,19 @@ void OpenCV::initMDIWidget()
     QMenu *fileMenu = menuBar()->addMenu(tr("File"));
     fileMenu->addAction("新建作业", this, SLOT(slot_NewJob()));
     fileMenu->addAction("加载作业", this, SLOT(slot_LoadJob()));
-
+    fileMenu->addAction("保存作业", this, SLOT(slot_SaveJob()));
 
     QMenu *winMenu = menuBar()->addMenu(tr("WindowView"));
     winMenu->addAction(tr("WorkPosition"), this, SLOT(slot_Win_WorkPosition()));
     winMenu->addAction(tr("CameraSetup"), this, SLOT(slot_Win_CameraConfig()));
     winMenu->addAction(tr("Output"), this, SLOT(slot_Win_Output()));
+    menuBar()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    menuBar()->setFixedSize(200, 40);
+    //QMenuBar *menubar = new QMenuBar(this);
+    //menubar->addMenu(cameraMenu);
+    //menubar->addMenu(fileMenu);
+    //menubar->addMenu(winMenu);
+    //setMenuBar(menubar);
 }
 
 void OpenCV::initDockTabContainer()
@@ -125,6 +138,51 @@ void OpenCV::initDockTabContainer()
     m_DockTab_Bottom = new ZDockTabContainer(0, this);
     m_DockTab_Left = new ZDockTabContainer(1, this);
     m_DockTab_Right = new ZDockTabContainer(2, this);
+}
+
+void OpenCV::initTabBar()
+{
+    QList<QTabBar *> list_tabBar = findChildren<QTabBar *>();
+    for (QTabBar *tabBar : list_tabBar)
+    {
+        if (tabBar)
+        {
+            tabBar->setTabEnabled(0, false);
+            tabBar->setStyleSheet(R"(
+                /* 空Dock的标签完全隐藏 */
+                QTabBar::tab:disabled {
+                    width: 0px;    /* 宽度为0 */
+                    height: 0px;   /* 高度为0 */
+                    padding: 0px;  /* 内边距为0 */
+                    margin: 0px;   /* 外边距为0 */
+                    opacity: 0;    /* 完全透明 */
+                }
+            )");
+            tabBar->setCurrentIndex(1);
+        }
+        //connect(tabBar, &QTabBar::tabBarClicked, this, [tabBar](int index)
+        //    {
+        //    }
+        //);
+    }
+}
+
+void OpenCV::initJob()
+{
+    m_jobController = new JobController();
+    m_jobBlock = new JobBlock(this);
+    m_jobConfig = new JobConfig(this);
+    m_jobTree = new JobTree(this);
+    m_jobEditModel = std::make_shared<JobEditModel>(this);
+
+    m_jobController->setView(m_jobBlock);
+    m_jobController->setView(m_jobConfig);
+    m_jobController->setView(m_jobTree);
+    m_jobController->setModel(m_jobEditModel);
+
+    connect(this, &OpenCV::sglNewJob, m_jobEditModel.get(), &JobEditModel::slotNewJob);
+    connect(this, &OpenCV::sglLoadJob, m_jobEditModel.get(), &JobEditModel::slotLoadJob);
+    connect(this, &OpenCV::sglSaveJob, m_jobEditModel.get(), &JobEditModel::slotSaveJob);
 }
 
 QDockWidget *OpenCV::initPlaceHoldeDocks(DockArea area)
@@ -143,10 +201,35 @@ QDockWidget *OpenCV::initPlaceHoldeDocks(DockArea area)
 QDockWidget *OpenCV::initDockWidget(QString name)
 {
     QDockWidget *WorkPosition_dockWdt = new QDockWidget(name, this);
+
+    QWidget *titleBar = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(titleBar);
+    layout->setContentsMargins(5, 0, 5, 0); // 紧凑一点
+    layout->setSpacing(5);
+    QLabel *titleLabel = new QLabel(name, this);
+    titleLabel->setStyleSheet("font-weight: bold;");
+
+    QToolButton *m_toggleBtn = new QToolButton(this);
+    m_toggleBtn->setArrowType(Qt::DownArrow);
+    m_toggleBtn->setFixedSize(16, 16);
+    m_toggleBtn->setStyleSheet("QToolButton { border: none; } QToolButton:hover { background-color: #ccc; }");
+
+    QSpacerItem *spacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    layout->addWidget(titleLabel);
+    layout->addItem(spacer);
+    layout->addWidget(m_toggleBtn);
+
+    titleBar->setLayout(layout);
+    WorkPosition_dockWdt->setTitleBarWidget(titleBar);
+    connect(m_toggleBtn, &QToolButton::clicked, this, [WorkPosition_dockWdt]()
+        {
+
+        }
+    );
+
     //addDockWidget(Qt::RightDockWidgetArea, m_WorkPosition_dockWdt);
     WorkPosition_dockWdt->setFeatures(QDockWidget::DockWidgetClosable
         | QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
-    WorkPosition_dockWdt->setFixedWidth(200);
     WorkPosition_dockWdt->setAcceptDrops(true);
     WorkPosition_dockWdt->setStyleSheet(R"(
         QDockWidget{
@@ -166,8 +249,7 @@ QDockWidget *OpenCV::initDockWidget(QString name)
 
 void OpenCV::addDockToArea(QDockWidget *dock, DockArea area, const QString &contentText)
 {
-    QTabBar *tabBar;
-    QWidget *contentWidget = new QWidget();
+    QWidget *contentWidget =  new QWidget();
     QVBoxLayout *layout = new QVBoxLayout(contentWidget);
     layout->addWidget(new QLabel(contentText));
     dock->setWidget(contentWidget);
@@ -179,7 +261,7 @@ void OpenCV::addDockToArea(QDockWidget *dock, DockArea area, const QString &cont
     {
         this->addDockWidget(static_cast<Qt::DockWidgetArea>(area), placeHolder);
         this->tabifyDockWidget(placeHolder, dock);
-        dock->raise();
+        //dock->raise();
     }
     else
     {
@@ -190,25 +272,23 @@ void OpenCV::addDockToArea(QDockWidget *dock, DockArea area, const QString &cont
     dock->setAllowedAreas(static_cast<Qt::DockWidgetArea>(area));
 
 
-    QList<QTabBar *> list_tabBar = findChildren<QTabBar *>();
-    for (QTabBar *tabBar : list_tabBar)
+
+}
+
+QSize OpenCV::WidgetShowAndHide(QWidget *widget, QSize size)
+{
+    QSize temp;
+    temp = widget->size();
+    if (temp.height()==0
+        &&temp.width()==0)
     {
-        if (tabBar)
-        {
-            tabBar->setTabEnabled(0, false);
-            tabBar->setStyleSheet(R"(
-                /* 空Dock的标签完全隐藏 */
-                QTabBar::tab:disabled {
-                    width: 0px;    /* 宽度为0 */
-                    height: 0px;   /* 高度为0 */
-                    padding: 0px;  /* 内边距为0 */
-                    margin: 0px;   /* 外边距为0 */
-                    opacity: 0;    /* 完全透明 */
-                }
-            )");
-            tabBar->setCurrentIndex(1);
-        }
+        widget->setFixedSize(size);
     }
+    else
+    {
+        widget->setFixedSize(0,0);
+    }
+    return temp;
 }
 
 void OpenCV::slotBtnGrayClicked()
@@ -283,24 +363,39 @@ void OpenCV::slot_NetworkConfig()
 
 void OpenCV::slot_NewJob()
 {
+    bool input_ok;
     QString job_path = QApplication::applicationDirPath() + "/job/";
-    QString job_name = QInputDialog::getText(this, "New Job", "Job Name:", QLineEdit::Normal, "New Job", nullptr);
-    if (!job_name.isEmpty())
+    QString job_file = QInputDialog::getText(this, "New Job", "Job Name", QLineEdit::Normal, "", &input_ok);
+    if (!input_ok)
     {
-        QString job_file_path = job_path + job_name + ".job";
-        QFile file(job_file_path);
+        return;
     }
-    //TODO:创建作业文件，并且
+    if (job_file.isEmpty())
+    {
+        QMessageBox::warning(this, "Warning", tr("Job File Name Can't be Empty!"));
+    }
+    else
+    {
+        QString job_file_path = job_path + job_file + ".job";
+        QFile file(job_file_path);
+        emit sglNewJob(job_file_path);
+    }
 }
 void OpenCV::slot_LoadJob()
 {
     QString job_path = QApplication::applicationDirPath() + "/job/";
     QString job_file_path = QFileDialog::getOpenFileName(this, "Load Job", job_path, tr("Job Files(*.job)"));
     if (job_file_path.isEmpty())
-    {
+    { 
         return;
     }
+    emit sglLoadJob(job_file_path);
     //TODO:加载作业
+}
+
+void OpenCV::slot_SaveJob()
+{
+    emit sglSaveJob();
 }
 
 void OpenCV::slot_Win_WorkPosition()
