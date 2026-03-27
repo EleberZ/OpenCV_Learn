@@ -1,20 +1,20 @@
 #include "NinePoint.h"
 
-//¾Åµã±ê¶¨ÎªÇó½â³¬¶¨·½³Ì×é¡£
+//ä¹ç‚¹æ ‡å®šä¸ºæ±‚è§£è¶…å®šæ–¹ç¨‹ç»„ã€‚
 
-//¸³Öµ
+//èµ‹å€¼
 Point2D Point2D::operator=(const Point2D& p) const
 {
 	return Point2D(p.m_x, p.m_y);
 }
 
-//¼õ·¨
+//å‡æ³•
 Point2D Point2D::operator-(const Point2D& p) const
 {
 	return Point2D(m_x - p.m_x, m_y - p.m_y);
 }
 
-//Íâ»ı
+//å¤–ç§¯
 Point2D Point2D::operator*(const Point2D& p) const
 {
 	return Point2D(m_x * p.m_x, m_y * p.m_y);
@@ -39,7 +39,7 @@ bool Calibration::calibrate()
 		return false;
 	}
 	int pixl_point_count = m_pixl_points.size();
-	//2X3¾ØÕóµÄ¸öÊı=ÏñËØµãµÄ¸öÊı
+	//2X3çŸ©é˜µçš„ä¸ªæ•°=åƒç´ ç‚¹çš„ä¸ªæ•°
 	std::vector<std::vector<double>> A(2 * pixl_point_count, std::vector<double>(6, 0));	
 	std::vector<double> B(2 * pixl_point_count, 0);
 }

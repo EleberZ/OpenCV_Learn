@@ -3,13 +3,17 @@
 
 #include <QTreeWidget>
 #include <QWidget>
+#include "JobEditViewImp.h"
 
-class JobTree: public QWidget
+class JobTree: public JobEditViewImp
 {
 	Q_OBJECT
 public:
 	JobTree(QWidget *parent = nullptr);
-	void initWidget();
+    void initWidget();
+    void updateWidget();
+public slots:
+    void slotNotifyJobEditView();
 private:
 	QTreeWidget *treeWidget;
 };
