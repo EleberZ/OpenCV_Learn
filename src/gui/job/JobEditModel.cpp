@@ -19,7 +19,7 @@ BlockData::BlockData(const BlockData &other)
     {
         m_roi_data = nullptr;
     }
-    //拷贝构造函数
+    //�������캯��
 }
 
 BlockData::BlockData(BlockData &&other)
@@ -47,7 +47,7 @@ BlockData &BlockData::operator=(const BlockData &other)
         }
     }
     return *this;
-    // TODO: 在此处插入 return 语句
+    // TODO: �ڴ˴����� return ���
 }
 
 BlockData &BlockData::operator=(BlockData &&other)
@@ -59,7 +59,7 @@ BlockData &BlockData::operator=(BlockData &&other)
         other.m_roi_data = nullptr;
     }
     return *this;
-    // TODO: 在此处插入 return 语句
+    // TODO: �ڴ˴����� return ���
 }
 
 void BlockData::setXpos(double xpos)
