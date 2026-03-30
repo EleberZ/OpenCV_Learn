@@ -23,7 +23,9 @@ OpenCV::OpenCV(QWidget *parent)
     setDockNestingEnabled(true);
 
     m_WorkPosition_dockWdt = initDockWidget("WorkPositon>>>>");
+    m_WorkPosition_dockWdt->setFixedWidth(200);
     m_CameraConfig_dockWdt = initDockWidget("CameraSetup>>>>");
+    m_CameraConfig_dockWdt->setFixedWidth(200);
     m_Output_dockWdt = initDockWidget("Output>>>>");
     m_Strip_dockWdt = initDockWidget("Strip>>>>");
 
@@ -170,7 +172,7 @@ void OpenCV::initTabBar()
 void OpenCV::initJob()
 {
     m_jobController = new JobController();
-    m_jobBlock = new JobBlock(this);
+    //m_jobBlock = new JobBlock(this);
     m_jobConfig = new JobConfig(this);
     m_jobTree = new JobTree(this);
     m_jobEditModel = std::make_shared<JobEditModel>(this);
@@ -179,6 +181,9 @@ void OpenCV::initJob()
     m_jobController->setView(m_jobConfig);
     m_jobController->setView(m_jobTree);
     m_jobController->setModel(m_jobEditModel);
+
+    m_WorkPosition_dockWdt->setWidget(m_jobTree);
+    m_CameraConfig_dockWdt->setWidget(m_jobConfig);
 
     connect(this, &OpenCV::sglNewJob, m_jobEditModel.get(), &JobEditModel::slotNewJob);
     connect(this, &OpenCV::sglLoadJob, m_jobEditModel.get(), &JobEditModel::slotLoadJob);

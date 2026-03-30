@@ -11,11 +11,11 @@ picture_analyze::~picture_analyze()
 
 int picture_analyze::CVMat2QImage(Mat bgrmat, QImage &img)
 {
-    if( bgrmat.empty() )
+    if (bgrmat.empty())
     {
         return -1;
     }
-    switch( bgrmat.type() )
+    switch (bgrmat.type())
     {
     case CV_8UC1:       //��ͨ��
         img = QImage(bgrmat.data, bgrmat.cols, bgrmat.rows, bgrmat.step, QImage::Format_Grayscale8);
@@ -33,20 +33,20 @@ int picture_analyze::CVMat2QImage(Mat bgrmat, QImage &img)
 
 int picture_analyze::QImage2CVMat(QImage img, Mat &mat)
 {
-    if( img.isNull() )
+    if (img.isNull())
     {
         return -1;
     }
-    switch( img.format() )
+    switch (img.format())
     {
     case QImage::Format_Grayscale8:
-        mat = Mat(img.height(), img.width(), CV_8UC1, (void*)img.bits(), img.bytesPerLine());
+        mat = Mat(img.height(), img.width(), CV_8UC1, (void *)img.bits(), img.bytesPerLine());
         break;
     case QImage::Format_RGB888:
-        mat = Mat(img.height(), img.width(), CV_8UC3, (void*)img.bits(), img.bytesPerLine());
+        mat = Mat(img.height(), img.width(), CV_8UC3, (void *)img.bits(), img.bytesPerLine());
         break;
     case QImage::Format_ARGB32:
-        mat = Mat(img.height(), img.width(), CV_8UC4, (void*)img.bits(), img.bytesPerLine());
+        mat = Mat(img.height(), img.width(), CV_8UC4, (void *)img.bits(), img.bytesPerLine());
         break;
     default:
         break;

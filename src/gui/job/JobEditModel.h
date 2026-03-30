@@ -6,38 +6,6 @@
 #include <QDomDocument>
 #include <QTextStream>
 
-struct BlockData
-{
-private:
-    ROIData *m_roi_data;
-    QString m_temp_picture_path;
-    QString m_mask_picture_path;
-    double m_xpos;
-    double m_ypos;
-public:
-    BlockData(): m_roi_data(nullptr), m_xpos(0), m_ypos(0){};
-    BlockData(const BlockData &other)noexcept;
-    BlockData(BlockData &&other)noexcept;
-    BlockData& operator=(const BlockData &other)noexcept;
-    BlockData& operator=(BlockData &&other)noexcept;
-    void setXpos(double xpos);
-    double getXpos();
-    void setYpos(double ypos);
-    double getYpos();
-    void setROIData(int width, int height, int stride, int threshold,
-        int overlapThreshold, int max_match_count);
-    ROIData getROIData();
-    void setMaskPicturePath(QString mask_picture_path);
-    QString getMaskPicturePath();
-    void setTempPicturePath(QString temp_picture_path);
-    QString getTempPicturePath();
-};
-
-enum ShapeEnum
-{
-    Circle,
-    Rectangle,
-};
 struct ROIData
 {
     double width;
@@ -49,6 +17,42 @@ struct ROIData
     int overlapThreshold;
     int max_match_count;
 };
+struct BlockData
+{
+private:
+    QString m_temp_picture_path;
+    QString m_mask_picture_path;
+    double m_xpos;
+    double m_ypos;
+    ROIData *m_roi_data;
+public:
+    BlockData();
+    ~BlockData();
+    BlockData(const BlockData &other)noexcept;
+    BlockData& operator=(const BlockData &other)noexcept;
+    BlockData(BlockData &&other)noexcept;
+    BlockData& operator=(BlockData &&other)noexcept;
+    void setXpos(double xpos);
+    double getXpos();
+    void setYpos(double ypos);
+    double getYpos();
+
+    void setROIData(const ROIData &roi_data);
+    void setROIData(int width, int height, int stride, int threshold,
+        int overlapThreshold, int max_match_count);
+    ROIData* getROIData();
+    void setMaskPicturePath(QString mask_picture_path);
+    QString getMaskPicturePath();
+    void setTempPicturePath(QString temp_picture_path);
+    QString getTempPicturePath();
+};
+
+enum ShapeEnum
+{
+    Circle,
+    Rectangle,
+};
+
 
 struct ShapeData
 {
@@ -79,8 +83,8 @@ public slots:
     void slotLoadJob(QString filepath);
 private:
     std::unique_ptr<QFile> openFileIfExists(QString filepath);
-    void addBlock(int index, QString mask_picture_path, 
-        QString output_picture_path);
+    void addBlock(int index, QString mask_picture_path, QString output_picture_path,
+        double xpos, double ypos, ROIData roi_data);
 private:
     QString m_filepath; //被加载之后将路径保存在这个位置
     std::unique_ptr<QFile> m_job_file;
