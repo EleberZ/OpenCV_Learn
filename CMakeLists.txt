@@ -246,7 +246,7 @@ elseif(${CMAKE_SIZEOF_VOID_P} EQUAL 4)
     )
 endif()
 
-copy_target_dlls(TARGET ${ProjectName})
+#copy_target_dlls(TARGET ${ProjectName})
 
 ###         Debugger         ###
 if(${CMAKE_SIZEOF_VOID_P} EQUAL 4)

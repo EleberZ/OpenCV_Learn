@@ -1,21 +1,36 @@
 #include "JobTree.h"
 #include <QHBoxLayout>
+#include <QGroupBox>
+#include <QStringList>
 
 JobTree::JobTree(QWidget* parent)
-    :JobEditViewImp(parent)
+    :JobEditViewImp(parent), m_blockCount(0)
 {
+    setWindowTitle("Job Tree");
     initWidget();
-
 
 }
 void JobTree::initWidget()
 {
+    m_edit1 = new QLineEdit(this);
     m_treeWdt = new QTreeWidget(this);
-    QHBoxLayout *main_hlyt = new QHBoxLayout(this);
+    m_treeWdt->setContextMenuPolicy(Qt::CustomContextMenu);
+    //m_treeWdt->setContextMenuPolicy(Qt::ActionsContextMenu);
+    m_treeWdt->setWindowTitle("Job Tree");
+
+    m_addBlockAct = new QAction("Add Block", m_treeWdt);
+    m_copyBlockAct = new QAction("Copy Block", m_treeWdt);
+    m_deleteBlockAct = new QAction("Delete Block", m_treeWdt);
+
+    //QGroupBox *gbox = new QGroupBox(this);
+    QVBoxLayout *main_hlyt = new QVBoxLayout(this);
+    main_hlyt->addWidget(m_edit1);
     main_hlyt->addWidget(m_treeWdt);
 
-    //QTreeWidgetItem *job_main_item =  new QTreeWidgetItem(m_treeWdt);
-    //job_main_item->setText(0, "Job");
+    connect(m_treeWdt, &QTreeWidget::customContextMenuRequested, this, &JobTree::slotGetCurrentItem);
+    connect(m_addBlockAct, &QAction::triggered, this, &JobTree::slotAddBlockToTreeWdt);
+    connect(m_copyBlockAct, &QAction::triggered, this, &JobTree::slotCopyBlockToTreeWdt);
+    connect(m_deleteBlockAct, &QAction::triggered, this, &JobTree::slotDeleteBlockFromTreeWdt);
 }
 void JobTree::updateWidget()
 {
@@ -23,47 +38,85 @@ void JobTree::updateWidget()
 
 QTreeWidgetItem* JobTree::addBlockToTreeWdt()
 {
+    //m_treeWdt->setColumnCount(1);
     QTreeWidgetItem *item = new QTreeWidgetItem(m_treeWdt);
+    item->setText(0, "Block"+QString::number(m_blockCount+1));
     m_treeWdt->addTopLevelItem(item);
-    int top_item_count = m_treeWdt->topLevelItemCount();
-    item->setText(top_item_count, "Block"+QString::number(top_item_count));
-
+    m_blockCount++;
     return item;
 }
 
-QTreeWidgetItem* JobTree::copyBlockToTreeWdt(QTreeWidgetItem *item, QString text)
+QTreeWidgetItem* JobTree::copyBlockToTreeWdt(QTreeWidgetItem *item)
 {
     if (!item)
     {
         return nullptr;
     }
     QTreeWidgetItem *itemCopy = item->clone();
-    int index = m_treeWdt->indexOfTopLevelItem(item)+1;
-    itemCopy->setText(index, "Block" + QString::number(index));
+    itemCopy->setText(0, "Block" + QString::number(m_blockCount+1));
     m_treeWdt->addTopLevelItem(itemCopy);
+    m_blockCount++;
 
     return itemCopy;
 }
 
 void JobTree::deleteBlockFromTreeWdt(QTreeWidgetItem *item)
 {
-    if (!item)
+    QTreeWidgetItem *item1;
+    if (!m_currentItem)
     {
         return;
     }
+    int delete_index = m_treeWdt->indexOfTopLevelItem(m_currentItem);
+    m_treeWdt->takeTopLevelItem(delete_index);
+    m_blockCount--;
+    int count = m_treeWdt->topLevelItemCount();
+    for (int i = delete_index; i < count; i++)
+    {
+        item1 = m_treeWdt->topLevelItem(i);
+        item1->setText(0, "Block" + QString::number(i+1));
+    }
     //m_treeWdt->removeItemWidget(item, 0);
-    //m_treeWdt->takeTopLevelItem(m_treeWdt->indexOfTopLevelItem(item));
-    delete item;
+    delete m_currentItem;
 }
 
-void JobTree::slotCopyBlockToTreeWdt(QTreeWidgetItem *item, QString text)
+void JobTree::slotAddBlockToTreeWdt(bool trigger)
 {
-    copyBlockToTreeWdt(item, text);
+    addBlockToTreeWdt();
 }
 
-void JobTree::slotDeleteBlockFromTreeWdt(QTreeWidgetItem *item)
+void JobTree::slotCopyBlockToTreeWdt(bool trigger)
 {
-    deleteBlockFromTreeWdt(item);
+    //QTreeWidgetItem *item = qobject_cast<QTreeWidgetItem *>(QObject::sender()->parent());
+    //QTreeWidgetItem *item = m_treeWdt->itemAt();
+    copyBlockToTreeWdt(m_currentItem);
+}
+
+void JobTree::slotDeleteBlockFromTreeWdt(bool trigger) 
+{
+    //QTreeWidgetItem *item = qobject_cast<QTreeWidgetItem *>(QObject::sender()->parent());
+    deleteBlockFromTreeWdt(m_currentItem);
+}
+
+void JobTree::slotGetCurrentItem(const QPoint &pos)
+{
+    QMenu menu(this);
+    menu.addAction(m_addBlockAct);
+    menu.addAction(m_copyBlockAct);
+    menu.addAction(m_deleteBlockAct);
+
+    m_currentItem = m_treeWdt->itemAt(pos);
+    if (m_currentItem)
+    {
+        m_copyBlockAct->setEnabled(true);
+        m_deleteBlockAct->setEnabled(true);
+    }
+    else
+    {
+        m_copyBlockAct->setEnabled(false);
+        m_deleteBlockAct->setEnabled(false);
+    }
+    menu.exec(mapToGlobal(pos));
 }
 
 void JobTree::slotNotifyJobEditView()

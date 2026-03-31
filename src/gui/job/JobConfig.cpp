@@ -3,6 +3,7 @@
 JobConfig::JobConfig(QWidget* parent)
     : JobEditViewImp(parent)
 {
+    setWindowTitle("Job Tree");
     initWidget();
     
 }

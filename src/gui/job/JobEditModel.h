@@ -1,4 +1,4 @@
-#ifndef JOB_EDIT_MODEL_H
+﻿#ifndef JOB_EDIT_MODEL_H
 #define JOB_EDIT_MODEL_H
 
 #include "JobEditModelImp.h"

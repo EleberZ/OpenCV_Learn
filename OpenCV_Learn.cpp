@@ -171,16 +171,16 @@ void OpenCV::initTabBar()
 
 void OpenCV::initJob()
 {
-    m_jobController = new JobController();
+    //m_jobController = new JobController();
     //m_jobBlock = new JobBlock(this);
     m_jobConfig = new JobConfig(this);
     m_jobTree = new JobTree(this);
     m_jobEditModel = std::make_shared<JobEditModel>(this);
 
-    m_jobController->setView(m_jobBlock);
-    m_jobController->setView(m_jobConfig);
-    m_jobController->setView(m_jobTree);
-    m_jobController->setModel(m_jobEditModel);
+    //m_jobController->setView(m_jobBlock);1
+    //m_jobController->setView(m_jobConfig);
+    //m_jobController->setView(m_jobTree);
+    //m_jobController->setModel(m_jobEditModel);
 
     m_WorkPosition_dockWdt->setWidget(m_jobTree);
     m_CameraConfig_dockWdt->setWidget(m_jobConfig);
@@ -275,9 +275,6 @@ void OpenCV::addDockToArea(QDockWidget *dock, DockArea area, const QString &cont
 
     dockList.append(dock);
     dock->setAllowedAreas(static_cast<Qt::DockWidgetArea>(area));
-
-
-
 }
 
 QSize OpenCV::WidgetShowAndHide(QWidget *widget, QSize size)

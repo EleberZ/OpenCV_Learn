@@ -1,9 +1,13 @@
 #ifndef JOB_TREE_H
 #define JOB_TREE_H
 
-#include <QTreeWidget>
-#include <QWidget>
 #include "JobEditViewImp.h"
+#include <QMenu>
+#include <QAction>
+#include <QTreeWidget>
+#include <QLineEdit>
+#include <QPoint>
+#include <QWidget>
 
 class JobTree: public JobEditViewImp
 {
@@ -15,15 +19,27 @@ public:
     void initWidget()override;
     void updateWidget()override;
     QTreeWidgetItem* addBlockToTreeWdt();
+    QTreeWidgetItem *copyBlockToTreeWdt(QTreeWidgetItem *item);
     QTreeWidgetItem* copyBlockToTreeWdt(QTreeWidgetItem *item, QString text);
     void deleteBlockFromTreeWdt(QTreeWidgetItem *item);
 public slots:
     void slotNotifyJobEditView();
 private slots:
-    void slotCopyBlockToTreeWdt(QTreeWidgetItem *item, QString text);
-    void slotDeleteBlockFromTreeWdt(QTreeWidgetItem *item);
+    void slotAddBlockToTreeWdt(bool trigger);
+    void slotCopyBlockToTreeWdt(bool trigger);
+    void slotDeleteBlockFromTreeWdt(bool trigger);
+    void slotGetCurrentItem(const QPoint &pos);
 private:
 	QTreeWidget *m_treeWdt;
+    QTreeWidgetItem *m_currentItem;
+    QMenu *m_menu_block;
+
+    QAction *m_addBlockAct;
+    QAction *m_copyBlockAct;
+    QAction *m_deleteBlockAct;
+    QLineEdit *m_edit1;
+    int m_blockCount;
+    
 };
 
 
