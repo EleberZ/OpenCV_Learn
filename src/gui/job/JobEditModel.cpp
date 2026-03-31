@@ -1,4 +1,4 @@
-#include "JobEditModel.h"
+﻿#include "JobEditModel.h"
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <QDomDocument>
