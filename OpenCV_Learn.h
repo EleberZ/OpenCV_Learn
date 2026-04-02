@@ -1,7 +1,4 @@
-// OpenCV_Learn.h: 标准系统包含文件的包含文件
-// 或项目特定的包含文件。
 #pragma once
-
 #include "JobBlock.h"
 #include "JobConfig.h"
 #include "JobController.h"
@@ -25,6 +22,7 @@
 #include <QMdiSubWindow>
 #include <QPushButton>
 #include <QSlider>
+#include"camer_config.h"
 
 class OpenCV: public QMainWindow
 {
@@ -43,6 +41,7 @@ public:
 	void initDockTabContainer();
     void initTabBar();
     void initJob();
+    void initGlobel();
 	QDockWidget* initPlaceHoldeDocks(DockArea area);
 	void initPlaceHoldeDocks();
 	QDockWidget* initDockWidget(QString name);
@@ -107,6 +106,8 @@ private:
     ZDockTabContainer *m_DockTab_Left;
     ZDockTabContainer *m_DockTab_Right;
     ZDockTabContainer *m_DockTab_Bottom;
+
+    CameraConfig *m_camer_config;
 
     JobController *m_jobController;
     JobBlock *m_jobBlock;

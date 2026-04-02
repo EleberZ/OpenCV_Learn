@@ -22,6 +22,8 @@ public:
     QTreeWidgetItem *copyBlockToTreeWdt(QTreeWidgetItem *item);
     QTreeWidgetItem* copyBlockToTreeWdt(QTreeWidgetItem *item, QString text);
     void deleteBlockFromTreeWdt(QTreeWidgetItem *item);
+signals:
+    void sglBlockDoubleClicked();
 public slots:
     void slotNotifyJobEditView();
 private slots:
@@ -29,6 +31,7 @@ private slots:
     void slotCopyBlockToTreeWdt(bool trigger);
     void slotDeleteBlockFromTreeWdt(bool trigger);
     void slotGetCurrentItem(const QPoint &pos);
+    void slotBlockDoubleClicked(QTreeWidgetItem *item, int column);
 private:
 	QTreeWidget *m_treeWdt;
     QTreeWidgetItem *m_currentItem;

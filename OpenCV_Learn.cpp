@@ -45,6 +45,7 @@ OpenCV::OpenCV(QWidget *parent)
 
     initTabBar();
     initJob();
+    initGlobel();
 
     z_cv_lib = new Z_CV_lib();
     connect(btn_open, SIGNAL(clicked()), this, SLOT(slotBtnOpenClicked()));
@@ -52,7 +53,6 @@ OpenCV::OpenCV(QWidget *parent)
     connect(btn_reset, SIGNAL(clicked()), this, SLOT(slotBtnColorClicked()));
     connect(transparency, &QSlider::valueChanged, this, &OpenCV::slotSliderValueChanged);
     setStyleSheet(R"(
-            /* 标签栏样式 */
             QTabBar::tab {
                 background-color: #F0F0F0;
                 color: #333;
@@ -63,17 +63,14 @@ OpenCV::OpenCV(QWidget *parent)
                 background-color: #0078D7;
                 color: white;
             }
-            /* Dock整体样式 */
             QDockWidget {
                 border: 1px solid #E0E0E0;
                 margin: 2px;
             }
-            /* Dock内容区间距 */
             QDockWidget > QWidget {
                 padding: 8px;
             }
         )");
-
 }
 
 OpenCV::~OpenCV()
@@ -188,6 +185,12 @@ void OpenCV::initJob()
     connect(this, &OpenCV::sglNewJob, m_jobEditModel.get(), &JobEditModel::slotNewJob);
     connect(this, &OpenCV::sglLoadJob, m_jobEditModel.get(), &JobEditModel::slotLoadJob);
     connect(this, &OpenCV::sglSaveJob, m_jobEditModel.get(), &JobEditModel::slotSaveJob);
+}
+
+void OpenCV::initGlobel()
+{
+    m_camer_config = new CameraConfig(this);
+    m_camer_config->hide();
 }
 
 QDockWidget *OpenCV::initPlaceHoldeDocks(DockArea area)
@@ -357,6 +360,7 @@ void OpenCV::slot_cascadeSubWindow()
 
 void OpenCV::slot_CameraConfig()
 {
+    m_camer_config->show();
 }
 
 void OpenCV::slot_NetworkConfig()
