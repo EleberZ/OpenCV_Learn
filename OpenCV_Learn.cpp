@@ -23,9 +23,9 @@ OpenCV::OpenCV(QWidget *parent)
     setDockNestingEnabled(true);
 
     m_WorkPosition_dockWdt = initDockWidget("WorkPositon>>>>");
-    m_WorkPosition_dockWdt->setFixedWidth(200);
-    m_CameraConfig_dockWdt = initDockWidget("CameraSetup>>>>");
-    m_CameraConfig_dockWdt->setFixedWidth(200);
+    //m_WorkPosition_dockWdt->setFixedWidth(200);
+    m_BlockConfig_dockWdt = initDockWidget("CameraSetup>>>>");
+    //m_BlockConfig_dockWdt->setFixedWidth(200);
     m_Output_dockWdt = initDockWidget("Output>>>>");
     m_Strip_dockWdt = initDockWidget("Strip>>>>");
 
@@ -38,7 +38,7 @@ OpenCV::OpenCV(QWidget *parent)
     setTabPosition(Qt::BottomDockWidgetArea, QTabWidget::South);
 
     // ========== 3. 示例：为四个区域分别添加单个Dock（验证单个标签） ==========
-    addDockToArea(m_CameraConfig_dockWdt, RightArea, "");
+    addDockToArea(m_BlockConfig_dockWdt, RightArea, "");
     addDockToArea(m_WorkPosition_dockWdt, LeftArea, "");
     addDockToArea(m_Output_dockWdt, BottomArea, "");
     addDockToArea(m_Strip_dockWdt, BottomArea, "");
@@ -125,18 +125,10 @@ void OpenCV::initMDIWidget()
     winMenu->addAction(tr("Output"), this, SLOT(slot_Win_Output()));
     menuBar()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     menuBar()->setFixedSize(200, 40);
-    //QMenuBar *menubar = new QMenuBar(this);
-    //menubar->addMenu(cameraMenu);
-    //menubar->addMenu(fileMenu);
-    //menubar->addMenu(winMenu);
-    //setMenuBar(menubar);
 }
 
 void OpenCV::initDockTabContainer()
 {
-    m_DockTab_Bottom = new ZDockTabContainer(0, this);
-    m_DockTab_Left = new ZDockTabContainer(1, this);
-    m_DockTab_Right = new ZDockTabContainer(2, this);
 }
 
 void OpenCV::initTabBar()
@@ -174,17 +166,20 @@ void OpenCV::initJob()
     m_jobTree = new JobTree(this);
     m_jobEditModel = std::make_shared<JobEditModel>(this);
 
-    //m_jobController->setView(m_jobBlock);1
+    //m_jobController->setView(m_jobBlock);
     //m_jobController->setView(m_jobConfig);
     //m_jobController->setView(m_jobTree);
     //m_jobController->setModel(m_jobEditModel);
 
     m_WorkPosition_dockWdt->setWidget(m_jobTree);
-    m_CameraConfig_dockWdt->setWidget(m_jobConfig);
+    m_BlockConfig_dockWdt->setWidget(m_jobConfig);
 
     connect(this, &OpenCV::sglNewJob, m_jobEditModel.get(), &JobEditModel::slotNewJob);
     connect(this, &OpenCV::sglLoadJob, m_jobEditModel.get(), &JobEditModel::slotLoadJob);
     connect(this, &OpenCV::sglSaveJob, m_jobEditModel.get(), &JobEditModel::slotSaveJob);
+
+    connect(m_jobTree, &JobTree::sglBlockDoubleClicked, m_jobConfig, &JobConfig::slotJobBlockDoubleClicked);
+    connect(m_jobTree, &JobTree::sglBlockDoubleClicked, this, &OpenCV::slot_JobTree_BlockDoubleClicked);
 }
 
 void OpenCV::initGlobel()
@@ -212,7 +207,7 @@ QDockWidget *OpenCV::initDockWidget(QString name)
 
     QWidget *titleBar = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(titleBar);
-    layout->setContentsMargins(5, 0, 5, 0); // 紧凑一点
+    layout->setContentsMargins(5, 5, 5, 5); // 紧凑一点
     layout->setSpacing(5);
     QLabel *titleLabel = new QLabel(name, this);
     titleLabel->setStyleSheet("font-weight: bold;");
@@ -239,19 +234,19 @@ QDockWidget *OpenCV::initDockWidget(QString name)
     WorkPosition_dockWdt->setFeatures(QDockWidget::DockWidgetClosable
         | QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
     WorkPosition_dockWdt->setAcceptDrops(true);
-    WorkPosition_dockWdt->setStyleSheet(R"(
-        QDockWidget{
-            background-color: #2E8000;
-            border: 5px solid #0088FF;
-            border-radius 4px;
-            margin: 5px; 
-        }
-        QDockWidget::title{
-            background-color: #2E86AB;
-            color: white; 
-            font-size: 14px;
-        })"
-    );
+    //WorkPosition_dockWdt->setStyleSheet(R"(
+    //    QDockWidget{
+    //        background-color: #2E8000;
+    //        border: 5px solid #0088FF;
+    //        border-radius 4px;
+    //        margin: 5px; 
+    //    }
+    //    QDockWidget::title{
+    //        background-color: #2E86AB;
+    //        color: white; 
+    //        font-size: 14px;
+    //    })"
+    //);
     return WorkPosition_dockWdt;
 }
 
@@ -270,6 +265,7 @@ void OpenCV::addDockToArea(QDockWidget *dock, DockArea area, const QString &cont
         this->addDockWidget(static_cast<Qt::DockWidgetArea>(area), placeHolder);
         this->tabifyDockWidget(placeHolder, dock);
         //dock->raise();
+        
     }
     else
     {
@@ -416,7 +412,14 @@ void OpenCV::slot_Win_Output()
 
 void OpenCV::slot_Win_CameraConfig()
 {
-    m_CameraConfig_dockWdt->show();
+    m_BlockConfig_dockWdt->show();
+}
+
+void OpenCV::slot_JobTree_BlockDoubleClicked(QTreeWidgetItem *item)
+{
+    QString str = item->text(0);
+    m_jobConfig->setMainGroubBoxTitle(str);
+    m_BlockConfig_dockWdt->setWindowTitle(str);
 }
 
 void OpenCV::slotBtnOpenClicked()

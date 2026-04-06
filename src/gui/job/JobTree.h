@@ -23,7 +23,7 @@ public:
     QTreeWidgetItem* copyBlockToTreeWdt(QTreeWidgetItem *item, QString text);
     void deleteBlockFromTreeWdt(QTreeWidgetItem *item);
 signals:
-    void sglBlockDoubleClicked();
+    void sglBlockDoubleClicked(QTreeWidgetItem *item);
 public slots:
     void slotNotifyJobEditView();
 private slots:

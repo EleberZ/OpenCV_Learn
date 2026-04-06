@@ -11,7 +11,9 @@ JobTree::JobTree(QWidget* parent)
 }
 void JobTree::initWidget()
 {
-    m_treeWdt = new QTreeWidget(this);
+    m_treeWdt = new QTreeWidget( this);
+    m_treeWdt->setHeaderLabel("*. Job");
+    //m_treeWdt->setHeaderHidden(true);
     m_treeWdt->setContextMenuPolicy(Qt::CustomContextMenu);
     //m_treeWdt->setContextMenuPolicy(Qt::ActionsContextMenu);
     m_treeWdt->setWindowTitle("Job Tree");
@@ -23,12 +25,14 @@ void JobTree::initWidget()
     //QGroupBox *gbox = new QGroupBox(this);
     QVBoxLayout *main_hlyt = new QVBoxLayout(this);
     main_hlyt->addWidget(m_treeWdt);
+    setLayout(main_hlyt);
+
 
     connect(m_treeWdt, &QTreeWidget::customContextMenuRequested, this, &JobTree::slotGetCurrentItem);
     connect(m_addBlockAct, &QAction::triggered, this, &JobTree::slotAddBlockToTreeWdt);
     connect(m_copyBlockAct, &QAction::triggered, this, &JobTree::slotCopyBlockToTreeWdt);
     connect(m_deleteBlockAct, &QAction::triggered, this, &JobTree::slotDeleteBlockFromTreeWdt);
-    connect(m_treeWdt, &QTreeWidget::itemDoubleClicked, this, &JobTree::slotBlockDoubleClicked);
+    connect(m_treeWdt, &QTreeWidget::itemClicked, this, &JobTree::slotBlockDoubleClicked);
 }
 void JobTree::updateWidget()
 {
@@ -125,7 +129,7 @@ void JobTree::slotBlockDoubleClicked(QTreeWidgetItem *item, int column)
         return;
     }
 
-    emit sglBlockDoubleClicked();
+    emit sglBlockDoubleClicked(item);
 }
 
 void JobTree::slotNotifyJobEditView()

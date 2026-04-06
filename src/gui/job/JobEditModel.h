@@ -1,10 +1,11 @@
-﻿#ifndef JOB_EDIT_MODEL_H
+#ifndef JOB_EDIT_MODEL_H
 #define JOB_EDIT_MODEL_H
 
 #include "JobEditModelImp.h"
 #include <QFile>
 #include <QDomDocument>
 #include <QTextStream>
+#include <opencv2/imgproc.hpp>
 
 struct ROIData
 {
@@ -25,6 +26,7 @@ private:
     double m_xpos;
     double m_ypos;
     ROIData *m_roi_data;
+    cv::TemplateMatchModes m_template_match_methor;
 public:
     BlockData();
     ~BlockData();
