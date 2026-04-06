@@ -24,8 +24,8 @@ OpenCV::OpenCV(QWidget *parent)
 
     m_WorkPosition_dockWdt = initDockWidget("WorkPositon>>>>");
     m_WorkPosition_dockWdt->setFixedWidth(200);
-    m_CameraConfig_dockWdt = initDockWidget("CameraSetup>>>>");
-    m_CameraConfig_dockWdt->setFixedWidth(200);
+    m_BlockConfig_dockWdt = initDockWidget("CameraSetup>>>>");
+    m_BlockConfig_dockWdt->setFixedWidth(200);
     m_Output_dockWdt = initDockWidget("Output>>>>");
     m_Strip_dockWdt = initDockWidget("Strip>>>>");
 
@@ -38,7 +38,7 @@ OpenCV::OpenCV(QWidget *parent)
     setTabPosition(Qt::BottomDockWidgetArea, QTabWidget::South);
 
     // ========== 3. 示例：为四个区域分别添加单个Dock（验证单个标签） ==========
-    addDockToArea(m_CameraConfig_dockWdt, RightArea, "");
+    addDockToArea(m_BlockConfig_dockWdt, RightArea, "");
     addDockToArea(m_WorkPosition_dockWdt, LeftArea, "");
     addDockToArea(m_Output_dockWdt, BottomArea, "");
     addDockToArea(m_Strip_dockWdt, BottomArea, "");
@@ -180,11 +180,14 @@ void OpenCV::initJob()
     //m_jobController->setModel(m_jobEditModel);
 
     m_WorkPosition_dockWdt->setWidget(m_jobTree);
-    m_CameraConfig_dockWdt->setWidget(m_jobConfig);
+    m_BlockConfig_dockWdt->setWidget(m_jobConfig);
 
     connect(this, &OpenCV::sglNewJob, m_jobEditModel.get(), &JobEditModel::slotNewJob);
     connect(this, &OpenCV::sglLoadJob, m_jobEditModel.get(), &JobEditModel::slotLoadJob);
     connect(this, &OpenCV::sglSaveJob, m_jobEditModel.get(), &JobEditModel::slotSaveJob);
+
+    connect(m_jobTree, &JobTree::sglBlockDoubleClicked, m_jobConfig, &JobConfig::slotJobBlockDoubleClicked);
+    connect(m_jobTree, &JobTree::sglBlockDoubleClicked, this, &OpenCV::slot_JobTree_BlockDoubleClicked);
 }
 
 void OpenCV::initGlobel()
@@ -416,7 +419,13 @@ void OpenCV::slot_Win_Output()
 
 void OpenCV::slot_Win_CameraConfig()
 {
-    m_CameraConfig_dockWdt->show();
+    m_BlockConfig_dockWdt->show();
+}
+
+void OpenCV::slot_JobTree_BlockDoubleClicked(QTreeWidgetItem *item)
+{
+    QString str = item->text(0);
+    m_BlockConfig_dockWdt->setWindowTitle(str);
 }
 
 void OpenCV::slotBtnOpenClicked()

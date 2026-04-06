@@ -68,6 +68,7 @@ private slots:
 	void slot_Win_WorkPosition();
 	void slot_Win_Output();
 	void slot_Win_CameraConfig();
+    void slot_JobTree_BlockDoubleClicked(QTreeWidgetItem *item);
 
 private:
     QGridLayout *glyt;
@@ -85,7 +86,7 @@ private:
     OutputWidget *output_wdt;
     QMdiArea *m_mdiArea;
     QDockWidget *m_WorkPosition_dockWdt;
-    QDockWidget *m_CameraConfig_dockWdt;
+    QDockWidget *m_BlockConfig_dockWdt;
     QDockWidget *m_Output_dockWdt;
     QDockWidget *m_Strip_dockWdt;
     QDockWidget *m_1_dockWdt;

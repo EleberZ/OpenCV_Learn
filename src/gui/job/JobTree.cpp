@@ -125,7 +125,7 @@ void JobTree::slotBlockDoubleClicked(QTreeWidgetItem *item, int column)
         return;
     }
 
-    emit sglBlockDoubleClicked();
+    emit sglBlockDoubleClicked(item);
 }
 
 void JobTree::slotNotifyJobEditView()
