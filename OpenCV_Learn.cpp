@@ -23,9 +23,9 @@ OpenCV::OpenCV(QWidget *parent)
     setDockNestingEnabled(true);
 
     m_WorkPosition_dockWdt = initDockWidget("WorkPositon>>>>");
-    //m_WorkPosition_dockWdt->setFixedWidth(200);
+    m_WorkPosition_dockWdt->setFixedWidth(300);
     m_BlockConfig_dockWdt = initDockWidget("CameraSetup>>>>");
-    //m_BlockConfig_dockWdt->setFixedWidth(200);
+    m_BlockConfig_dockWdt->setFixedWidth(300);
     m_Output_dockWdt = initDockWidget("Output>>>>");
     m_Strip_dockWdt = initDockWidget("Strip>>>>");
 
