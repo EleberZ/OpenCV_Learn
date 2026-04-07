@@ -151,25 +151,15 @@ void OpenCV::initTabBar()
             )");
             tabBar->setCurrentIndex(1);
         }
-        //connect(tabBar, &QTabBar::tabBarClicked, this, [tabBar](int index)
-        //    {
-        //    }
-        //);
     }
 }
 
 void OpenCV::initJob()
 {
-    //m_jobController = new JobController();
-    //m_jobBlock = new JobBlock(this);
     m_jobConfig = new JobConfig(this);
     m_jobTree = new JobTree(this);
     m_jobEditModel = std::make_shared<JobEditModel>(this);
 
-    //m_jobController->setView(m_jobBlock);
-    //m_jobController->setView(m_jobConfig);
-    //m_jobController->setView(m_jobTree);
-    //m_jobController->setModel(m_jobEditModel);
 
     m_WorkPosition_dockWdt->setWidget(m_jobTree);
     m_BlockConfig_dockWdt->setWidget(m_jobConfig);
@@ -229,24 +219,22 @@ QDockWidget *OpenCV::initDockWidget(QString name)
 
         }
     );
-
-    //addDockWidget(Qt::RightDockWidgetArea, m_WorkPosition_dockWdt);
     WorkPosition_dockWdt->setFeatures(QDockWidget::DockWidgetClosable
         | QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
     WorkPosition_dockWdt->setAcceptDrops(true);
-    //WorkPosition_dockWdt->setStyleSheet(R"(
-    //    QDockWidget{
-    //        background-color: #2E8000;
-    //        border: 5px solid #0088FF;
-    //        border-radius 4px;
-    //        margin: 5px; 
-    //    }
-    //    QDockWidget::title{
-    //        background-color: #2E86AB;
-    //        color: white; 
-    //        font-size: 14px;
-    //    })"
-    //);
+    WorkPosition_dockWdt->setStyleSheet(R"(
+        QDockWidget{
+            background-color: #2E8000;
+            border: 5px solid #0088FF;
+            border-radius 4px;
+            margin: 5px; 
+        }
+        QDockWidget::title{
+            background-color: #2E86AB;
+            color: white; 
+            font-size: 14px;
+        })"
+    );
     return WorkPosition_dockWdt;
 }
 

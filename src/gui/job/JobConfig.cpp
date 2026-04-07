@@ -25,6 +25,8 @@ void JobConfig::initWidget()
     m_gbox_picture_show = new QGroupBox(tr("Picture Show"), this);
     QGridLayout *grid_layout = new QGridLayout(m_gbox_picture_show);
 
+    m_ledit_roi_x = new QLineEdit(this);
+    m_ledit_roi_y = new QLineEdit(this);
     m_ledit_roi_width = new QLineEdit(this);
     m_ledit_roi_height = new QLineEdit(this);
 
@@ -34,7 +36,7 @@ void JobConfig::initWidget()
     m_label_template_file = new QLabel(tr("Template File:"), this);
     m_ledit_template_file = new QLineEdit(this);
     m_graphic_view_template = new QGraphicsView(m_graphic_scene_template, this);
-    m_check_enable_mask = new QCheckBox(this);
+    m_check_enable_mask = new QCheckBox(tr("Mask Disable"), this);
     m_label_mask_file = new QLabel(tr("Mask File:"), this);
     m_ledit_mask_file = new QLineEdit(this);
     m_ledit_mask_file->setEnabled(false);
@@ -42,18 +44,26 @@ void JobConfig::initWidget()
     m_graphic_view_mask->setEnabled(false);
 
 
-    grid_layout->addWidget(new QLabel("ROI Width(px)", this), 0, 0, 1, 1);
-    grid_layout->addWidget(m_ledit_roi_width, 0, 1, 1, 2);
-    grid_layout->addWidget(new QLabel("ROI Height(px)", this), 1, 0, 1, 1);
-    grid_layout->addWidget(m_ledit_roi_height, 1, 1, 1, 2);
-    grid_layout->addWidget(m_label_template_file, 2, 0, 1, 1);
-    grid_layout->addWidget(m_ledit_template_file, 3, 0, 1, 3);
-    grid_layout->addWidget(m_graphic_view_template, 4, 0, 3, 3);
+    grid_layout->addWidget(new QLabel("ROI Origin", this), 0, 0, 1, 1);
+    grid_layout->addWidget(new QLabel("X", this), 0, 1, 1, 1);
+    grid_layout->addWidget(m_ledit_roi_x, 0, 2, 1, 2);
+    grid_layout->addWidget(new QLabel("Y", this), 0, 4, 1, 1);
+    grid_layout->addWidget(m_ledit_roi_y, 0, 5, 1, 2);
 
-    grid_layout->addWidget(m_label_mask_file, 8, 0, 1, 1);
-    grid_layout->addWidget(m_check_enable_mask, 8, 2, 1, 1);
-    grid_layout->addWidget(m_ledit_mask_file, 9, 0, 1, 3);
-    grid_layout->addWidget(m_graphic_view_mask, 10, 0, 3, 3);
+    grid_layout->addWidget(new QLabel("ROI Width(px)", this), 1, 0, 1, 1);
+    grid_layout->addWidget(m_ledit_roi_width, 1, 1, 1, 6);
+
+    grid_layout->addWidget(new QLabel("ROI Height(px)", this), 2, 0, 1, 1);
+    grid_layout->addWidget(m_ledit_roi_height, 2, 1, 1, 6);
+
+    grid_layout->addWidget(m_label_template_file, 3, 0, 1, 1);
+    grid_layout->addWidget(m_ledit_template_file, 4, 0, 1, 7);
+    grid_layout->addWidget(m_graphic_view_template, 5, 0, 7, 7);
+
+    grid_layout->addWidget(m_label_mask_file, 12, 0, 1, 1);
+    grid_layout->addWidget(m_check_enable_mask, 12, 1, 1, 6);
+    grid_layout->addWidget(m_ledit_mask_file, 13, 0, 1, 7);
+    grid_layout->addWidget(m_graphic_view_mask, 14, 0, 7, 7);
 
     QVBoxLayout *hbox = new QVBoxLayout(m_gbox_main);
     hbox->addWidget(m_cbox_job_mode);

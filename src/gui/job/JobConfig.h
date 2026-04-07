@@ -50,6 +50,8 @@ private:
     QLineEdit *m_ledit_mask_file;
     QLineEdit *m_ledit_roi_width;
     QLineEdit *m_ledit_roi_height;
+    QLineEdit *m_ledit_roi_x;
+    QLineEdit *m_ledit_roi_y;
 
     QGraphicsView *m_graphic_view_template;
     QGraphicsView *m_graphic_view_mask;
