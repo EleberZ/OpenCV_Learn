@@ -4,7 +4,6 @@
 #include <QWidget>
 #include <QTextEdit>
 
-
 class OutputWidget : public QWidget
 {
     Q_OBJECT

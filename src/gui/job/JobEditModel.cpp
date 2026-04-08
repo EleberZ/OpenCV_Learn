@@ -1,4 +1,4 @@
-﻿#include "JobEditModel.h"
+#include "JobEditModel.h"
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <QDomDocument>
@@ -185,6 +185,7 @@ void JobEditModel::loadJobFile(QString filepath)
         file.close();
         return;
     }
+    emit sglloadJobFileSuccess();
 }
 
 void JobEditModel::saveJobFile()

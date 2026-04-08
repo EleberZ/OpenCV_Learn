@@ -178,6 +178,71 @@ void OpenCV::initGlobel()
     m_camer_config->hide();
 }
 
+void OpenCV::initHSM()
+{
+    m_stateMachine = new QStateMachine(this);
+
+    m_state_Pconfig = new QState(m_stateMachine);
+    m_state_init = new QState(m_state_Pconfig);
+    m_state_init->setObjectName("Init");
+    m_state_ready = new QState(m_state_Pconfig);
+    m_state_ready->setObjectName("Ready");
+    m_state_init->addTransition(m_jobEditModel.get(), &JobEditModel::sglloadJobFileSuccess, m_state_ready);
+
+    m_state_PRun = new QState(m_stateMachine);
+    m_state_work = new QState(m_state_PRun);
+    m_state_work->setObjectName("Work");
+    m_state_done = new QState(m_state_PRun);
+    m_state_done->setObjectName("Done");
+
+    m_state_PStop = new QState(m_stateMachine);
+    m_state_alarm = new QState(m_state_PStop);
+    m_state_alarm->setObjectName("Alarm");
+
+    m_stateMachine->setInitialState(m_state_Pconfig);
+    m_state_Pconfig->setInitialState(m_state_init);
+    m_state_PRun->setInitialState(m_state_work);
+    m_state_PStop->setInitialState(m_state_alarm);
+
+    connect(m_state_init, &QState::entered, this, [this]()
+        {
+            m_jobBlock->setEnabled(false);
+            m_output->appendText("System State:Init");
+        });
+    connect(m_state_ready, &QState::entered, this, [this]()
+        {
+            m_jobBlock->setEnabled(true);
+            m_jobBlock->update();
+            m_jobConfig->update();
+            m_output->appendText("System State:Ready");
+        });
+
+    connect(m_state_work, &QState::entered, this, [this]()
+        {
+            m_jobBlock->setEnabled(false);
+            m_output->appendText("System State:Work");
+        });
+    connect(m_state_done, &QState::entered, this, [this]()
+        {
+            m_jobBlock->setEnabled(false);
+            m_output->appendText("System State:Done");
+        });
+
+    connect(m_state_alarm, &QState::entered, this, [this]()
+        {
+            m_jobBlock->setEnabled(false);
+            m_output->appendText("System State:Alarm");
+        });
+
+    m_stateMachine->start();
+}
+
+void OpenCV::initLogAndOutput()
+{
+    m_output = new OutputWidget(this);
+    //m_log_system = new LogSystem();
+}
+
 QDockWidget *OpenCV::initPlaceHoldeDocks(DockArea area)
 {
     QDockWidget *dock = new QDockWidget(this);
@@ -252,8 +317,6 @@ void OpenCV::addDockToArea(QDockWidget *dock, DockArea area, const QString &cont
     {
         this->addDockWidget(static_cast<Qt::DockWidgetArea>(area), placeHolder);
         this->tabifyDockWidget(placeHolder, dock);
-        //dock->raise();
-        
     }
     else
     {

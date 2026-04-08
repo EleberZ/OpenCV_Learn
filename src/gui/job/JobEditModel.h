@@ -78,6 +78,7 @@ public:
     BlockData getBlockData(int index);
 
 signals:
+    void sglloadJobFileSuccess();
     void sglNotifyJobEditView();
 public slots:
     void slotNewJob(QString filepath);
