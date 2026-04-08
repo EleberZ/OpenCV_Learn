@@ -100,6 +100,7 @@ set(src_gui_job "${src_gui}/job")
 set(src_gui_main "${src_gui}/main")
 set(src_gui_zhang "${src_gui}/zhang")
 set(src_gui_globel "${src_gui}/globel")
+set(src_gui_logsystem "${src_gui}/logsystem")
 
 set(cpp_h_dir
     ${PROJECT_SOURCE_DIR}
@@ -117,6 +118,7 @@ set(cpp_h_dir
     ${src_gui_main}
     ${src_gui_zhang}
     ${src_gui_globel}
+    ${src_gui_logsystem}
 )
 
 set(lib_h_dir

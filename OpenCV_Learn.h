@@ -1,14 +1,16 @@
 #pragma once
+#include"camer_config.h"
 #include "JobBlock.h"
 #include "JobConfig.h"
 #include "JobController.h"
 #include "JobEditModel.h"
 #include "JobTree.h"
+#include "LogSystem.h"
 #include "picture_analyze.h"
 #include "Z_CV_lib.h"
 #include "ZDockTabContainer.h"
 #include <iostream>
-#include <output_widget.h>
+#include <OutputWidget.h>
 #include <QDockWidget>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
@@ -22,7 +24,17 @@
 #include <QMdiSubWindow>
 #include <QPushButton>
 #include <QSlider>
-#include"camer_config.h"
+#include <QState>
+#include <QStateMachine>
+
+enum StateEnum
+{
+    Init,
+    Ready,
+    Work,
+    Done,
+    Alarm
+};
 
 class OpenCV: public QMainWindow
 {
@@ -41,7 +53,10 @@ public:
 	void initDockTabContainer();
     void initTabBar();
     void initJob();
+    void initOutput();
     void initGlobel();
+    void initHSM();
+    void initLogAndOutput();
 	QDockWidget* initPlaceHoldeDocks(DockArea area);
 	void initPlaceHoldeDocks();
 	QDockWidget* initDockWidget(QString name);
@@ -56,6 +71,7 @@ private slots:
 	void slotBtnOpenClicked();
 	void slotBtnGrayClicked();
 	void slotBtnColorClicked();
+    void slotStart(bool clicked);
 	void slotSliderValueChanged(int value);
 	void slot_createNewSubWindow();
 	void slot_tileSubWindow();
@@ -89,12 +105,7 @@ private:
     QDockWidget *m_BlockConfig_dockWdt;
     QDockWidget *m_Output_dockWdt;
     QDockWidget *m_Strip_dockWdt;
-    QDockWidget *m_1_dockWdt;
-    QDockWidget *m_2_dockWdt;
-    QDockWidget *m_3_dockWdt;
-    QDockWidget *m_4_dockWdt;
     QStringList m_strlist_dockWdt;
-
 
     QHash<int, QDockWidget> m_dockWidgetHash;
     QHash<int, QMdiSubWindow> m_subWinHash;
@@ -112,4 +123,14 @@ private:
     JobConfig *m_jobConfig;
     JobTree *m_jobTree;
     std::shared_ptr<JobEditModel> m_jobEditModel;
+
+    OutputWidget *m_output;
+    LogSystem *m_log_system;
+
+    QStateMachine *m_stateMachine;
+    QState *m_state_Pconfig, *m_state_PRun, *m_state_PStop;
+    QState *m_state_ready, *m_state_init, *m_state_work, *m_state_done, *m_state_alarm;
+
+    QAction *toolbar_action_start;
+    static StateEnum m_state;
 };

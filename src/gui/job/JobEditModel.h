@@ -2,10 +2,13 @@
 #define JOB_EDIT_MODEL_H
 
 #include "JobEditModelImp.h"
-#include <QFile>
-#include <QDomDocument>
-#include <QTextStream>
 #include <opencv2/imgproc.hpp>
+#include <QDomDocument>
+#include <QFile>
+#include <QMetaObject>
+#include <QMetaProperty>
+#include <QObject>
+#include <QTextStream>
 
 struct ROIData
 {
@@ -20,6 +23,7 @@ struct ROIData
 };
 struct BlockData
 {
+        
 private:
     QString m_temp_picture_path;
     QString m_mask_picture_path;
@@ -78,12 +82,15 @@ public:
     BlockData getBlockData(int index);
 
 signals:
+    void sglloadJobFileSuccess();
     void sglNotifyJobEditView();
 public slots:
     void slotNewJob(QString filepath);
     void slotSaveJob();
     void slotLoadJob(QString filepath);
+    void slotBlockSave();
 private:
+    void editXmlFile();
     std::unique_ptr<QFile> openFileIfExists(QString filepath);
     void addBlock(int index, QString mask_picture_path, QString output_picture_path,
         double xpos, double ypos, ROIData roi_data);

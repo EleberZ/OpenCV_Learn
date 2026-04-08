@@ -3,16 +3,19 @@
 
 #include <QWidget>
 #include <QTextEdit>
-
+#include <QDateTime>
 
 class OutputWidget : public QWidget
 {
     Q_OBJECT
 public:
     OutputWidget(QWidget *parent = nullptr);
-    QTextEdit *textEdit;
+    void initWidget();
     void appendText(const QString& text);
-
+private:
+    QTextEdit *m_output_edit;
+    QDateTime m_datetime;
+    QDate m_date;
 };
 
 #endif // OUTPUT_WIDGET_H

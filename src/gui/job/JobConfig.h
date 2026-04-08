@@ -23,12 +23,12 @@ public:
     void initWidget()override;
     void updateWidget()override;
     void initConnect();
-
+signals:
+    void sglBtnSave();
     void setMainGroubBoxTitle(const QString &title);
 public slots:
     void slotNotifyJobEditView()override;
     void slotJobBlockDoubleClicked(QTreeWidgetItem *item);
-    void slotBtnSave();
     void slotCheckEnableMask(bool ischeck);
 private:
     QString m_job_block_name;

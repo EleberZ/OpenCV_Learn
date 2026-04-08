@@ -87,6 +87,7 @@ void JobConfig::updateWidget()
 void JobConfig::initConnect()
 {
     connect(m_check_enable_mask, &QCheckBox::toggled, this, &JobConfig::slotCheckEnableMask);
+    connect(m_btn_save, &QPushButton::clicked, this, &JobConfig::sglBtnSave);
 }
 
 void JobConfig::setMainGroubBoxTitle(const QString &title)
@@ -100,11 +101,6 @@ void JobConfig::slotJobBlockDoubleClicked(QTreeWidgetItem *item)
     QString name = item->text(0);
     setWindowTitle(name);
     m_gbox_main->setTitle(name);
-
-}
-
-void JobConfig::slotBtnSave()
-{
 
 }
 

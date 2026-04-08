@@ -1,4 +1,4 @@
-﻿#include "JobEditModel.h"
+#include "JobEditModel.h"
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 #include <QDomDocument>
@@ -163,7 +163,7 @@ void JobEditModel::NewJobFile(QString filepath)
     QDomProcessingInstruction xmlDecl = m_job_xml.createProcessingInstruction(
         "xml", "version='1.0' encoding='UTF-8'"
     );
-    QDomElement rootElement = m_job_xml.createElement(fileInfo.baseName());
+    QDomElement rootElement = m_job_xml.createElement("root");
     m_job_xml.appendChild(xmlDecl);
     m_job_xml.appendChild(rootElement);
 }
@@ -171,7 +171,7 @@ void JobEditModel::NewJobFile(QString filepath)
 void JobEditModel::loadJobFile(QString filepath)
 {
     QFileInfo info(filepath);
-    QFile file;
+    QFile file(filepath);
     if (!info.exists())
     {
         return;
@@ -185,6 +185,7 @@ void JobEditModel::loadJobFile(QString filepath)
         file.close();
         return;
     }
+    emit sglloadJobFileSuccess();
 }
 
 void JobEditModel::saveJobFile()
@@ -222,9 +223,19 @@ void JobEditModel::slotLoadJob(QString filepath)
     loadJobFile(filepath);
 }
 
+void JobEditModel::slotBlockSave()
+{
+    
+}
+
 void JobEditModel::slotSaveJob()
 {
     saveJobFile();
+}
+
+void JobEditModel::editXmlFile()
+{
+
 }
 
 std::unique_ptr<QFile> JobEditModel::openFileIfExists(QString filepath)
