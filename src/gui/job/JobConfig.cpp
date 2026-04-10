@@ -81,7 +81,7 @@ void JobConfig::initWidget()
 
 void JobConfig::updateWidget()
 {
-
+    
 }
 
 void JobConfig::initConnect()

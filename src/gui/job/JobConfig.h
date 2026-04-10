@@ -23,9 +23,9 @@ public:
     void initWidget()override;
     void updateWidget()override;
     void initConnect();
+    void setMainGroubBoxTitle(const QString &title);
 signals:
     void sglBtnSave();
-    void setMainGroubBoxTitle(const QString &title);
 public slots:
     void slotNotifyJobEditView()override;
     void slotJobBlockDoubleClicked(QTreeWidgetItem *item);

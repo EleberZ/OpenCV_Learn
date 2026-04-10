@@ -9,6 +9,7 @@
 #include <QMetaProperty>
 #include <QObject>
 #include <QTextStream>
+#include <map>
 
 struct ROIData
 {
@@ -23,7 +24,6 @@ struct ROIData
 };
 struct BlockData
 {
-        
 private:
     QString m_temp_picture_path;
     QString m_mask_picture_path;
@@ -38,6 +38,7 @@ public:
     BlockData& operator=(const BlockData &other)noexcept;
     BlockData(BlockData &&other)noexcept;
     BlockData& operator=(BlockData &&other)noexcept;
+
     void setXpos(double xpos);
     double getXpos();
     void setYpos(double ypos);
@@ -51,6 +52,9 @@ public:
     QString getMaskPicturePath();
     void setTempPicturePath(QString temp_picture_path);
     QString getTempPicturePath();
+
+    void setTemplateMatchMethod(cv::TemplateMatchModes methor);
+    cv::TemplateMatchModes getTemplateMatchMethod();
 };
 
 enum ShapeEnum
@@ -58,7 +62,6 @@ enum ShapeEnum
     Circle,
     Rectangle,
 };
-
 
 struct ShapeData
 {
@@ -72,13 +75,17 @@ class JobEditModel : public JobEditModelImp
     Q_OBJECT
 public:
     explicit JobEditModel(QObject *parent = nullptr);
+    // Inherited via JobEditModelImp
     void setJobFilepath(QString filepath)override;
     QString getJobFilepath()override;
     void NewJobFile(QString filepath)override;  
     void loadJobFile(QString filepath)override; 
     void saveJobFile()override;
+    void setView(JobEditViewImp *view) override;
 
     void addEmptyBlock(int index);
+    int copyBlock(int index);
+    int deleteBlock(int index);
     BlockData getBlockData(int index);
 
 signals:
@@ -100,6 +107,9 @@ private:
     QTextStream m_job_stream;
     QDomDocument m_job_xml;
     std::vector<BlockData> m_blocks_data;
+    std::map<int, BlockData> m_blocks_data1;
+
+
 };
 
 #endif // JOB_EDIT_MODEL_H

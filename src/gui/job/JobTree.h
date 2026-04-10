@@ -18,12 +18,16 @@ public:
     // 通过 JobEditViewImp 继承
     void initWidget()override;
     void updateWidget()override;
-    QTreeWidgetItem* addBlockToTreeWdt();
-    QTreeWidgetItem *copyBlockToTreeWdt(QTreeWidgetItem *item);
+    int addBlockToTreeWdt();
+    int copyBlockToTreeWdt(QTreeWidgetItem *item);
     QTreeWidgetItem* copyBlockToTreeWdt(QTreeWidgetItem *item, QString text);
-    void deleteBlockFromTreeWdt(QTreeWidgetItem *item);
+    int deleteBlockFromTreeWdt(QTreeWidgetItem *item);
 signals:
     void sglBlockDoubleClicked(QTreeWidgetItem *item);
+    void sglAddBlockToTreeWdt(int index);
+    void sglCopyBlockToTreeWdt(int index);
+    void sglDeleteBlockFromTreeWdt(int index);
+
 public slots:
     void slotNotifyJobEditView();
 private slots:

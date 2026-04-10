@@ -38,67 +38,80 @@ void JobTree::updateWidget()
 {
 }
 
-QTreeWidgetItem* JobTree::addBlockToTreeWdt()
+int JobTree::addBlockToTreeWdt()
 {
-    //m_treeWdt->setColumnCount(1);
+    int add_index = -1;
     QTreeWidgetItem *item = new QTreeWidgetItem(m_treeWdt);
-    item->setText(0, "Block"+QString::number(m_blockCount+1));
+    add_index = m_blockCount + 1;
+    item->setText(0, "Block"+QString::number(add_index));
+
     m_treeWdt->addTopLevelItem(item);
     m_blockCount++;
-    return item;
-
+    return add_index;
 }
 
-QTreeWidgetItem* JobTree::copyBlockToTreeWdt(QTreeWidgetItem *item)
+int JobTree::copyBlockToTreeWdt(QTreeWidgetItem *item)
 {
+    int copy_index = -1;
+    QTreeWidgetItem *item1;
     if (!item)
     {
-        return nullptr;
+        return copy_index;
     }
     QTreeWidgetItem *itemCopy = item->clone();
-    itemCopy->setText(0, "Block" + QString::number(m_blockCount+1));
-    m_treeWdt->addTopLevelItem(itemCopy);
+    int index = m_treeWdt->indexOfTopLevelItem(item);
+    copy_index = index + 1;
+    m_treeWdt->insertTopLevelItem(copy_index, itemCopy);
     m_blockCount++;
 
-    return itemCopy;
+    int count = m_treeWdt->topLevelItemCount();
+    for (int i = copy_index; i < count; i++)
+    {
+        item1 = m_treeWdt->topLevelItem(i);
+        item1->setText(0, "Block" + QString::number(i + 1));
+    }
+    return copy_index;
 }
 
-void JobTree::deleteBlockFromTreeWdt(QTreeWidgetItem *item)
+int JobTree::deleteBlockFromTreeWdt(QTreeWidgetItem *item)
 {
     QTreeWidgetItem *item1;
-    if (!m_currentItem)
+    int delete_index = -1;
+    if (!item)
     {
-        return;
+        return delete_index;
     }
-    int delete_index = m_treeWdt->indexOfTopLevelItem(m_currentItem);
+    delete_index = m_treeWdt->indexOfTopLevelItem(item);
     m_treeWdt->takeTopLevelItem(delete_index);
     m_blockCount--;
+
     int count = m_treeWdt->topLevelItemCount();
     for (int i = delete_index; i < count; i++)
     {
         item1 = m_treeWdt->topLevelItem(i);
         item1->setText(0, "Block" + QString::number(i+1));
     }
-    //m_treeWdt->removeItemWidget(item, 0);
-    delete m_currentItem;
+    delete item;
+    item = nullptr;
+    return delete_index;
 }
 
 void JobTree::slotAddBlockToTreeWdt(bool trigger)
 {
-    addBlockToTreeWdt();
+    int tmp = addBlockToTreeWdt();
+    emit sglAddBlockToTreeWdt(tmp);
 }
 
 void JobTree::slotCopyBlockToTreeWdt(bool trigger)
 {
-    //QTreeWidgetItem *item = qobject_cast<QTreeWidgetItem *>(QObject::sender()->parent());
-    //QTreeWidgetItem *item = m_treeWdt->itemAt();
-    copyBlockToTreeWdt(m_currentItem);
+    int tmp = copyBlockToTreeWdt(m_currentItem);
+    emit sglCopyBlockToTreeWdt(tmp);
 }
 
 void JobTree::slotDeleteBlockFromTreeWdt(bool trigger) 
 {
-    //QTreeWidgetItem *item = qobject_cast<QTreeWidgetItem *>(QObject::sender()->parent());
-    deleteBlockFromTreeWdt(m_currentItem);
+    int tmp = deleteBlockFromTreeWdt(m_currentItem);
+    emit sglDeleteBlockFromTreeWdt(tmp);
 }
 
 void JobTree::slotGetCurrentItem(const QPoint &pos)
