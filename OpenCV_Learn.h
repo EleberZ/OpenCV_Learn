@@ -81,10 +81,14 @@ private slots:
 	void slot_NewJob();
 	void slot_LoadJob();
 	void slot_SaveJob();
+
 	void slot_Win_WorkPosition();
 	void slot_Win_Output();
 	void slot_Win_CameraConfig();
     void slot_JobTree_BlockDoubleClicked(QTreeWidgetItem *item);
+    void slot_JobTree_AddBlock(int index);
+    void slot_JobTree_CopyBlock(int index);
+    void slot_JobTree_DeleteBlock(int index);
 
 private:
     QGridLayout *glyt;

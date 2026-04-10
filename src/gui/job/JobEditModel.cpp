@@ -138,6 +138,16 @@ QString BlockData::getTempPicturePath()
     return m_temp_picture_path;
 }
 
+void BlockData::setTemplateMatchMethod(cv::TemplateMatchModes methor)
+{
+    m_template_match_methor = methor;
+}
+
+cv::TemplateMatchModes BlockData::getTemplateMatchMethod()
+{
+    return m_template_match_methor;
+}
+
 
 
 JobEditModel::JobEditModel(QObject *parent)
@@ -199,17 +209,46 @@ void JobEditModel::saveJobFile()
     m_job_xml.save(out, 4);
 }
 
+void JobEditModel::setView(JobEditViewImp *view)
+{
+    m_view = view;
+}
+
+
 BlockData JobEditModel::getBlockData(int index)
 {
-    if (!m_blocks_data.empty()
-        && m_blocks_data.size() > index)
+    auto it = m_blocks_data1.find(index);
+    if (!m_blocks_data1.empty()
+        &&it != m_blocks_data1.end())
     {
-        return m_blocks_data[index];
+        return it->second;
     }
     else
     {
         return BlockData();
     }
+    //if (!m_blocks_data.empty()
+    //    && m_blocks_data.size() > index)
+    //{
+    //    return m_blocks_data[index];
+    //}
+    //else
+    //{
+    //    return BlockData();
+    //}
+}
+
+int JobEditModel::copyBlock(int index)
+{
+    BlockData tmp;
+    auto it = m_blocks_data1.find(index);
+    m_blocks_data1.emplace(index + 1, it->second);
+}
+
+int JobEditModel::deleteBlock(int index)
+{
+    int rtn = m_blocks_data1.erase(index);
+    return rtn;
 }
 
 void JobEditModel::slotNewJob(QString filepath)
@@ -265,7 +304,7 @@ void JobEditModel::addBlock(int index, QString mask_picture_path, QString output
     block.setXpos(xpos);
     block.setYpos(ypos);
     block.setROIData(roi_data);
-    m_blocks_data.insert(m_blocks_data.begin() + index, block);
+    m_blocks_data1.emplace(index, block);
 }
 
 void JobEditModel::addEmptyBlock(int index)
@@ -274,6 +313,7 @@ void JobEditModel::addEmptyBlock(int index)
     {
         return;
     }
-    m_blocks_data.insert(m_blocks_data.begin() + index, BlockData());
+    m_blocks_data1.emplace(index, BlockData());
+
 }
 

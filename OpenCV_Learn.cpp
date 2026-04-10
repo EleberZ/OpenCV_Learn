@@ -87,28 +87,9 @@ void OpenCV::initWidget()
     QWidget *central_wdt = new QWidget(this);
     glyt = new QGridLayout(central_wdt);
     grv = new QGraphicsView();
-    //btn_open = new QPushButton("Open");
-    //btn_gray = new QPushButton("Gray_scale");
-    //btn_reset = new QPushButton("Origin_scale");
-    //ledit = new QLineEdit();
-    //scene = new QGraphicsScene();
-    //picture = new picture_analyze();
-    //transparency = new QSlider();
-    //transparency->setRange(0, 100);
-    //transparency->setValue(100);
-    //transparency->setTickPosition(QSlider::TicksRight); // 刻度显示在滑块下方
-
-    //grv->setScene(scene);
-    //glyt->addWidget(grv, 0, 0, 50, 50);
-    //glyt->addWidget(transparency, 0, 50, 47, 1);
-    //glyt->addWidget(ledit, 50, 0, 1, 50);
-    //glyt->addWidget(btn_gray, 48, 50, 1, 1);
-    //glyt->addWidget(btn_reset, 49, 50, 1, 1);
-    //glyt->addWidget(btn_open, 50, 50, 1, 1);
     QToolBar *bar = addToolBar("MainToolbar");
     bar->setFixedHeight(30);
     toolbar_action_start = bar->addAction(("Start"), this, OpenCV::slotStart);
-    //toolbar_action->setIcon();
     bar->setStatusTip("Start the pocess");
     setCentralWidget(central_wdt);
 }
@@ -134,7 +115,6 @@ void OpenCV::initMDIWidget()
     winMenu->addAction(tr("CameraSetup"), this, SLOT(slot_Win_CameraConfig()));
     winMenu->addAction(tr("Output"), this, SLOT(slot_Win_Output()));
     menuBar()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    //menuBar()->setFixedSize(200, 40);
 }
 
 void OpenCV::initDockTabContainer()
@@ -179,6 +159,9 @@ void OpenCV::initJob()
     connect(m_jobTree, &JobTree::sglBlockDoubleClicked, m_jobConfig, &JobConfig::slotJobBlockDoubleClicked);
     connect(m_jobTree, &JobTree::sglBlockDoubleClicked, this, &OpenCV::slot_JobTree_BlockDoubleClicked);
     connect(m_jobConfig, &JobConfig::sglBtnSave, m_jobEditModel.get(), &JobEditModel::slotBlockSave);
+    connect(m_jobTree, &JobTree::sglAddBlockToTreeWdt, this, &OpenCV::slot_JobTree_AddBlock);
+    connect(m_jobTree, &JobTree::sglCopyBlockToTreeWdt, this, &OpenCV::slot_JobTree_CopyBlock);
+    connect(m_jobTree, &JobTree::sglDeleteBlockFromTreeWdt, this, &OpenCV::slot_JobTree_DeleteBlock);
 }
 
 void OpenCV::initGlobel()
@@ -191,7 +174,7 @@ void OpenCV::initOutput()
 {
     m_output = new OutputWidget(this);
     m_Output_dockWdt->setWidget(m_output);
-    m_log_system = new LogSystem();
+    m_log_system = LogSystem::getInstance();
 }
 
 void OpenCV::initHSM()
@@ -503,8 +486,34 @@ void OpenCV::slot_Win_CameraConfig()
 void OpenCV::slot_JobTree_BlockDoubleClicked(QTreeWidgetItem *item)
 {
     QString str = item->text(0);
-    m_jobConfig->setMainGroubBoxTitle(str);
-    m_BlockConfig_dockWdt->setWindowTitle(str);
+    QString str_index = str.remove("Block");
+    bool btmp = m_jobConfig->setMainGroubBoxTitle(str);
+
+    if (btmp)
+    {
+        //双击没有被打开Block
+        m_BlockConfig_dockWdt->setWindowTitle(str);
+
+        BlockData block_data = m_jobEditModel.get()->getBlockData(str_index.toInt());
+        m_jobConfig->updateWidget(block_data);
+    }
+    //TODO
+    //m_jobConfig->updateWidget();
+}
+
+void OpenCV::slot_JobTree_AddBlock(int index)
+{
+    m_jobEditModel.get()->addEmptyBlock(index);
+}
+
+void OpenCV::slot_JobTree_CopyBlock(int index)
+{
+    m_jobEditModel.get()->copyBlock(index);
+}
+
+void OpenCV::slot_JobTree_DeleteBlock(int index)
+{
+    m_jobEditModel.get()->deleteBlock(index);
 }
 
 void OpenCV::slotBtnOpenClicked()

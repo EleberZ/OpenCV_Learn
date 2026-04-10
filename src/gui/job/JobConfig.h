@@ -13,6 +13,7 @@
 #include <QImage>
 #include <QGraphicsView>
 #include <QGraphicsScene>
+#include "JobEditModel.h"
 
 class JobConfig : public JobEditViewImp
 {
@@ -22,10 +23,11 @@ public:
     // 通过 JobEditViewImp 继承
     void initWidget()override;
     void updateWidget()override;
+    void updateWidget(BlockData block);
     void initConnect();
+    bool setMainGroubBoxTitle(const QString &title);
 signals:
     void sglBtnSave();
-    void setMainGroubBoxTitle(const QString &title);
 public slots:
     void slotNotifyJobEditView()override;
     void slotJobBlockDoubleClicked(QTreeWidgetItem *item);

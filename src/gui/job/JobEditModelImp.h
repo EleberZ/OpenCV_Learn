@@ -15,7 +15,8 @@ public:
     virtual void NewJobFile(QString filepath) = 0;  
     virtual void loadJobFile(QString filepath) = 0; 
     virtual void saveJobFile() = 0;
-
+    virtual void setView(JobEditViewImp *view) = 0;
 protected:
+    JobEditViewImp *m_view;
 };
 #endif // JOB_EDIT_MODELIMP_H

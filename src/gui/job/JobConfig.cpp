@@ -81,7 +81,11 @@ void JobConfig::initWidget()
 
 void JobConfig::updateWidget()
 {
+    
+}
 
+void JobConfig::updateWidget(BlockData block)
+{
 }
 
 void JobConfig::initConnect()
@@ -90,10 +94,19 @@ void JobConfig::initConnect()
     connect(m_btn_save, &QPushButton::clicked, this, &JobConfig::sglBtnSave);
 }
 
-void JobConfig::setMainGroubBoxTitle(const QString &title)
+bool JobConfig::setMainGroubBoxTitle(const QString &title)
 {
-    m_job_block_name = title;
-    m_gbox_main->setTitle(title);
+    QString current_block = m_gbox_main->title();
+    if (current_block==title)
+    {
+        return true;
+    }
+    else
+    {
+        m_job_block_name = title;
+        m_gbox_main->setTitle(title);
+        return false;
+    }
 }
 
 void JobConfig::slotJobBlockDoubleClicked(QTreeWidgetItem *item)
