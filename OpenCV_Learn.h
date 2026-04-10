@@ -36,10 +36,18 @@ enum StateEnum
     Alarm
 };
 
+
 class OpenCV: public QMainWindow
 {
 	Q_OBJECT
 public:
+    enum LogTypeEnum
+    {
+        info,
+        warning,
+        alarm,
+    };
+    Q_ENUM(LogTypeEnum)
 	enum DockArea {
 		LeftArea = Qt::LeftDockWidgetArea,
 		RightArea = Qt::RightDockWidgetArea,
@@ -67,6 +75,10 @@ signals:
     void sglNewJob(QString job_file);
     void sglLoadJob(QString job_file);
     void sglSaveJob();
+
+    void sglinfo();
+    void sglAlarm();
+    void sglWarning();
 private slots:
 	void slotBtnOpenClicked();
 	void slotBtnGrayClicked();

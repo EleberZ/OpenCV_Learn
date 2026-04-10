@@ -78,7 +78,6 @@ OpenCV::OpenCV(QWidget *parent)
 
 OpenCV::~OpenCV()
 {
-    delete m_log_system;
     m_log_system = nullptr;
 }
 
@@ -130,13 +129,12 @@ void OpenCV::initTabBar()
         {
             tabBar->setTabEnabled(0, false);
             tabBar->setStyleSheet(R"(
-                /* 空Dock的标签完全隐藏 */
                 QTabBar::tab:disabled {
-                    width: 0px;    /* 宽度为0 */
-                    height: 0px;   /* 高度为0 */
-                    padding: 0px;  /* 内边距为0 */
-                    margin: 0px;   /* 外边距为0 */
-                    opacity: 0;    /* 完全透明 */
+                    width: 0px;
+                    height: 0px;
+                    padding: 0px;
+                    margin: 0px;
+                    opacity: 0;
                 }
             )");
             tabBar->setCurrentIndex(1);
@@ -175,6 +173,15 @@ void OpenCV::initOutput()
     m_output = new OutputWidget(this);
     m_Output_dockWdt->setWidget(m_output);
     m_log_system = LogSystem::getInstance();
+
+    const QMetaObject &metaObject = OpenCV::staticMetaObject;
+    int  enum_inde = metaObject.indexOfEnumerator("LogType");
+    QMetaEnum meta_enum = metaObject.enumerator(enum_inde);
+
+    m_log_system->addLogType(meta_enum.key(LogTypeEnum::info));
+    m_log_system->addLogType(meta_enum.key(LogTypeEnum::warning));
+    m_log_system->addLogType(meta_enum.key(LogTypeEnum::alarm));
+
 }
 
 void OpenCV::initHSM()
@@ -200,7 +207,7 @@ void OpenCV::initHSM()
     m_state_done->setObjectName("Done");
     m_state_work->addTransition(toolbar_action_start, &QAction::triggered, m_state_ready);
     m_state_alarm->setObjectName("Alarm");
-    m_state_PRun->addTransition(m_log_system, &LogSystem::sglAlarm, m_state_alarm);
+    m_state_PRun->addTransition(this, &OpenCV::sglAlarm, m_state_alarm);
 
     m_stateMachine->setInitialState(m_state_Pconfig);
     m_state_Pconfig->setInitialState(m_state_init);
@@ -213,6 +220,7 @@ void OpenCV::initHSM()
             m_jobTree->setEnabled(false);
             m_jobConfig->setEnabled(false);
             m_output->appendText("System State:Init");
+            m_log_system->RecordLog("info", "System State:Init");
         });
     connect(m_state_ready, &QState::entered, this, [this]()
         {
@@ -222,6 +230,8 @@ void OpenCV::initHSM()
             m_jobTree->update();
             m_jobConfig->update();
             m_output->appendText("System State:Ready");
+            m_log_system->RecordLog("info", "System State:Ready");
+
         });
     connect(m_state_work, &QState::entered, this, [this]()
         {
@@ -229,6 +239,7 @@ void OpenCV::initHSM()
             m_jobTree->setEnabled(false);
             m_jobConfig->setEnabled(false);
             m_output->appendText("System State:Work");
+            m_log_system->RecordLog("info", "System State:Work");
         });
     connect(m_state_done, &QState::entered, this, [this]()
         {
@@ -236,6 +247,7 @@ void OpenCV::initHSM()
             m_jobTree->setEnabled(false);
             m_jobConfig->setEnabled(false);
             m_output->appendText("System State:Done");
+            m_log_system->RecordLog("info", "System State:Done");
         });
     connect(m_state_alarm, &QState::entered, this, [this]()
         {
@@ -243,6 +255,7 @@ void OpenCV::initHSM()
             m_jobTree->setEnabled(false);
             m_jobConfig->setEnabled(false);
             m_output->appendText("System State:Alarm");
+            m_log_system->RecordLog("info", "System State:Alarm");
         });
     m_stateMachine->start();
 }
