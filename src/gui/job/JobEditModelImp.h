@@ -12,7 +12,7 @@ public:
     explicit JobEditModelImp(QObject *parent = nullptr);
     virtual void setJobFilepath(QString filepath)= 0 ;
     virtual QString getJobFilepath() = 0;
-    virtual void NewJobFile(QString filepath) = 0;  
+    virtual bool NewJobFile(QString filepath) = 0;  
     virtual void loadJobFile(QString filepath) = 0; 
     virtual void saveJobFile() = 0;
     virtual void setView(JobEditViewImp *view) = 0;

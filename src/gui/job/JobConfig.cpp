@@ -42,7 +42,7 @@ void JobConfig::initWidget()
     m_ledit_mask_file->setEnabled(false);
     m_graphic_view_mask = new QGraphicsView(m_graphic_scene_mask, this);
     m_graphic_view_mask->setEnabled(false);
-
+    
 
     grid_layout->addWidget(new QLabel("ROI Origin", this), 0, 0, 1, 1);
     grid_layout->addWidget(new QLabel("X", this), 0, 1, 1, 1);

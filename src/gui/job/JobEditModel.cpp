@@ -138,20 +138,29 @@ QString BlockData::getTempPicturePath()
     return m_temp_picture_path;
 }
 
-void BlockData::setTemplateMatchMethod(cv::TemplateMatchModes methor)
+void BlockData::setTemplateMatchType(cv::TemplateMatchModes methor)
 {
-    m_template_match_methor = methor;
+    m_template_match_type = methor;
 }
 
-cv::TemplateMatchModes BlockData::getTemplateMatchMethod()
+cv::TemplateMatchModes BlockData::getTemplateMatchType()
 {
-    return m_template_match_methor;
+    return m_template_match_type;
 }
 
+void BlockData::setMatchMethod(int match_method)
+{
+    m_match_method = match_method;
+}
 
+int BlockData::getMatchMethod()
+{
+    return m_match_method;
+}
 
 JobEditModel::JobEditModel(QObject *parent)
 {
+    m_blocks_data1 = new std::map<int, BlockData>();
     m_job_file = nullptr;
 }
 
@@ -165,24 +174,38 @@ QString JobEditModel::getJobFilepath()
     return m_filepath;
 }
 
-void JobEditModel::NewJobFile(QString filepath)
+bool JobEditModel::NewJobFile(QString filepath)
 {
     m_filepath = filepath;
     QFileInfo fileInfo(filepath);
+    QFile file(filepath);
+    if (fileInfo.exists())
+    {
+        return false;
+    }
+    if (!file.open(QIODevice::ReadWrite))
+    {
+        return false;
+    }
+    QTextStream out(&file);
     m_job_xml.clear();
     QDomProcessingInstruction xmlDecl = m_job_xml.createProcessingInstruction(
         "xml", "version='1.0' encoding='UTF-8'"
     );
-    QDomElement rootElement = m_job_xml.createElement("root");
+    QDomElement rootElement = m_job_xml.createElement("job");
+    rootElement.setAttribute("name", fileInfo.baseName());
     m_job_xml.appendChild(xmlDecl);
     m_job_xml.appendChild(rootElement);
+    m_job_xml.save(out, 4);
+    file.close();
+    return true;
 }
 
 void JobEditModel::loadJobFile(QString filepath)
 {
-    QFileInfo info(filepath);
+    QFileInfo fileInfo(filepath);
     QFile file(filepath);
-    if (!info.exists())
+    if (!fileInfo.exists())
     {
         return;
     }
@@ -214,12 +237,11 @@ void JobEditModel::setView(JobEditViewImp *view)
     m_view = view;
 }
 
-
 BlockData JobEditModel::getBlockData(int index)
 {
-    auto it = m_blocks_data1.find(index);
-    if (!m_blocks_data1.empty()
-        &&it != m_blocks_data1.end())
+    auto it = m_blocks_data1->find(index);
+    if (!m_blocks_data1->empty()
+        &&it != m_blocks_data1->end())
     {
         return it->second;
     }
@@ -241,13 +263,13 @@ BlockData JobEditModel::getBlockData(int index)
 int JobEditModel::copyBlock(int index)
 {
     BlockData tmp;
-    auto it = m_blocks_data1.find(index);
-    m_blocks_data1.emplace(index + 1, it->second);
+    auto it = m_blocks_data1->find(index);
+    m_blocks_data1->emplace(index + 1, it->second);
 }
 
 int JobEditModel::deleteBlock(int index)
 {
-    int rtn = m_blocks_data1.erase(index);
+    int rtn = m_blocks_data1->erase(index);
     return rtn;
 }
 
@@ -264,7 +286,33 @@ void JobEditModel::slotLoadJob(QString filepath)
 
 void JobEditModel::slotBlockSave()
 {
-    
+    QDomElement  elem = m_job_xml.firstChildElement("job");
+    QStringList attr_names, attr_values;
+    attr_names << "match_method" << "method_type" << "x" << "y";
+    //attr_value <<
+    BlockData block = m_blocks_data1->find(m_current_block_index)->second;
+    attr_values
+        << QString::number(block.getMatchMethod())
+        << QString::number(block.getTemplateMatchType())
+        << QString::number(block.getXpos())
+        << QString::number(block.getYpos());
+
+    QDomElement block_elem = m_job_xml.createElement("block"+QString::number(m_current_block_index));
+    for (auto attr_name: attr_names)
+    {
+        block_elem.setAttribute(attr_name, attr_values.at(attr_names.indexOf(attr_name)));
+    }
+    QDomElement mask_path = m_job_xml.createElement("mask_path");
+    QDomElement temp_path = m_job_xml.createElement("temp_path");
+    block_elem.appendChild(mask_path);
+    block_elem.appendChild(temp_path);
+
+    QDomText mask_text = m_job_xml.createTextNode(block.getMaskPicturePath());
+    QDomText temp_text = m_job_xml.createTextNode(block.getTempPicturePath());
+    mask_path.appendChild(mask_text);
+    temp_path.appendChild(temp_text);
+
+    //m_job_xml.save();
 }
 
 void JobEditModel::slotSaveJob()
@@ -304,7 +352,39 @@ void JobEditModel::addBlock(int index, QString mask_picture_path, QString output
     block.setXpos(xpos);
     block.setYpos(ypos);
     block.setROIData(roi_data);
-    m_blocks_data1.emplace(index, block);
+    m_blocks_data1->emplace(index, block);
+}
+
+QDomNode JobEditModel::createNodeIfNotExists(QDomNode &parent, QString name, QStringList attr_names, QStringList attr_value)
+{
+    QDomNodeList childNodes = parent.childNodes();
+    QDomNode elem;
+    bool exist = false;
+    for (int i = 0; i < childNodes.count(); i++)
+    {
+        elem = childNodes.at(i).toElement();
+        exist = (elem.nodeName() == name) || exist;
+        if (exist)
+        {
+            break;
+        }
+        else
+        {
+            continue;
+        }
+    }
+    if (!exist)
+    {
+        elem = m_job_xml.createElement(name);
+        parent.appendChild(elem);
+    }
+    int i = 0;
+    for (auto str : attr_names)
+    {
+        elem.toElement().setAttribute(str, attr_value[i]);
+        i++;
+    }
+    return elem;
 }
 
 void JobEditModel::addEmptyBlock(int index)
@@ -313,7 +393,7 @@ void JobEditModel::addEmptyBlock(int index)
     {
         return;
     }
-    m_blocks_data1.emplace(index, BlockData());
+    m_blocks_data1->emplace(index, BlockData());
 
 }
 

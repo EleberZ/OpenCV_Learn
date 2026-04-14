@@ -22,11 +22,12 @@ signals:
     //void sglWarning();
     //void sglInfo();
     void sglOutput(const QString &str);
-
+public:
+    QStringList m_log_type;
 private:
+    int m_i;
     static LogSystem *m_instance;
     explicit LogSystem();
-    QStringList m_log_type;
     QString m_log_path;
 };
 

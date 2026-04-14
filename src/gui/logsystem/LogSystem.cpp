@@ -1,6 +1,7 @@
 #include "LogSystem.h"
 #include <QApplication>
 #include <QDateTime>
+#include <QDir>
 
 LogSystem *LogSystem::getInstance()
 {
@@ -14,9 +15,14 @@ void LogSystem::output(const QString &str)
     QString str_time_y = time.currentDateTime().toString("yyyy");
     QString str_time_m = time.currentDateTime().toString("MM");
     QString str_time_d = time.currentDateTime().toString("dd");
-    QString str_time_time = time.currentDateTime().toString("hh:mm:ss");
-    QFile file(m_log_path + "/output/" + str_time_y + "/" + str_time_m + "/" + str_time_d + ".log");
-    if (!file.open(QIODevice::ReadWrite))
+    QString dir_path = m_log_path + "/output/" + str_time_y + "/" + str_time_m;
+    QDir dir(dir_path);
+    if (!dir.exists())
+    {
+        dir.mkpath(dir_path);
+    }
+    QFile file(dir_path + "/" + str_time_d + ".log");
+    if (!file.open(QIODevice::ReadWrite| QIODevice::Append))
     {
         return;
     }
@@ -27,11 +33,9 @@ void LogSystem::output(const QString &str)
 
 void LogSystem::addLogType(const QString &str)
 {
-    QStringList list;
     if (!m_log_type.contains(str))
     {
-        m_log_type<<str;
-        list.append(str);
+        m_log_type.append(str);
     }
 }
 
@@ -44,8 +48,14 @@ void LogSystem::RecordLog(const QString &type, const QString &log)
         QString str_time_m = time.currentDateTime().toString("MM");
         QString str_time_d = time.currentDateTime().toString("dd");
         QString str_time_time = time.currentDateTime().toString("hh:mm:ss");
-        QFile file(m_log_path + "/" + type + "/" + str_time_y + "/" + str_time_m + "/" + str_time_d + ".log");
-        if (!file.open(QIODevice::ReadWrite))
+        QString dir_path = m_log_path + "/" + type + "/" + str_time_y + "/" + str_time_m;
+        QDir dir(dir_path);
+        if (!dir.exists())
+        {
+            dir.mkpath(dir_path);
+        }
+        QFile file(dir_path + "/" + str_time_d + ".log");
+        if (!file.open(QIODevice::ReadWrite|QIODevice::Append))
         {
             return;
         }

@@ -175,12 +175,14 @@ void OpenCV::initOutput()
     m_log_system = LogSystem::getInstance();
 
     const QMetaObject &metaObject = OpenCV::staticMetaObject;
-    int  enum_inde = metaObject.indexOfEnumerator("LogType");
+    int  enum_inde = metaObject.indexOfEnumerator("LogTypeEnum");
     QMetaEnum meta_enum = metaObject.enumerator(enum_inde);
-
-    m_log_system->addLogType(meta_enum.key(LogTypeEnum::info));
-    m_log_system->addLogType(meta_enum.key(LogTypeEnum::warning));
-    m_log_system->addLogType(meta_enum.key(LogTypeEnum::alarm));
+    QString str = meta_enum.key(LogTypeEnum::info);
+    m_log_system->addLogType(str);
+    str = meta_enum.key(LogTypeEnum::warning);
+    m_log_system->addLogType(str);
+    str = meta_enum.key(LogTypeEnum::alarm);
+    m_log_system->addLogType(str);
 
 }
 
