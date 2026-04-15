@@ -162,6 +162,24 @@ JobEditModel::JobEditModel(QObject *parent)
 {
     //m_blocks_data1 = new std::map<int, BlockData>();
     m_job_file = nullptr;
+    m_dtd = R"(
+    <!DOCTYPE job[
+        <!ELEMENT job (blockCount, Block*)>
+        <!ATTLIST job id ID #REQUIRED >
+        <!ELEMENT blockCount (#PCDATA)>
+        <!ATTLIST blockCount id ID #REQUIRED >
+        <!ELEMENT Block (Position, MaskPath, TempPath)>
+        <!ATTLIST Block id ID #REQUIRED >
+        <!ELEMENT MaskPath (#PCDATA)>
+        <!ATTLIST MaskPath id ID #REQUIRED >
+        <!ELEMENT TempPath (#PCDATA)>
+        <!ATTLIST TempPath id ID #REQUIRED >
+        <!ELEMENT Position EMPTY>
+        <!ATTLIST Position id ID #REQUIRED x CDATA #REQUIRED y CDATA #REQUIRED >
+    ]>
+)";
+    m_xs = "http://www.w3.org/2001/XMLSchema";
+    m_xsi = "http://www.w3.org/2001/XMLSchema-instance";
 }
 
 void JobEditModel::setJobFilepath(QString filepath)
@@ -187,30 +205,25 @@ bool JobEditModel::NewJobFile(QString filepath)
     {
         return false;
     }
-    QTextStream out(&file);
-    m_job_xml.clear();
-    QDomProcessingInstruction xmlDecl = m_job_xml.createProcessingInstruction(
-        "xml", "version='1.0' encoding='UTF-8'"
-    );
-    QString xs = "http://www.w3.org/2001/XMLSchema";
-    QString xsi = "http://www.w3.org/2001/XMLSchema-instance";
-    QDomElement rootElement = m_job_xml.createElement("job");
-    rootElement.setAttribute("xmlns:xs", xs);
-    rootElement.setAttribute("xmlns:xsi", xsi);
-    rootElement.setAttribute("xsi:schemaLocation",
-        xsi + " ./schemes/XMLSchema-instance.xsd " + xs + " ./schemes/XMLSchema.xsd");
+    m_job_xml_writer.setDevice(&file);
+    m_job_xml_writer.setAutoFormatting(true);
+    m_job_xml_writer.writeStartDocument("1.0", "UTF-8");
+    m_job_xml_writer.writeDTD(m_dtd);
 
-    rootElement.setAttribute("id", fileInfo.baseName());
-    QDomElement block_count = m_job_xml.createElement("blockCount");
-    block_count.setAttribute("id", "blockCount");
-    block_count.setAttribute("type", "int");
-    block_count.appendChild(m_job_xml.createTextNode("0"));
+    m_job_xml_writer.writeStartElement("job");
+    m_job_xml_writer.writeAttribute("id", fileInfo.baseName());
+    m_job_xml_writer.writeAttribute("xmlns:xsi", m_xsi);
+    m_job_xml_writer.writeAttribute("xmlns:xs", m_xs);
 
-    rootElement.appendChild(block_count);
+    m_job_xml_writer.writeStartElement("blockCount");
+    m_job_xml_writer.writeAttribute("id", "blockCount");
+    m_job_xml_writer.writeAttribute("type", "int");
+    m_job_xml_writer.writeCharacters("0");
+    m_job_xml_writer.writeEndElement();
 
-    m_job_xml.appendChild(xmlDecl);
-    m_job_xml.appendChild(rootElement);
-    m_job_xml.save(out, 4);
+    m_job_xml_writer.writeEndElement();
+    m_job_xml_writer.writeEndDocument();
+
     file.close();
     return true;
 }
@@ -228,10 +241,41 @@ void JobEditModel::loadJobFile(QString filepath)
     {
         return;
     }
-    if (!m_job_xml.setContent(&file))
+    m_job_xml_reader.setDevice(&file);
+
+    while (!m_job_xml_reader.atEnd()
+        && !m_job_xml_reader.hasError())
     {
-        return;
+        m_job_xml_reader.readNext();
+        if (m_job_xml_reader.isStartElement())
+        {
+            continue;
+        }
+
+        if (m_job_xml_reader.name() == "blockCount")
+        {
+
+        }
+        else if (m_job_xml_reader.name() == "Block")
+        {
+
+        }
+        else if (m_job_xml_reader.name() == "Position")
+        {
+
+        }
+        else if (m_job_xml_reader.name() == "MaskPath")
+        {
+
+        }
+        else if (m_job_xml_reader.name() == "TempPath")
+        {
+
+        }
     }
+
+
+
     file.close();
     //TODO:需要添加更新job_xml的功能
     emit sglloadJobFileSuccess();
@@ -246,7 +290,6 @@ void JobEditModel::saveJobFile()
         return;
     }
     QTextStream out(&file);
-    m_job_xml.save(out, 4);
     file.close();
 }
 
@@ -267,15 +310,6 @@ BlockData JobEditModel::getBlockData(int index)
     {
         return BlockData();
     }
-    //if (!m_blocks_data.empty()
-    //    && m_blocks_data.size() > index)
-    //{
-    //    return m_blocks_data[index];
-    //}
-    //else
-    //{
-    //    return BlockData();
-    //}
 }
 
 int JobEditModel::getBlockCount()
@@ -314,68 +348,10 @@ void JobEditModel::slotLoadJob(QString filepath)
 
 void JobEditModel::slotBlockSave()
 {
-    QDomElement  elem = m_job_xml.firstChildElement("job");
-    QStringList attr_names, attr_values;
-    attr_names << "match_method" << "method_type" << "x" << "y";
-    //attr_value <<
-    auto it = m_blocks_data1.find(m_current_block_index);
-    if (it == m_blocks_data1.end())
-    {
-        return;
-    }
-    BlockData block = it->second;
-
-    attr_values
-        << QString::number(block.getMatchMethod())
-        << QString::number(block.getTemplateMatchType())
-        << QString::number(block.getXpos())
-        << QString::number(block.getYpos());
-
-    QDomElement block_elem = m_job_xml.createElement("block"+QString::number(m_current_block_index));
-    for (auto attr_name: attr_names)
-    {
-        block_elem.setAttribute(attr_name, attr_values.at(attr_names.indexOf(attr_name)));
-    }
-    QDomElement mask_path = m_job_xml.createElement("mask_path");
-    QDomElement temp_path = m_job_xml.createElement("temp_path");
-    block_elem.appendChild(mask_path);
-    block_elem.appendChild(temp_path);
-
-    QDomText mask_text = m_job_xml.createTextNode(block.getMaskPicturePath());
-    QDomText temp_text = m_job_xml.createTextNode(block.getTempPicturePath());
-    mask_path.appendChild(mask_text);
-    temp_path.appendChild(temp_text);
-
-    //m_job_xml.save();
 }
 
 void JobEditModel::slotSaveJob()
 {
-    QFileInfo fileInfo(m_filepath);
-    QDomElement root_elem = m_job_xml.elementById(fileInfo.baseName());
-    for (auto block:m_blocks_data1)
-    {
-        QDomElement elem = m_job_xml.createElement("block");
-        elem.setAttribute("id", "block" + QString::number(block.first));
-        QDomElement match_method = m_job_xml.createElement("match_method");
-        match_method.appendChild(m_job_xml.createTextNode(QString::number(block.second.getMatchMethod())));
-        QDomElement method_type = m_job_xml.createElement("method_type");
-        method_type.appendChild(m_job_xml.createTextNode(QString::number(block.second.getMatchMethod())));
-        QDomElement position = m_job_xml.createElement("position");
-        position.setAttribute("x", QString::number(block.second.getXpos()));
-        position.setAttribute("y", QString::number(block.second.getYpos()));
-        QDomElement temp_path = m_job_xml.createElement("temp_path");
-        temp_path.appendChild(m_job_xml.createTextNode(block.second.getTempPicturePath()));
-        QDomElement mask_path = m_job_xml.createElement("mask_path");
-        mask_path.appendChild(m_job_xml.createTextNode(block.second.getMaskPicturePath()));
-        elem.appendChild(match_method);
-        elem.appendChild(method_type);
-        elem.appendChild(position);
-        elem.appendChild(temp_path);
-        elem.appendChild(mask_path);
-
-        root_elem.appendChild(elem);
-    }
     saveJobFile();
 }
 
@@ -391,6 +367,14 @@ bool JobEditModel::Xml_to_BlockMap()
 bool JobEditModel::BlockMap_to_Xml()
 {
     return false;
+}
+
+void JobEditModel::createDTD()
+{
+    QString dtdContent;
+
+
+
 }
 
 void JobEditModel::editXmlFile()
@@ -430,34 +414,34 @@ void JobEditModel::addBlock(int index, QString mask_picture_path, QString output
 
 QDomNode JobEditModel::createNodeIfNotExists(QDomNode &parent, QString name, QStringList attr_names, QStringList attr_value)
 {
-    QDomNodeList childNodes = parent.childNodes();
-    QDomNode elem;
-    bool exist = false;
-    for (int i = 0; i < childNodes.count(); i++)
-    {
-        elem = childNodes.at(i).toElement();
-        exist = (elem.nodeName() == name) || exist;
-        if (exist)
-        {
-            break;
-        }
-        else
-        {
-            continue;
-        }
-    }
-    if (!exist)
-    {
-        elem = m_job_xml.createElement(name);
-        parent.appendChild(elem);
-    }
-    int i = 0;
-    for (auto str : attr_names)
-    {
-        elem.toElement().setAttribute(str, attr_value[i]);
-        i++;
-    }
-    return elem;
+    //QDomNodeList childNodes = parent.childNodes();
+    //QDomNode elem;
+    //bool exist = false;
+    //for (int i = 0; i < childNodes.count(); i++)
+    //{
+    //    elem = childNodes.at(i).toElement();
+    //    exist = (elem.nodeName() == name) || exist;
+    //    if (exist)
+    //    {
+    //        break;
+    //    }
+    //    else
+    //    {
+    //        continue;
+    //    }
+    //}
+    //if (!exist)
+    //{
+    //    elem = m_job_xml.createElement(name);
+    //    parent.appendChild(elem);
+    //}
+    //int i = 0;
+    //for (auto str : attr_names)
+    //{
+    //    elem.toElement().setAttribute(str, attr_value[i]);
+    //    i++;
+    //}
+    //return elem;
 }
 
 void JobEditModel::addEmptyBlock(int index)

@@ -10,6 +10,7 @@
 #include <QObject>
 #include <QTextStream>
 #include <map>
+#include <qxmlstream.h>
 
 struct ROIData
 {
@@ -105,6 +106,8 @@ public slots:
 private:
     bool Xml_to_BlockMap();
     bool BlockMap_to_Xml();
+    void createDTD();
+
     void editXmlFile();
     std::unique_ptr<QFile> openFileIfExists(QString filepath);
     void addBlock(int index, QString mask_picture_path, QString output_picture_path,
@@ -115,10 +118,14 @@ private:
     QString m_filepath; //被加载之后将路径保存在这个位置
     std::unique_ptr<QFile> m_job_file;
     QTextStream m_job_stream;
-    QDomDocument m_job_xml;
+    QXmlStreamWriter m_job_xml_writer;
+    QXmlStreamReader m_job_xml_reader;
     int m_current_block_index;
     std::vector<BlockData> m_blocks_data;
     std::map<int, BlockData> m_blocks_data1;
+    QString m_dtd;
+    QString m_xs;
+    QString m_xsi;
 };
 
 #endif // JOB_EDIT_MODEL_H

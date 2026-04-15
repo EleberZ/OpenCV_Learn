@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+    <!DOCTYPE job[
+        <!ELEMENT job (blockCount, Block*)>
+        <!ATTLIST job id ID #REQUIRED >
+        <!ELEMENT blockCount (#PCDATA)>
+        <!ATTLIST blockCount id ID #REQUIRED >
+        <!ELEMENT Block (Position, MaskPath, TempPath)>
+        <!ATTLIST Block id ID #REQUIRED >
+        <!ELEMENT MaskPath (#PCDATA)>
+        <!ATTLIST MaskPath id ID #REQUIRED >
+        <!ELEMENT TempPath (#PCDATA)>
+        <!ATTLIST TempPath id ID #REQUIRED >
+        <!ELEMENT Position EMPTY>
+        <!ATTLIST Position id ID #REQUIRED x CDATA #REQUIRED y CDATA #REQUIRED >
+    ]>
+
+<job id="test" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <blockCount id="blockCount" type="int">0</blockCount>
+</job>
