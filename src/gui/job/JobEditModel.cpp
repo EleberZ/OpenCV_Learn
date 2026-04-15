@@ -160,7 +160,7 @@ int BlockData::getMatchMethod()
 
 JobEditModel::JobEditModel(QObject *parent)
 {
-    m_blocks_data1 = new std::map<int, BlockData>();
+    //m_blocks_data1 = new std::map<int, BlockData>();
     m_job_file = nullptr;
 }
 
@@ -192,8 +192,22 @@ bool JobEditModel::NewJobFile(QString filepath)
     QDomProcessingInstruction xmlDecl = m_job_xml.createProcessingInstruction(
         "xml", "version='1.0' encoding='UTF-8'"
     );
+    QString xs = "http://www.w3.org/2001/XMLSchema";
+    QString xsi = "http://www.w3.org/2001/XMLSchema-instance";
     QDomElement rootElement = m_job_xml.createElement("job");
-    rootElement.setAttribute("name", fileInfo.baseName());
+    rootElement.setAttribute("xmlns:xs", xs);
+    rootElement.setAttribute("xmlns:xsi", xsi);
+    rootElement.setAttribute("xsi:schemaLocation",
+        xsi + " ./schemes/XMLSchema-instance.xsd " + xs + " ./schemes/XMLSchema.xsd");
+
+    rootElement.setAttribute("id", fileInfo.baseName());
+    QDomElement block_count = m_job_xml.createElement("blockCount");
+    block_count.setAttribute("id", "blockCount");
+    block_count.setAttribute("type", "int");
+    block_count.appendChild(m_job_xml.createTextNode("0"));
+
+    rootElement.appendChild(block_count);
+
     m_job_xml.appendChild(xmlDecl);
     m_job_xml.appendChild(rootElement);
     m_job_xml.save(out, 4);
@@ -203,6 +217,7 @@ bool JobEditModel::NewJobFile(QString filepath)
 
 void JobEditModel::loadJobFile(QString filepath)
 {
+    m_filepath = filepath;
     QFileInfo fileInfo(filepath);
     QFile file(filepath);
     if (!fileInfo.exists())
@@ -215,14 +230,16 @@ void JobEditModel::loadJobFile(QString filepath)
     }
     if (!m_job_xml.setContent(&file))
     {
-        file.close();
         return;
     }
+    file.close();
+    //TODO:需要添加更新job_xml的功能
     emit sglloadJobFileSuccess();
 }
 
 void JobEditModel::saveJobFile()
 {
+    QString str = m_filepath;
     QFile file(m_filepath);
     if (!file.open(QIODevice::ReadWrite))
     {
@@ -230,6 +247,7 @@ void JobEditModel::saveJobFile()
     }
     QTextStream out(&file);
     m_job_xml.save(out, 4);
+    file.close();
 }
 
 void JobEditModel::setView(JobEditViewImp *view)
@@ -239,9 +257,9 @@ void JobEditModel::setView(JobEditViewImp *view)
 
 BlockData JobEditModel::getBlockData(int index)
 {
-    auto it = m_blocks_data1->find(index);
-    if (!m_blocks_data1->empty()
-        &&it != m_blocks_data1->end())
+    auto it = m_blocks_data1.find(index);
+    if (!m_blocks_data1.empty()
+        &&it != m_blocks_data1.end())
     {
         return it->second;
     }
@@ -260,16 +278,26 @@ BlockData JobEditModel::getBlockData(int index)
     //}
 }
 
+int JobEditModel::getBlockCount()
+{
+    return m_blocks_data1.size();
+}
+
+void JobEditModel::setCurrentBlockIndex(int index)
+{
+    m_current_block_index = index;
+}
+
 int JobEditModel::copyBlock(int index)
 {
     BlockData tmp;
-    auto it = m_blocks_data1->find(index);
-    m_blocks_data1->emplace(index + 1, it->second);
+    auto it = m_blocks_data1.find(index);
+    m_blocks_data1.emplace(index + 1, it->second);
 }
 
 int JobEditModel::deleteBlock(int index)
 {
-    int rtn = m_blocks_data1->erase(index);
+    int rtn = m_blocks_data1.erase(index);
     return rtn;
 }
 
@@ -290,7 +318,13 @@ void JobEditModel::slotBlockSave()
     QStringList attr_names, attr_values;
     attr_names << "match_method" << "method_type" << "x" << "y";
     //attr_value <<
-    BlockData block = m_blocks_data1->find(m_current_block_index)->second;
+    auto it = m_blocks_data1.find(m_current_block_index);
+    if (it == m_blocks_data1.end())
+    {
+        return;
+    }
+    BlockData block = it->second;
+
     attr_values
         << QString::number(block.getMatchMethod())
         << QString::number(block.getTemplateMatchType())
@@ -317,7 +351,46 @@ void JobEditModel::slotBlockSave()
 
 void JobEditModel::slotSaveJob()
 {
+    QFileInfo fileInfo(m_filepath);
+    QDomElement root_elem = m_job_xml.elementById(fileInfo.baseName());
+    for (auto block:m_blocks_data1)
+    {
+        QDomElement elem = m_job_xml.createElement("block");
+        elem.setAttribute("id", "block" + QString::number(block.first));
+        QDomElement match_method = m_job_xml.createElement("match_method");
+        match_method.appendChild(m_job_xml.createTextNode(QString::number(block.second.getMatchMethod())));
+        QDomElement method_type = m_job_xml.createElement("method_type");
+        method_type.appendChild(m_job_xml.createTextNode(QString::number(block.second.getMatchMethod())));
+        QDomElement position = m_job_xml.createElement("position");
+        position.setAttribute("x", QString::number(block.second.getXpos()));
+        position.setAttribute("y", QString::number(block.second.getYpos()));
+        QDomElement temp_path = m_job_xml.createElement("temp_path");
+        temp_path.appendChild(m_job_xml.createTextNode(block.second.getTempPicturePath()));
+        QDomElement mask_path = m_job_xml.createElement("mask_path");
+        mask_path.appendChild(m_job_xml.createTextNode(block.second.getMaskPicturePath()));
+        elem.appendChild(match_method);
+        elem.appendChild(method_type);
+        elem.appendChild(position);
+        elem.appendChild(temp_path);
+        elem.appendChild(mask_path);
+
+        root_elem.appendChild(elem);
+    }
     saveJobFile();
+}
+
+bool JobEditModel::Xml_to_BlockMap()
+{
+    BlockData block;
+    QDomElement block_elem;
+
+
+    return false;
+}
+
+bool JobEditModel::BlockMap_to_Xml()
+{
+    return false;
 }
 
 void JobEditModel::editXmlFile()
@@ -352,7 +425,7 @@ void JobEditModel::addBlock(int index, QString mask_picture_path, QString output
     block.setXpos(xpos);
     block.setYpos(ypos);
     block.setROIData(roi_data);
-    m_blocks_data1->emplace(index, block);
+    m_blocks_data1.emplace(index, block);
 }
 
 QDomNode JobEditModel::createNodeIfNotExists(QDomNode &parent, QString name, QStringList attr_names, QStringList attr_value)
@@ -393,7 +466,7 @@ void JobEditModel::addEmptyBlock(int index)
     {
         return;
     }
-    m_blocks_data1->emplace(index, BlockData());
+    m_blocks_data1.emplace(index, BlockData());
 
 }
 

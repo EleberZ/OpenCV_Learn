@@ -86,6 +86,11 @@ void JobConfig::updateWidget()
 
 void JobConfig::updateWidget(BlockData block)
 {
+    if (!isEnabled())
+    {
+        setEnabled(true);
+    }
+    //TODO:加载指定Block的数据
 }
 
 void JobConfig::initConnect()

@@ -91,6 +91,8 @@ public:
     int copyBlock(int index);
     int deleteBlock(int index);
     BlockData getBlockData(int index);
+    int getBlockCount();
+    void setCurrentBlockIndex(int index);
 
 signals:
     void sglloadJobFileSuccess();
@@ -101,6 +103,8 @@ public slots:
     void slotLoadJob(QString filepath);
     void slotBlockSave();
 private:
+    bool Xml_to_BlockMap();
+    bool BlockMap_to_Xml();
     void editXmlFile();
     std::unique_ptr<QFile> openFileIfExists(QString filepath);
     void addBlock(int index, QString mask_picture_path, QString output_picture_path,
@@ -114,7 +118,7 @@ private:
     QDomDocument m_job_xml;
     int m_current_block_index;
     std::vector<BlockData> m_blocks_data;
-    std::map<int, BlockData> *m_blocks_data1;
+    std::map<int, BlockData> m_blocks_data1;
 };
 
 #endif // JOB_EDIT_MODEL_H
