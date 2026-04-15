@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<job xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2001/XMLSchema-instance ./schemes/XMLSchema-instance.xsd http://www.w3.org/2001/XMLSchema ./schemes/XMLSchema.xsd" name="test">
+    <blockCount id="blockCount" type="int"/>
+</job>
