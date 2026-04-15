@@ -192,8 +192,21 @@ bool JobEditModel::NewJobFile(QString filepath)
     QDomProcessingInstruction xmlDecl = m_job_xml.createProcessingInstruction(
         "xml", "version='1.0' encoding='UTF-8'"
     );
+    QString xs = "http://www.w3.org/2001/XMLSchema";
+    QString xsi = "http://www.w3.org/2001/XMLSchema-instance";
     QDomElement rootElement = m_job_xml.createElement("job");
+    rootElement.setAttribute("xmlns:xs", xs);
+    rootElement.setAttribute("xmlns:xsi", xsi);
+    rootElement.setAttribute("xsi:schemaLocation",
+        xsi + " ./schemes/XMLSchema-instance.xsd " + xs + " ./schemes/XMLSchema.xsd");
+
     rootElement.setAttribute("name", fileInfo.baseName());
+    QDomElement block_count = m_job_xml.createElement("blockCount");
+    block_count.setAttribute("id", "blockCount");
+    block_count.setAttribute("type", "int");
+
+    rootElement.appendChild(block_count);
+
     m_job_xml.appendChild(xmlDecl);
     m_job_xml.appendChild(rootElement);
     m_job_xml.save(out, 4);
@@ -203,6 +216,7 @@ bool JobEditModel::NewJobFile(QString filepath)
 
 void JobEditModel::loadJobFile(QString filepath)
 {
+    m_filepath = filepath;
     QFileInfo fileInfo(filepath);
     QFile file(filepath);
     if (!fileInfo.exists())
@@ -215,14 +229,16 @@ void JobEditModel::loadJobFile(QString filepath)
     }
     if (!m_job_xml.setContent(&file))
     {
-        file.close();
         return;
     }
+    file.close();
+    //TODO:需要添加更新job_xml的功能
     emit sglloadJobFileSuccess();
 }
 
 void JobEditModel::saveJobFile()
 {
+    QString str = m_filepath;
     QFile file(m_filepath);
     if (!file.open(QIODevice::ReadWrite))
     {
@@ -230,6 +246,7 @@ void JobEditModel::saveJobFile()
     }
     QTextStream out(&file);
     m_job_xml.save(out, 4);
+    file.close();
 }
 
 void JobEditModel::setView(JobEditViewImp *view)
@@ -258,6 +275,16 @@ BlockData JobEditModel::getBlockData(int index)
     //{
     //    return BlockData();
     //}
+}
+
+int JobEditModel::getBlockCount()
+{
+    return m_blocks_data1->size();
+}
+
+void JobEditModel::setCurrentBlockIndex(int index)
+{
+    m_current_block_index = index;
 }
 
 int JobEditModel::copyBlock(int index)
@@ -290,7 +317,13 @@ void JobEditModel::slotBlockSave()
     QStringList attr_names, attr_values;
     attr_names << "match_method" << "method_type" << "x" << "y";
     //attr_value <<
-    BlockData block = m_blocks_data1->find(m_current_block_index)->second;
+    auto it = m_blocks_data1->find(m_current_block_index);
+    if (it == m_blocks_data1->end())
+    {
+        return;
+    }
+    BlockData block = it->second;
+
     attr_values
         << QString::number(block.getMatchMethod())
         << QString::number(block.getTemplateMatchType())
@@ -318,6 +351,20 @@ void JobEditModel::slotBlockSave()
 void JobEditModel::slotSaveJob()
 {
     saveJobFile();
+}
+
+bool JobEditModel::Xml_to_BlockMap()
+{
+    BlockData block;
+    QDomElement block_elem;
+
+
+    return false;
+}
+
+bool JobEditModel::BlockMap_to_Xml()
+{
+    return false;
 }
 
 void JobEditModel::editXmlFile()

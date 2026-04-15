@@ -27,7 +27,6 @@ void JobTree::initWidget()
     main_hlyt->addWidget(m_treeWdt);
     setLayout(main_hlyt);
 
-
     connect(m_treeWdt, &QTreeWidget::customContextMenuRequested, this, &JobTree::slotGetCurrentItem);
     connect(m_addBlockAct, &QAction::triggered, this, &JobTree::slotAddBlockToTreeWdt);
     connect(m_copyBlockAct, &QAction::triggered, this, &JobTree::slotCopyBlockToTreeWdt);
@@ -36,6 +35,28 @@ void JobTree::initWidget()
 }
 void JobTree::updateWidget()
 {
+    m_treeWdt->setUpdatesEnabled(false);
+    m_treeWdt->blockSignals(true);
+    int count = m_treeWdt->topLevelItemCount();
+    int deltaCount = m_blockCount - count;
+
+    for (int i = 1; i <= abs(deltaCount); i++)
+    {
+        if (deltaCount > 0)
+        {
+            QTreeWidgetItem *item = new QTreeWidgetItem(m_treeWdt);
+            item->setText(0, "Block" + QString::number(count + i));
+            m_treeWdt->addTopLevelItem(item);
+        }
+        else
+        {
+            QTreeWidgetItem *item = m_treeWdt->takeTopLevelItem(count - i - 1);
+            delete item;
+        }
+    }
+
+    m_treeWdt->blockSignals(false);
+    m_treeWdt->setUpdatesEnabled(true);
 }
 
 int JobTree::addBlockToTreeWdt()
@@ -48,6 +69,7 @@ int JobTree::addBlockToTreeWdt()
     m_treeWdt->addTopLevelItem(item);
     m_blockCount++;
     return add_index;
+
 }
 
 int JobTree::copyBlockToTreeWdt(QTreeWidgetItem *item)
@@ -94,6 +116,11 @@ int JobTree::deleteBlockFromTreeWdt(QTreeWidgetItem *item)
     delete item;
     item = nullptr;
     return delete_index;
+}
+
+void JobTree::setBlockCount(int count)
+{
+    m_blockCount = count;
 }
 
 void JobTree::slotAddBlockToTreeWdt(bool trigger)

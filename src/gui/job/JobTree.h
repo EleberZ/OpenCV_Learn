@@ -22,6 +22,8 @@ public:
     int copyBlockToTreeWdt(QTreeWidgetItem *item);
     QTreeWidgetItem* copyBlockToTreeWdt(QTreeWidgetItem *item, QString text);
     int deleteBlockFromTreeWdt(QTreeWidgetItem *item);
+
+    void setBlockCount(int count);
 signals:
     void sglBlockDoubleClicked(QTreeWidgetItem *item);
     void sglAddBlockToTreeWdt(int index);

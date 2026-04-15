@@ -91,6 +91,8 @@ public:
     int copyBlock(int index);
     int deleteBlock(int index);
     BlockData getBlockData(int index);
+    int getBlockCount();
+    void setCurrentBlockIndex(int index);
 
 signals:
     void sglloadJobFileSuccess();
@@ -101,6 +103,8 @@ public slots:
     void slotLoadJob(QString filepath);
     void slotBlockSave();
 private:
+    bool Xml_to_BlockMap();
+    bool BlockMap_to_Xml();
     void editXmlFile();
     std::unique_ptr<QFile> openFileIfExists(QString filepath);
     void addBlock(int index, QString mask_picture_path, QString output_picture_path,

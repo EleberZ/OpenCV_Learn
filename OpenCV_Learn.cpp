@@ -145,6 +145,7 @@ void OpenCV::initTabBar()
 void OpenCV::initJob()
 {
     m_jobConfig = new JobConfig(this);
+    m_jobConfig->setEnabled(false);
     m_jobTree = new JobTree(this);
     m_jobEditModel = std::make_shared<JobEditModel>(this);
     m_WorkPosition_dockWdt->setWidget(m_jobTree);
@@ -160,6 +161,12 @@ void OpenCV::initJob()
     connect(m_jobTree, &JobTree::sglAddBlockToTreeWdt, this, &OpenCV::slot_JobTree_AddBlock);
     connect(m_jobTree, &JobTree::sglCopyBlockToTreeWdt, this, &OpenCV::slot_JobTree_CopyBlock);
     connect(m_jobTree, &JobTree::sglDeleteBlockFromTreeWdt, this, &OpenCV::slot_JobTree_DeleteBlock);
+    connect(m_jobEditModel.get(), &JobEditModel::sglloadJobFileSuccess, this, [this]()
+        {
+            int block_count = m_jobEditModel.get()->getBlockCount();
+            m_jobTree->updateWidget();
+        }
+    );
 }
 
 void OpenCV::initGlobel()
@@ -228,7 +235,6 @@ void OpenCV::initHSM()
         {
             m_state = Ready;
             m_jobTree->setEnabled(true);
-            m_jobConfig->setEnabled(true);
             m_jobTree->update();
             m_jobConfig->update();
             m_output->appendText("System State:Ready");
@@ -501,16 +507,18 @@ void OpenCV::slot_Win_CameraConfig()
 void OpenCV::slot_JobTree_BlockDoubleClicked(QTreeWidgetItem *item)
 {
     QString str = item->text(0);
-    QString str_index = str.remove("Block");
+    QString str_tmp = str;
+    str.remove("Block");
     bool btmp = m_jobConfig->setMainGroubBoxTitle(str);
 
-    if (btmp)
+    if (!btmp)
     {
         //双击没有被打开Block
-        m_BlockConfig_dockWdt->setWindowTitle(str);
-
-        BlockData block_data = m_jobEditModel.get()->getBlockData(str_index.toInt());
+        m_BlockConfig_dockWdt->setWindowTitle(str_tmp);
+        BlockData block_data = m_jobEditModel.get()->getBlockData(str.toInt());
+        m_jobEditModel.get()->setCurrentBlockIndex(str.toInt());
         m_jobConfig->updateWidget(block_data);
+        //m_jobConfig->setEnabled(true);
     }
     //TODO
     //m_jobConfig->updateWidget();
