@@ -10,7 +10,8 @@ class JobEditViewImp:public QWidget
 public:
     explicit JobEditViewImp(QWidget *parent = nullptr);
     //virtual ~JobEditViewImp() = default;
-    virtual void updateWidget() = 0;
+    template<typename T>
+    inline void updateWidget(T data);
     virtual void initWidget() = 0;
 public slots:
     virtual void slotNotifyJobEditView() = 0;
@@ -19,3 +20,9 @@ private:
 };
 
 #endif // JOB_EDIT_VIEWLIMP_H
+
+//template<typename T>
+//void JobEditViewImp::updateWidget(T data)
+//{
+//    //TODO:需要实现页面更新
+//}

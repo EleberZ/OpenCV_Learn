@@ -14,14 +14,14 @@
 
 struct ROIData
 {
-    double width;
-    double height;
-    double pix_x;
-    double pix_y;
-    int stride;
-    int threshold;
-    int overlapThreshold;
-    int max_match_count;
+    double width = 0.0;
+    double height = 0.0;
+    double pix_x = 0.0;
+    double pix_y = 0.0;
+    double stride = 0.0;
+    int threshold = 0;
+    double overlapThreshold = 0.0;
+    int max_match_count = 0;
 };
 struct BlockData
 {
@@ -47,8 +47,8 @@ public:
     double getYpos();
 
     void setROIData(const ROIData &roi_data);
-    void setROIData(int width, int height, int stride, int threshold,
-        int overlapThreshold, int max_match_count);
+    void setROIData(double pix_x, double piy_y, double width, double height,
+        double stride, int threshold, double overlapThreshold, int max_match_count);
     ROIData* getROIData();
     void setMaskPicturePath(QString mask_picture_path);
     QString getMaskPicturePath();
@@ -106,7 +106,9 @@ public slots:
 private:
     bool Xml_to_BlockMap();
     bool BlockMap_to_Xml();
-    void createDTD();
+
+    bool WriteTemplateMatchXml();
+    void ReadTemplateMatchXml();
 
     void editXmlFile();
     std::unique_ptr<QFile> openFileIfExists(QString filepath);

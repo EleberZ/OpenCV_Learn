@@ -17,7 +17,8 @@ public:
 
     // 通过 JobEditViewImp 继承
     void initWidget()override;
-    void updateWidget()override;
+    void updateWidget(int data);
+
     int addBlockToTreeWdt();
     int copyBlockToTreeWdt(QTreeWidgetItem *item);
     QTreeWidgetItem* copyBlockToTreeWdt(QTreeWidgetItem *item, QString text);

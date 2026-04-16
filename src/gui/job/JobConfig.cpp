@@ -1,5 +1,6 @@
 #include "JobConfig.h"
 #include <QHBoxLayout>
+#include <QFormLayout>
 
 JobConfig::JobConfig(QWidget *parent)
     : JobEditViewImp(parent), m_job_block_name("Block*")
@@ -13,14 +14,21 @@ void JobConfig::initWidget()
 {
     m_btn_save = new QPushButton(tr("Save"), this);
     m_gbox_main = new QGroupBox(m_job_block_name, this);
-    m_cbox_job_mode = new QComboBox(this);
-    m_cbox_job_mode->addItem(tr("Template Match"));
-    m_template_match_method = new QComboBox(this);
-    m_template_match_method->addItem(tr("SAD"));
-    m_template_match_method->addItem(tr("SSD"));
-    m_template_match_method->addItem(tr("NCC"));
+    m_cbox_match_method = new QComboBox(this);
+    m_cbox_match_method->addItem(tr("Template Match"));
+    m_cbox_template_match_method = new QComboBox(this);
+    m_cbox_template_match_method->addItem(tr("SAD"));
+    m_cbox_template_match_method->addItem(tr("SSD"));
+    m_cbox_template_match_method->addItem(tr("NCC"));
 
     //m_gbox_path = new QGroupBox(tr("Path"), this);
+
+    m_gbox_position = new QGroupBox(tr("Position"), this);
+    m_ledit_position_x = new QLineEdit(this);
+    m_ledit_position_y = new QLineEdit(this);
+    QFormLayout *flyt = new QFormLayout(m_gbox_position);
+    flyt->addRow(tr("PositionX"), m_ledit_position_x);
+    flyt->addRow(tr("PositionY"), m_ledit_position_y);
 
     m_gbox_picture_show = new QGroupBox(tr("Picture Show"), this);
     QGridLayout *grid_layout = new QGridLayout(m_gbox_picture_show);
@@ -42,7 +50,6 @@ void JobConfig::initWidget()
     m_ledit_mask_file->setEnabled(false);
     m_graphic_view_mask = new QGraphicsView(m_graphic_scene_mask, this);
     m_graphic_view_mask->setEnabled(false);
-    
 
     grid_layout->addWidget(new QLabel("ROI Origin", this), 0, 0, 1, 1);
     grid_layout->addWidget(new QLabel("X", this), 0, 1, 1, 1);
@@ -66,8 +73,9 @@ void JobConfig::initWidget()
     grid_layout->addWidget(m_graphic_view_mask, 14, 0, 7, 7);
 
     QVBoxLayout *hbox = new QVBoxLayout(m_gbox_main);
-    hbox->addWidget(m_cbox_job_mode);
-    hbox->addWidget(m_template_match_method);
+    hbox->addWidget(m_cbox_match_method);
+    hbox->addWidget(m_cbox_template_match_method);
+    hbox->addWidget(m_gbox_position);
     hbox->addWidget(m_gbox_picture_show);
     hbox->addStretch();
     hbox->addWidget(m_btn_save);
@@ -79,17 +87,23 @@ void JobConfig::initWidget()
     m_gbox_main->setLayout(hbox);
 }
 
-void JobConfig::updateWidget()
-{
-    
-}
-
 void JobConfig::updateWidget(BlockData block)
 {
     if (!isEnabled())
     {
         setEnabled(true);
     }
+    m_cbox_match_method->setCurrentIndex(block.getMatchMethod());
+    m_cbox_template_match_method->setCurrentIndex(block.getTemplateMatchType());
+    m_ledit_position_x->setText(QString::number(block.getXpos(), 'f'));
+    m_ledit_position_y->setText(QString::number(block.getYpos(), 'f'));
+    m_ledit_roi_x->setText(QString::number(block.getROIData()->pix_x, 'f'));
+    m_ledit_roi_y->setText(QString::number(block.getROIData()->pix_y, 'f'));
+    m_ledit_roi_width->setText(QString::number(block.getROIData()->width, 'f'));
+    m_ledit_roi_height->setText(QString::number(block.getROIData()->height, 'f'));
+    m_ledit_template_file->setText(block.getTempPicturePath());
+    m_ledit_mask_file->setText(block.getMaskPicturePath());
+    
     //TODO:加载指定Block的数据
 }
 

@@ -164,7 +164,8 @@ void OpenCV::initJob()
     connect(m_jobEditModel.get(), &JobEditModel::sglloadJobFileSuccess, this, [this]()
         {
             int block_count = m_jobEditModel.get()->getBlockCount();
-            m_jobTree->updateWidget();
+            m_jobTree->updateWidget(block_count);
+
         }
     );
 }
@@ -515,8 +516,8 @@ void OpenCV::slot_JobTree_BlockDoubleClicked(QTreeWidgetItem *item)
     {
         //双击没有被打开Block
         m_BlockConfig_dockWdt->setWindowTitle(str_tmp);
-        BlockData block_data = m_jobEditModel.get()->getBlockData(str.toInt());
         m_jobEditModel.get()->setCurrentBlockIndex(str.toInt());
+        BlockData block_data = m_jobEditModel.get()->getBlockData(str.toInt());
         m_jobConfig->updateWidget(block_data);
         //m_jobConfig->setEnabled(true);
     }

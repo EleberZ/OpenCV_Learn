@@ -15,7 +15,7 @@
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include <QGridLayout>
+#include <QGridLayout> 
 #include <QHash>
 #include <QLabel>
 #include <QLineEdit>
@@ -127,9 +127,7 @@ private:
     QHash<int, QMdiSubWindow> m_subWinHash;
     QMdiSubWindow *m_subWin_camera1, *m_subWin_camera2;
 
-    // 存储各区域的占位Dock（key：停靠区域，value：占位Dock）
     QMap<DockArea, QDockWidget *> m_placeHolderDocks;
-    // 存储各区域的业务Dock列表（key：停靠区域，value：Dock列表）
     QMap<DockArea, QList<QDockWidget *>> m_areaDockLists;
 
     CameraConfig *m_camer_config;

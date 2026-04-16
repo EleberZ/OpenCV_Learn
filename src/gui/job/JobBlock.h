@@ -11,7 +11,7 @@ public:
 	JobBlock(QWidget *parent = nullptr);
 
     // 通过 JobEditViewImp 继承
-    void updateWidget() override;
+    void updateWidget();
     void initWidget() override;
 
 public slots:

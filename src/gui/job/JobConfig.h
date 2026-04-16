@@ -1,6 +1,5 @@
 #ifndef JOB_CONFIG_H
 #define JOB_CONFIG_H
-
 #include "JobEditViewImp.h"
 #include<QTreeWidgetItem>
 #include<QWidget>
@@ -22,7 +21,6 @@ public:
     explicit JobConfig(QWidget *parent = nullptr);
     // 通过 JobEditViewImp 继承
     void initWidget()override;
-    void updateWidget()override;
     void updateWidget(BlockData block);
     void initConnect();
     bool setMainGroubBoxTitle(const QString &title);
@@ -37,9 +35,10 @@ private:
     QGroupBox *m_gbox_main;
     QGroupBox *m_gbox_path;
     QGroupBox *m_gbox_picture_show;
+    QGroupBox *m_gbox_position;
 
-    QComboBox *m_cbox_job_mode;
-    QComboBox *m_template_match_method;
+    QComboBox *m_cbox_match_method;
+    QComboBox *m_cbox_template_match_method;
 
     QPushButton *m_btn_save;
 
@@ -54,6 +53,8 @@ private:
     QLineEdit *m_ledit_roi_height;
     QLineEdit *m_ledit_roi_x;
     QLineEdit *m_ledit_roi_y;
+    QLineEdit *m_ledit_position_x;
+    QLineEdit *m_ledit_position_y;
 
     QGraphicsView *m_graphic_view_template;
     QGraphicsView *m_graphic_view_mask;

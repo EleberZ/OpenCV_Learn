@@ -33,8 +33,9 @@ void JobTree::initWidget()
     connect(m_deleteBlockAct, &QAction::triggered, this, &JobTree::slotDeleteBlockFromTreeWdt);
     connect(m_treeWdt, &QTreeWidget::itemClicked, this, &JobTree::slotBlockDoubleClicked);
 }
-void JobTree::updateWidget()
+void JobTree::updateWidget(int data)
 {
+    m_blockCount = data;
     m_treeWdt->setUpdatesEnabled(false);
     m_treeWdt->blockSignals(true);
     int count = m_treeWdt->topLevelItemCount();
@@ -69,7 +70,6 @@ int JobTree::addBlockToTreeWdt()
     m_treeWdt->addTopLevelItem(item);
     m_blockCount++;
     return add_index;
-
 }
 
 int JobTree::copyBlockToTreeWdt(QTreeWidgetItem *item)
