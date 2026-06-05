@@ -95,6 +95,9 @@ public:
     int getBlockCount();
     void setCurrentBlockIndex(int index);
 
+    QString getJobId();
+    void setJobId(QString job_id);
+
 signals:
     void sglloadJobFileSuccess();
     void sglNotifyJobEditView();
@@ -123,6 +126,8 @@ private:
     QXmlStreamWriter m_job_xml_writer;
     QXmlStreamReader m_job_xml_reader;
     int m_current_block_index;
+    unsigned int m_block_count;
+    QString m_job_id;
     std::vector<BlockData> m_blocks_data;
     std::map<int, BlockData> m_blocks_data1;
     QString m_dtd;

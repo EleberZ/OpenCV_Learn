@@ -41,11 +41,12 @@
         <ROIData id="roi_data2" pix_x="0" pix_y="0" width="0" height="0" stride="0" threshold="0" overlapThreshold="0" max_match_count="0"/>
     </Block>
     <Block id="block3">
-        <MatchMethod id="match_method3">0</MatchMethod>
-        <MatchType id="match_type3">0</MatchType>
-        <Position id="position3" x="0" y="0"/>
-        <MaskPath id="mask_path3">./picture/mask/</MaskPath>
+        <MatchMethod id="match_method3">123.68</MatchMethod>
+        <MatchType id="match_type3">23</MatchType>
+        <Position id="position3" x="7.9" y="6.3"/>
+        <MaskPath id="mask_path3">./pict/mask/</MaskPath>
         <TempPath id="temp_path3">./picture/</TempPath>
         <ROIData id="roi_data3" pix_x="0" pix_y="0" width="0" height="0" stride="0" threshold="0" overlapThreshold="0" max_match_count="0"/>
     </Block>
+
 </Job>

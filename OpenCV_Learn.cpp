@@ -157,15 +157,14 @@ void OpenCV::initJob()
 
     connect(m_jobTree, &JobTree::sglBlockDoubleClicked, m_jobConfig, &JobConfig::slotJobBlockDoubleClicked);
     connect(m_jobTree, &JobTree::sglBlockDoubleClicked, this, &OpenCV::slot_JobTree_BlockDoubleClicked);
-    connect(m_jobConfig, &JobConfig::sglBtnSave, m_jobEditModel.get(), &JobEditModel::slotBlockSave);
     connect(m_jobTree, &JobTree::sglAddBlockToTreeWdt, this, &OpenCV::slot_JobTree_AddBlock);
     connect(m_jobTree, &JobTree::sglCopyBlockToTreeWdt, this, &OpenCV::slot_JobTree_CopyBlock);
     connect(m_jobTree, &JobTree::sglDeleteBlockFromTreeWdt, this, &OpenCV::slot_JobTree_DeleteBlock);
+    connect(m_jobConfig, &JobConfig::sglBtnSave, m_jobEditModel.get(), &JobEditModel::slotBlockSave);
     connect(m_jobEditModel.get(), &JobEditModel::sglloadJobFileSuccess, this, [this]()
         {
             int block_count = m_jobEditModel.get()->getBlockCount();
             m_jobTree->updateWidget(block_count);
-
         }
     );
 }
