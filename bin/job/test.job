@@ -14,7 +14,7 @@
         <!ELEMENT Position EMPTY>
         <!ATTLIST Position id ID #REQUIRED x CDATA #REQUIRED y CDATA #REQUIRED >
         <!ELEMENT MaskPath (#PCDATA)>
-        <!ATTLIST MaskPath id ID #REQUIRED >
+        <!ATTLIST MaskPath id ID #REQUIRED enable CDATA #REQUIRED >
         <!ELEMENT TempPath (#PCDATA)>
         <!ATTLIST TempPath id ID #REQUIRED >
         <!ELEMENT ROIData EMPTY>
@@ -25,27 +25,28 @@
 <Job id="test" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <BlockCount id="blockCount" type="int">3</BlockCount>
     <Block id="block1">
-        <MatchMethod id="match_method1">0</MatchMethod>
-        <MatchType id="match_type1">0</MatchType>
-        <Position id="position1" x="0" y="0"/>
-        <MaskPath id="mask_path1">./picture/mask/</MaskPath>
+        <MatchMethod id="match_method1">13</MatchMethod>
+        <MatchType id="match_type1">34</MatchType>
+        <Position id="position1" x="0.023000" y="0.000000"/>
+        <MaskPath id="mask_path1" enable="1">./piure/mask/</MaskPath>
         <TempPath id="temp_path1">./picture/</TempPath>
-        <ROIData id="roi_data1" pix_x="0" pix_y="0" width="0" height="0" stride="0" threshold="0" overlapThreshold="0" max_match_count="0"/>
+        <ROIData id="roi_data1" pix_x="0.45" pix_y="7.000000" width="8.000000" height="5.000000" stride="12.56" threshold="73.12" overlapThreshold="0.000000" max_match_count="0"/>
     </Block>
     <Block id="block2">
         <MatchMethod id="match_method2">0</MatchMethod>
-        <MatchType id="match_type2">0</MatchType>
-        <Position id="position2" x="0" y="0"/>
-        <MaskPath id="mask_path2">./picture/mask/</MaskPath>
+        <MatchType id="match_type2">90</MatchType>
+        <Position id="position2" x="0.000034" y="0.000000"/>
+        <MaskPath id="mask_path2" enable="1">./picture/ma/</MaskPath>
         <TempPath id="temp_path2">./picture/</TempPath>
-        <ROIData id="roi_data2" pix_x="0" pix_y="0" width="0" height="0" stride="0" threshold="0" overlapThreshold="0" max_match_count="0"/>
+        <ROIData id="roi_data2" pix_x="0.000000" pix_y="0.000000" width="0.89" height="0.56" stride="0.56" threshold="86.3" overlapThreshold="0.86" max_match_count="0"/>
     </Block>
     <Block id="block3">
         <MatchMethod id="match_method3">0</MatchMethod>
         <MatchType id="match_type3">0</MatchType>
-        <Position id="position3" x="0" y="0"/>
-        <MaskPath id="mask_path3">./picture/mask/</MaskPath>
-        <TempPath id="temp_path3">./picture/</TempPath>
-        <ROIData id="roi_data3" pix_x="0" pix_y="0" width="0" height="0" stride="0" threshold="0" overlapThreshold="0" max_match_count="0"/>
+        <Position id="position3" x="7.900000" y="6.300000"/>
+        <MaskPath id="mask_path3" enable="1">./pict/mask/</MaskPath>
+        <TempPath id="temp_path3">./pic/</TempPath>
+        <ROIData id="roi_data3" pix_x="0.000000" pix_y="0.000000" width="0.74" height="0.47" stride="0.000000" threshold="99" overlapThreshold="0.000000" max_match_count="0"/>
     </Block>
 </Job>
+

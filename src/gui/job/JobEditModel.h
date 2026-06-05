@@ -28,11 +28,12 @@ struct BlockData
 private:
     QString m_temp_picture_path;
     QString m_mask_picture_path;
+    bool m_enable;
     double m_xpos;
     double m_ypos;
     ROIData *m_roi_data;
-    int m_match_method;
-    cv::TemplateMatchModes m_template_match_type;
+    QString m_match_method;
+    int m_template_match_type;
 public:
     BlockData();
     ~BlockData();
@@ -41,6 +42,8 @@ public:
     BlockData(BlockData &&other)noexcept;
     BlockData& operator=(BlockData &&other)noexcept;
 
+    void setEnable(bool enable);
+    bool getEnable();
     void setXpos(double xpos);
     double getXpos();
     void setYpos(double ypos);
@@ -55,11 +58,11 @@ public:
     void setTempPicturePath(QString temp_picture_path);
     QString getTempPicturePath();
 
-    void setTemplateMatchType(cv::TemplateMatchModes methor);
-    cv::TemplateMatchModes getTemplateMatchType();
+    void setTemplateMatchType(int methor);
+    int getTemplateMatchType();
 
-    void setMatchMethod(int match_method);
-    int getMatchMethod();
+    void setMethod(QString match_method);
+    QString getMatchMethod();
 };
 
 enum ShapeEnum
@@ -92,8 +95,12 @@ public:
     int copyBlock(int index);
     int deleteBlock(int index);
     BlockData getBlockData(int index);
+    void setBlockData(int index, BlockData);
     int getBlockCount();
     void setCurrentBlockIndex(int index);
+
+    QString getJobId();
+    void setJobId(QString job_id);
 
 signals:
     void sglloadJobFileSuccess();
@@ -123,6 +130,8 @@ private:
     QXmlStreamWriter m_job_xml_writer;
     QXmlStreamReader m_job_xml_reader;
     int m_current_block_index;
+    unsigned int m_block_count;
+    QString m_job_id;
     std::vector<BlockData> m_blocks_data;
     std::map<int, BlockData> m_blocks_data1;
     QString m_dtd;

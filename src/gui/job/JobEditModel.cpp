@@ -4,6 +4,8 @@
 #include <QDomDocument>
 // #include <QDebug>
 #include <QfileInfo>
+#include <QDebug>
+#include <QStack>
 
 BlockData::BlockData():
     m_roi_data(nullptr),
@@ -11,7 +13,7 @@ BlockData::BlockData():
     m_mask_picture_path("./picture/mask/"),
     m_xpos(0),
     m_ypos(0),
-    m_match_method(0),
+    m_match_method(QString()),
     m_template_match_type(cv::TM_SQDIFF)
 {
     m_roi_data = new ROIData();
@@ -81,6 +83,16 @@ BlockData &BlockData::operator=(BlockData &&other)noexcept
     return *this;
 }
 
+void BlockData::setEnable(bool enable)
+{
+    m_enable = enable;
+}
+
+bool BlockData::getEnable()
+{
+    return m_enable;
+}
+
 void BlockData::setXpos(double xpos)
 {
     m_xpos = xpos;
@@ -148,22 +160,22 @@ QString BlockData::getTempPicturePath()
     return m_temp_picture_path;
 }
 
-void BlockData::setTemplateMatchType(cv::TemplateMatchModes methor)
+void BlockData::setTemplateMatchType(int methor)
 {
     m_template_match_type = methor;
 }
 
-cv::TemplateMatchModes BlockData::getTemplateMatchType()
+int BlockData::getTemplateMatchType()
 {
     return m_template_match_type;
 }
 
-void BlockData::setMatchMethod(int match_method)
+void BlockData::setMethod(QString match_method)
 {
     m_match_method = match_method;
 }
 
-int BlockData::getMatchMethod()
+QString BlockData::getMatchMethod()
 {
     return m_match_method;
 }
@@ -247,6 +259,11 @@ BlockData JobEditModel::getBlockData(int index)
     }
 }
 
+void JobEditModel::setBlockData(int index, BlockData block_data)
+{
+    m_blocks_data1[index] = block_data;
+}
+
 int JobEditModel::getBlockCount()
 {
     return m_blocks_data1.size();
@@ -255,6 +272,16 @@ int JobEditModel::getBlockCount()
 void JobEditModel::setCurrentBlockIndex(int index)
 {
     m_current_block_index = index;
+}
+
+QString JobEditModel::getJobId()
+{
+    return m_job_id;
+}
+
+void JobEditModel::setJobId(QString job_id)
+{
+    m_job_id = job_id;
 }
 
 int JobEditModel::copyBlock(int index)
@@ -285,6 +312,7 @@ void JobEditModel::slotLoadJob(QString filepath)
 
 void JobEditModel::slotBlockSave()
 {
+    //TODO:Block 保存
 }
 
 void JobEditModel::slotSaveJob()
@@ -342,7 +370,7 @@ bool JobEditModel::WriteTemplateMatchXml()
                     m_job_xml_writer.writeStartElement("MatchMethod");
                     m_job_xml_writer.writeAttribute("id", "match_method"+ QString::number(i));
                     {
-                        m_job_xml_writer.writeCharacters(QString::number(block.second.getMatchMethod()));
+                        m_job_xml_writer.writeCharacters(block.second.getMatchMethod());
                     }
                     m_job_xml_writer.writeEndElement();
                     //<MatchType>
@@ -401,7 +429,8 @@ bool JobEditModel::WriteTemplateMatchXml()
 
 void JobEditModel::ReadTemplateMatchXml()
 {
-    int index;
+    QStack<QStringRef> stack;
+    int index=0;
     QFileInfo fileInfo(m_filepath);
     QFile file(m_filepath);
     if (!fileInfo.exists())
@@ -412,70 +441,104 @@ void JobEditModel::ReadTemplateMatchXml()
     {
         return;
     }
-
     m_job_xml_reader.setDevice(&file);
 
     while (!m_job_xml_reader.atEnd()
         && !m_job_xml_reader.hasError())
     {
-        m_job_xml_reader.readNext();
-        if (!m_job_xml_reader.isStartElement())
+        auto token =  m_job_xml_reader.readNext();
+
+        if (m_job_xml_reader.isStartDocument())
         {
             continue;
         }
+        if (m_job_xml_reader.isEndDocument())
+        {
+            break;
+        }
+        if (m_job_xml_reader.isStartElement())
+        {
+            if (m_job_xml_reader.name() == "Job")
+            {
+                m_job_id = m_job_xml_reader.attributes().value("id").toString();
+            }
+            else if (m_job_xml_reader.name() == "Block")
+            {
+                QString str = m_job_xml_reader.attributes().value("id").toString();
+                index = str.remove("block").toUInt();
+                m_blocks_data1[index] = BlockData();
+            }
+            else if (m_job_xml_reader.name() == "Position")
+            {
+                double xpos = m_job_xml_reader.attributes().value("x").toDouble();
+                double ypos = m_job_xml_reader.attributes().value("y").toDouble();
+                bool enable = m_job_xml_reader.attributes().value("enable").toShort();
+                m_blocks_data1[index].setXpos(xpos);
+                m_blocks_data1[index].setYpos(ypos);
+            }
+            else if (m_job_xml_reader.name() == "ROIData")
+            {
+                double pix_x = m_job_xml_reader.attributes().value("pix_x").toDouble();
+                double pix_y = m_job_xml_reader.attributes().value("pix_y").toDouble();
+                double width = m_job_xml_reader.attributes().value("width").toDouble();
+                double height = m_job_xml_reader.attributes().value("height").toDouble();
+                double stride = m_job_xml_reader.attributes().value("stride").toInt();
+                int threshold = m_job_xml_reader.attributes().value("threshold").toInt();
+                double overlapThreshold = m_job_xml_reader.attributes().value("overlapThreshold").toDouble();
+                int max_match_count = m_job_xml_reader.attributes().value("max_match_count").toInt();
 
-        if (m_job_xml_reader.name() == "BlockCount")
+                m_blocks_data1[index].setROIData(pix_x, pix_y, width, height,
+                    stride, threshold, overlapThreshold, max_match_count);
+                m_job_xml_reader.skipCurrentElement(); // 跳过剩余子元素
+            }
+            stack.push(m_job_xml_reader.name());
+        }
+        if (m_job_xml_reader.isEndElement())
+        {
+            if (stack.top() == m_job_xml_reader.name())
+            {
+                stack.pop();
+            }
+        }
+        if (m_job_xml_reader.isCharacters())
+        {
+            QStringRef txt = stack.top();
+            if (txt == "BlockCount")
+            {
+                int block_count = m_job_xml_reader.text().toInt();
+                m_block_count = block_count;
+            }
+            else if (txt == "MatchMethod")
+            {
+                QString match_method = m_job_xml_reader.text().toString();
+                m_blocks_data1[index].setMethod(match_method);
+            }
+            else if (txt == "MatchType")
+            {
+                QString match_method = m_job_xml_reader.text().toString();
+                m_blocks_data1[index].setMethod(match_method);
+            }
+            else if (txt == "MaskPath")
+            {
+                QString mask_path = m_job_xml_reader.text().toString();
+                m_blocks_data1[index].setMaskPicturePath(mask_path);
+            }
+            else if (txt == "TempPath")
+            {
+                QString temp_path = m_job_xml_reader.text().toString();
+                m_blocks_data1[index].setTempPicturePath(temp_path);
+            }
+        }
+        if (m_job_xml_reader.isEntityReference())
         {
 
-        }
-        else if (m_job_xml_reader.name() == "Block")
-        {
-            index = m_job_xml_reader.attributes().value("id").right(1).toInt();
-        }
-        else if (m_job_xml_reader.name() == "MatchMethod")
-        {
-            int match_method = m_job_xml_reader.text().toInt();
-            m_blocks_data1[index].setMatchMethod(match_method);
-        }
-        else if (m_job_xml_reader.name() == "MatchType")
-        {
-            int match_method = m_job_xml_reader.text().toInt();
-            m_blocks_data1[index].setMatchMethod(match_method);
-        }
-        else if (m_job_xml_reader.name() == "Position")
-        {
-            double xpos = m_job_xml_reader.attributes().value("x").toDouble();
-            double ypos = m_job_xml_reader.attributes().value("y").toDouble();
-            m_blocks_data1[index].setXpos(xpos);
-            m_blocks_data1[index].setYpos(ypos);
-        }
-        else if (m_job_xml_reader.name() == "MaskPath")
-        {
-            QString mask_path = m_job_xml_reader.text().toString();
-            m_blocks_data1[index].setMaskPicturePath(mask_path);
-        }
-        else if (m_job_xml_reader.name() == "TempPath")
-        {
-            QString temp_path = m_job_xml_reader.text().toString();
-            m_blocks_data1[index].setTempPicturePath(temp_path);
-        }
-        else if (m_job_xml_reader.name() == "ROIData")
-        {
-            double pix_x = m_job_xml_reader.attributes().value("pix_x").toDouble();
-            double pix_y = m_job_xml_reader.attributes().value("pix_y").toDouble();
-            double width = m_job_xml_reader.attributes().value("width").toDouble();
-            double height = m_job_xml_reader.attributes().value("height").toDouble();
-            double stride = m_job_xml_reader.attributes().value("stride").toInt();
-            int threshold = m_job_xml_reader.attributes().value("threshold").toInt();
-            double overlapThreshold = m_job_xml_reader.attributes().value("overlapThreshold").toDouble();
-            int max_match_count = m_job_xml_reader.attributes().value("max_match_count").toInt();
-
-            m_blocks_data1[index].setROIData(pix_x, pix_y, width, height,
-                stride, threshold, overlapThreshold, max_match_count);
         }
     }
-
-
+    if (m_job_xml_reader.hasError())
+    {
+        qDebug()<<"XML Error:"<< m_job_xml_reader.errorString();
+        
+    }
     file.close();
 }
 

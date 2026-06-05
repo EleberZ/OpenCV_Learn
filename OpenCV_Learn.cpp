@@ -157,15 +157,24 @@ void OpenCV::initJob()
 
     connect(m_jobTree, &JobTree::sglBlockDoubleClicked, m_jobConfig, &JobConfig::slotJobBlockDoubleClicked);
     connect(m_jobTree, &JobTree::sglBlockDoubleClicked, this, &OpenCV::slot_JobTree_BlockDoubleClicked);
-    connect(m_jobConfig, &JobConfig::sglBtnSave, m_jobEditModel.get(), &JobEditModel::slotBlockSave);
     connect(m_jobTree, &JobTree::sglAddBlockToTreeWdt, this, &OpenCV::slot_JobTree_AddBlock);
     connect(m_jobTree, &JobTree::sglCopyBlockToTreeWdt, this, &OpenCV::slot_JobTree_CopyBlock);
     connect(m_jobTree, &JobTree::sglDeleteBlockFromTreeWdt, this, &OpenCV::slot_JobTree_DeleteBlock);
+    connect(m_jobConfig, &JobConfig::sglBtnSave, this, [this]()
+        {
+            BlockData block;
+            block.setTempPicturePath(m_jobConfig->get_ledit_template_file());
+            block.setMaskPicturePath(m_jobConfig->get_ledit_mask_file());
+            block.setXpos(m_jobConfig->get_ledit_position_x());
+            block.setYpos(m_jobConfig->get_ledit_position_y());
+            block.setMethod(m_jobConfig->get_cbox_method());
+            block.setTemplateMatchType(m_jobConfig->get_cbox_template_match_method());
+        }
+    );
     connect(m_jobEditModel.get(), &JobEditModel::sglloadJobFileSuccess, this, [this]()
         {
             int block_count = m_jobEditModel.get()->getBlockCount();
             m_jobTree->updateWidget(block_count);
-
         }
     );
 }
@@ -486,7 +495,8 @@ void OpenCV::slot_LoadJob()
 
 void OpenCV::slot_SaveJob()
 {
-    m_jobEditModel.get()->slotSaveJob();
+    auto jobModel = m_jobEditModel.get();
+    jobModel->slotSaveJob();
     //emit sglSaveJob();
 }
 

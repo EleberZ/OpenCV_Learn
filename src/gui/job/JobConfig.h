@@ -24,6 +24,17 @@ public:
     void updateWidget(BlockData block);
     void initConnect();
     bool setMainGroubBoxTitle(const QString &title);
+
+    QString get_cbox_method();
+    int get_cbox_template_match_method();
+    QString get_ledit_template_file();
+    QString get_ledit_mask_file();
+    double get_ledit_roi_x();
+    double get_ledit_roi_y();
+    double get_ledit_roi_width();
+    double get_ledit_roi_height();
+    double get_ledit_position_x();
+    double get_ledit_position_y();
 signals:
     void sglBtnSave();
 public slots:

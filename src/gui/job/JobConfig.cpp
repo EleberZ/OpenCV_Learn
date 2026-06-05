@@ -93,7 +93,7 @@ void JobConfig::updateWidget(BlockData block)
     {
         setEnabled(true);
     }
-    m_cbox_match_method->setCurrentIndex(block.getMatchMethod());
+    m_cbox_match_method->setCurrentIndex(block.getMatchMethod().toInt());
     m_cbox_template_match_method->setCurrentIndex(block.getTemplateMatchType());
     m_ledit_position_x->setText(QString::number(block.getXpos(), 'f'));
     m_ledit_position_y->setText(QString::number(block.getYpos(), 'f'));
@@ -128,12 +128,61 @@ bool JobConfig::setMainGroubBoxTitle(const QString &title)
     }
 }
 
+QString JobConfig::get_cbox_method()
+{
+    return m_cbox_match_method->currentText();
+}
+
+int JobConfig::get_cbox_template_match_method()
+{
+    return m_cbox_template_match_method->currentIndex();
+}
+
+QString JobConfig::get_ledit_template_file()
+{
+    return m_ledit_template_file->text();
+}   
+
+QString JobConfig::get_ledit_mask_file()
+{
+    return m_ledit_mask_file->text();
+}
+
+double JobConfig::get_ledit_roi_x()
+{
+    return m_ledit_roi_x->text().toDouble();
+}
+
+double JobConfig::get_ledit_roi_y()
+{
+    return m_ledit_roi_y->text().toDouble();
+}
+
+double JobConfig::get_ledit_roi_width()
+{
+    return m_ledit_roi_width->text().toDouble();
+}
+
+double JobConfig::get_ledit_roi_height()
+{
+    return m_ledit_roi_height->text().toDouble();
+}
+
+double JobConfig::get_ledit_position_x()
+{
+    return m_ledit_position_x->text().toDouble();
+}
+
+double JobConfig::get_ledit_position_y()
+{
+    return m_ledit_position_y->text().toDouble();
+}
+
 void JobConfig::slotJobBlockDoubleClicked(QTreeWidgetItem *item)
 {
     QString name = item->text(0);
     setWindowTitle(name);
     m_gbox_main->setTitle(name);
-
 }
 
 void JobConfig::slotCheckEnableMask(bool ischeck)

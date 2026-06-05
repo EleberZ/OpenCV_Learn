@@ -36,7 +36,6 @@ enum StateEnum
     Alarm
 };
 
-
 class OpenCV: public QMainWindow
 {
 	Q_OBJECT
