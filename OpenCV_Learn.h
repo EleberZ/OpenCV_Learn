@@ -69,7 +69,7 @@ public:
 	QDockWidget* initDockWidget(QString name);
 	void addDockToArea(QDockWidget* dock, DockArea area, const QString& contentText);
 
-    QSize WidgetShowAndHide(QWidget* widget, QSize size);
+    //QSize WidgetShowAndHide(QWidget* widget, QSize size);
 signals:
     void sglNewJob(QString job_file);
     void sglLoadJob(QString job_file);
@@ -100,6 +100,7 @@ private slots:
     void slot_JobTree_AddBlock(int index);
     void slot_JobTree_CopyBlock(int index);
     void slot_JobTree_DeleteBlock(int index);
+    void slot_JonConfig_SaveSingleBlock();
 
 private:
     QGridLayout *glyt;

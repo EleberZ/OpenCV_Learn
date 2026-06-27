@@ -16,6 +16,8 @@ void JobConfig::initWidget()
     m_gbox_main = new QGroupBox(m_job_block_name, this);
     m_cbox_match_method = new QComboBox(this);
     m_cbox_match_method->addItem(tr("Template Match"));
+    m_cbox_match_method->addItem(tr("Block Analyse"));
+    m_cbox_match_method->addItem(tr("Edge Detection"));
     m_cbox_template_match_method = new QComboBox(this);
     m_cbox_template_match_method->addItem(tr("SAD"));
     m_cbox_template_match_method->addItem(tr("SSD"));
@@ -93,8 +95,8 @@ void JobConfig::updateWidget(BlockData block)
     {
         setEnabled(true);
     }
-    m_cbox_match_method->setCurrentIndex(block.getMatchMethod().toInt());
-    m_cbox_template_match_method->setCurrentIndex(block.getTemplateMatchType());
+    m_cbox_match_method->setCurrentText(block.getMatchMethod());
+    m_cbox_template_match_method->setCurrentText(block.getTemplateMatchType());
     m_ledit_position_x->setText(QString::number(block.getXpos(), 'f'));
     m_ledit_position_y->setText(QString::number(block.getYpos(), 'f'));
     m_ledit_roi_x->setText(QString::number(block.getROIData()->pix_x, 'f'));
@@ -103,14 +105,17 @@ void JobConfig::updateWidget(BlockData block)
     m_ledit_roi_height->setText(QString::number(block.getROIData()->height, 'f'));
     m_ledit_template_file->setText(block.getTempPicturePath());
     m_ledit_mask_file->setText(block.getMaskPicturePath());
-    
+    m_check_enable_mask->setChecked(block.getMaskEnable());
     //TODO:加载指定Block的数据
 }
 
 void JobConfig::initConnect()
 {
     connect(m_check_enable_mask, &QCheckBox::toggled, this, &JobConfig::slotCheckEnableMask);
-    connect(m_btn_save, &QPushButton::clicked, this, &JobConfig::sglBtnSave);
+    connect(m_btn_save, &QPushButton::clicked, this, [this]()
+        {
+            emit sglBtnSave(m_current_block_index);
+        });
 }
 
 bool JobConfig::setMainGroubBoxTitle(const QString &title)
@@ -133,9 +138,9 @@ QString JobConfig::get_cbox_method()
     return m_cbox_match_method->currentText();
 }
 
-int JobConfig::get_cbox_template_match_method()
+QString JobConfig::get_cbox_template_match_method()
 {
-    return m_cbox_template_match_method->currentIndex();
+    return m_cbox_template_match_method->currentText();
 }
 
 QString JobConfig::get_ledit_template_file()
@@ -176,13 +181,6 @@ double JobConfig::get_ledit_position_x()
 double JobConfig::get_ledit_position_y()
 {
     return m_ledit_position_y->text().toDouble();
-}
-
-void JobConfig::slotJobBlockDoubleClicked(QTreeWidgetItem *item)
-{
-    QString name = item->text(0);
-    setWindowTitle(name);
-    m_gbox_main->setTitle(name);
 }
 
 void JobConfig::slotCheckEnableMask(bool ischeck)

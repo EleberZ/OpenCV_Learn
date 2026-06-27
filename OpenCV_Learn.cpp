@@ -151,26 +151,13 @@ void OpenCV::initJob()
     m_WorkPosition_dockWdt->setWidget(m_jobTree);
     m_BlockConfig_dockWdt->setWidget(m_jobConfig);
 
-    //connect(this, &OpenCV::sglNewJob, m_jobEditModel.get(), &JobEditModel::slotNewJob);
-    //connect(this, &OpenCV::sglLoadJob, m_jobEditModel.get(), &JobEditModel::slotLoadJob);
-    //connect(this, &OpenCV::sglSaveJob, m_jobEditModel.get(), &JobEditModel::slotSaveJob);
-
-    connect(m_jobTree, &JobTree::sglBlockDoubleClicked, m_jobConfig, &JobConfig::slotJobBlockDoubleClicked);
+    //connect(m_jobTree, &JobTree::sglBlockDoubleClicked, m_jobConfig, &JobConfig::slotJobBlockDoubleClicked);
     connect(m_jobTree, &JobTree::sglBlockDoubleClicked, this, &OpenCV::slot_JobTree_BlockDoubleClicked);
     connect(m_jobTree, &JobTree::sglAddBlockToTreeWdt, this, &OpenCV::slot_JobTree_AddBlock);
     connect(m_jobTree, &JobTree::sglCopyBlockToTreeWdt, this, &OpenCV::slot_JobTree_CopyBlock);
     connect(m_jobTree, &JobTree::sglDeleteBlockFromTreeWdt, this, &OpenCV::slot_JobTree_DeleteBlock);
-    connect(m_jobConfig, &JobConfig::sglBtnSave, this, [this]()
-        {
-            BlockData block;
-            block.setTempPicturePath(m_jobConfig->get_ledit_template_file());
-            block.setMaskPicturePath(m_jobConfig->get_ledit_mask_file());
-            block.setXpos(m_jobConfig->get_ledit_position_x());
-            block.setYpos(m_jobConfig->get_ledit_position_y());
-            block.setMethod(m_jobConfig->get_cbox_method());
-            block.setTemplateMatchType(m_jobConfig->get_cbox_template_match_method());
-        }
-    );
+
+    connect(m_jobConfig, &JobConfig::sglBtnSave, this, &OpenCV::slot_JonConfig_SaveSingleBlock);
     connect(m_jobEditModel.get(), &JobEditModel::sglloadJobFileSuccess, this, [this]()
         {
             int block_count = m_jobEditModel.get()->getBlockCount();
@@ -360,21 +347,21 @@ void OpenCV::addDockToArea(QDockWidget *dock, DockArea area, const QString &cont
     dock->setAllowedAreas(static_cast<Qt::DockWidgetArea>(area));
 }
 
-QSize OpenCV::WidgetShowAndHide(QWidget *widget, QSize size)
-{
-    QSize temp;
-    temp = widget->size();
-    if (temp.height()==0
-        &&temp.width()==0)
-    {
-        widget->setFixedSize(size);
-    }
-    else
-    {
-        widget->setFixedSize(0,0);
-    }
-    return temp;
-}
+//QSize OpenCV::WidgetShowAndHide(QWidget *widget, QSize size)
+//{
+//    QSize temp;
+//    temp = widget->size();
+//    if (temp.height()==0
+//        &&temp.width()==0)
+//    {
+//        widget->setFixedSize(size);
+//    }
+//    else
+//    {
+//        widget->setFixedSize(0,0);
+//    }
+//    return temp;
+//}
 
 void OpenCV::slotBtnGrayClicked()
 {
@@ -489,7 +476,6 @@ void OpenCV::slot_LoadJob()
         return;
     }
     m_jobEditModel.get()->slotLoadJob(job_file_path);
-    //emit sglLoadJob(job_file_path);
     //TODO:加载作业
 }
 
@@ -520,19 +506,17 @@ void OpenCV::slot_JobTree_BlockDoubleClicked(QTreeWidgetItem *item)
     QString str = item->text(0);
     QString str_tmp = str;
     str.remove("Block");
-    bool btmp = m_jobConfig->setMainGroubBoxTitle(str);
 
+    bool btmp = m_jobConfig->setMainGroubBoxTitle(str_tmp);
     if (!btmp)
     {
         //双击没有被打开Block
-        m_BlockConfig_dockWdt->setWindowTitle(str_tmp);
+        //m_BlockConfig_dockWdt->setWindowTitle(str_tmp);
         m_jobEditModel.get()->setCurrentBlockIndex(str.toInt());
         BlockData block_data = m_jobEditModel.get()->getBlockData(str.toInt());
         m_jobConfig->updateWidget(block_data);
-        //m_jobConfig->setEnabled(true);
     }
     //TODO
-    //m_jobConfig->updateWidget();
 }
 
 void OpenCV::slot_JobTree_AddBlock(int index)
@@ -548,6 +532,18 @@ void OpenCV::slot_JobTree_CopyBlock(int index)
 void OpenCV::slot_JobTree_DeleteBlock(int index)
 {
     m_jobEditModel.get()->deleteBlock(index);
+}
+
+void OpenCV::slot_JonConfig_SaveSingleBlock()
+{
+    BlockData block;
+    block.setTempPicturePath(m_jobConfig->get_ledit_template_file());
+    block.setMaskPicturePath(m_jobConfig->get_ledit_mask_file());
+    block.setXpos(m_jobConfig->get_ledit_position_x());
+    block.setYpos(m_jobConfig->get_ledit_position_y());
+    block.setMethod(m_jobConfig->get_cbox_method());
+    block.setTemplateMatchType(m_jobConfig->get_cbox_template_match_method());
+    //m_jobEditModel.get()->setBlockData(,block);
 }
 
 void OpenCV::slotBtnOpenClicked()

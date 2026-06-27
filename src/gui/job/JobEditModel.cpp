@@ -6,6 +6,7 @@
 #include <QfileInfo>
 #include <QDebug>
 #include <QStack>
+#include "JobConfig.h"
 
 BlockData::BlockData():
     m_roi_data(nullptr),
@@ -83,12 +84,12 @@ BlockData &BlockData::operator=(BlockData &&other)noexcept
     return *this;
 }
 
-void BlockData::setEnable(bool enable)
+void BlockData::setMaskEnable(bool enable)
 {
     m_enable = enable;
 }
 
-bool BlockData::getEnable()
+bool BlockData::getMaskEnable()
 {
     return m_enable;
 }
@@ -129,7 +130,7 @@ void BlockData::setROIData(double pix_x, double piy_y, double width, double heig
     m_roi_data->pix_y = piy_y;
     m_roi_data->width = width;
     m_roi_data->height = height;
-    m_roi_data->stride = stride;
+    m_roi_data->stride = stride; 
     m_roi_data->threshold = threshold;
     m_roi_data->overlapThreshold = overlapThreshold;
     m_roi_data->max_match_count = max_match_count;
@@ -160,12 +161,12 @@ QString BlockData::getTempPicturePath()
     return m_temp_picture_path;
 }
 
-void BlockData::setTemplateMatchType(int methor)
+void BlockData::setTemplateMatchType(QString methor)
 {
     m_template_match_type = methor;
 }
 
-int BlockData::getTemplateMatchType()
+QString BlockData::getTemplateMatchType()
 {
     return m_template_match_type;
 }
@@ -274,6 +275,11 @@ void JobEditModel::setCurrentBlockIndex(int index)
     m_current_block_index = index;
 }
 
+int JobConfig::getCurrentBlockIndex()
+{
+    return 0;
+}
+
 QString JobEditModel::getJobId()
 {
     return m_job_id;
@@ -377,7 +383,7 @@ bool JobEditModel::WriteTemplateMatchXml()
                     m_job_xml_writer.writeStartElement("MatchType");
                     m_job_xml_writer.writeAttribute("id", "match_type" + QString::number(i));
                     {
-                        m_job_xml_writer.writeCharacters(QString::number(block.second.getTemplateMatchType()));
+                        m_job_xml_writer.writeCharacters(block.second.getTemplateMatchType());
                     }
                     m_job_xml_writer.writeEndElement();
                     //<Position>
@@ -388,6 +394,7 @@ bool JobEditModel::WriteTemplateMatchXml()
                     m_job_xml_writer.writeEndElement();
                     //<MaskPath>
                     m_job_xml_writer.writeStartElement("MaskPath");
+                    m_job_xml_writer.writeAttribute("enable", QString::number(block.second.getMaskEnable()));
                     m_job_xml_writer.writeAttribute("id", "mask_path"+ QString::number(i));
                     {
                         m_job_xml_writer.writeCharacters(block.second.getMaskPicturePath());
@@ -405,12 +412,12 @@ bool JobEditModel::WriteTemplateMatchXml()
                     ROIData roi_data = *block.second.getROIData();
                     m_job_xml_writer.writeStartElement("ROIData");
                     m_job_xml_writer.writeAttribute("id", "roi_data" + QString::number(i));
-                    m_job_xml_writer.writeAttribute("pix_x", QString::number(roi_data.pix_x, 'f'));
+                    m_job_xml_writer .writeAttribute("pix_x", QString::number(roi_data.pix_x, 'f'));
                     m_job_xml_writer.writeAttribute("pix_y", QString::number(roi_data.pix_y, 'f'));
                     m_job_xml_writer.writeAttribute("width", QString::number(roi_data.width, 'f'));
                     m_job_xml_writer.writeAttribute("height", QString::number(roi_data.height, 'f'));
                     m_job_xml_writer.writeAttribute("stride", QString::number(roi_data.stride, 'f'));
-                    m_job_xml_writer.writeAttribute("threshold", QString::number(roi_data.threshold));          //匹配分数阈值
+                    m_job_xml_writer.writeAttribute("threshold", QString::number(roi_data.threshold));   //匹配分数阈值
                     m_job_xml_writer.writeAttribute("overlapThreshold", QString::number(roi_data.overlapThreshold, 'f'));       //重叠阈值
                     m_job_xml_writer.writeAttribute("max_match_count", QString::number(roi_data.max_match_count));       //最大匹配数量
                     m_job_xml_writer.writeEndElement();
@@ -472,9 +479,13 @@ void JobEditModel::ReadTemplateMatchXml()
             {
                 double xpos = m_job_xml_reader.attributes().value("x").toDouble();
                 double ypos = m_job_xml_reader.attributes().value("y").toDouble();
-                bool enable = m_job_xml_reader.attributes().value("enable").toShort();
                 m_blocks_data1[index].setXpos(xpos);
                 m_blocks_data1[index].setYpos(ypos);
+            }
+            else if (m_job_xml_reader.name() == "MaskPath")
+            {
+                bool enable = m_job_xml_reader.attributes().value("enable").toShort();
+                m_blocks_data1[index].setMaskEnable(enable);
             }
             else if (m_job_xml_reader.name() == "ROIData")
             {
@@ -516,7 +527,7 @@ void JobEditModel::ReadTemplateMatchXml()
             else if (txt == "MatchType")
             {
                 QString match_method = m_job_xml_reader.text().toString();
-                m_blocks_data1[index].setMethod(match_method);
+                m_blocks_data1[index].setTemplateMatchType(match_method);
             }
             else if (txt == "MaskPath")
             {
