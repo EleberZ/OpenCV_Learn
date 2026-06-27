@@ -26,7 +26,7 @@ public:
     bool setMainGroubBoxTitle(const QString &title);
 
     QString get_cbox_method();
-    int get_cbox_template_match_method();
+    QString get_cbox_template_match_method();
     QString get_ledit_template_file();
     QString get_ledit_mask_file();
     double get_ledit_roi_x();
@@ -36,12 +36,13 @@ public:
     double get_ledit_position_x();
     double get_ledit_position_y();
 signals:
-    void sglBtnSave();
+    void sglBtnSave(int block_index);
 public slots:
     void slotNotifyJobEditView()override;
     void slotJobBlockDoubleClicked(QTreeWidgetItem *item);
     void slotCheckEnableMask(bool ischeck);
 private:
+    int m_current_block_index;
     QString m_job_block_name;
     QGroupBox *m_gbox_main;
     QGroupBox *m_gbox_path;

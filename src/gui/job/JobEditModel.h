@@ -33,7 +33,7 @@ private:
     double m_ypos;
     ROIData *m_roi_data;
     QString m_match_method;
-    int m_template_match_type;
+    QString m_template_match_type;
 public:
     BlockData();
     ~BlockData();
@@ -42,8 +42,8 @@ public:
     BlockData(BlockData &&other)noexcept;
     BlockData& operator=(BlockData &&other)noexcept;
 
-    void setEnable(bool enable);
-    bool getEnable();
+    void setMaskEnable(bool enable);
+    bool getMaskEnable();
     void setXpos(double xpos);
     double getXpos();
     void setYpos(double ypos);
@@ -53,13 +53,14 @@ public:
     void setROIData(double pix_x, double piy_y, double width, double height,
         double stride, int threshold, double overlapThreshold, int max_match_count);
     ROIData* getROIData();
+
     void setMaskPicturePath(QString mask_picture_path);
     QString getMaskPicturePath();
     void setTempPicturePath(QString temp_picture_path);
     QString getTempPicturePath();
 
-    void setTemplateMatchType(int methor);
-    int getTemplateMatchType();
+    void setTemplateMatchType(QString methor);
+    QString getTemplateMatchType();
 
     void setMethod(QString match_method);
     QString getMatchMethod();

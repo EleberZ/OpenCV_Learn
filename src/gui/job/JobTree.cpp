@@ -13,16 +13,13 @@ void JobTree::initWidget()
 {
     m_treeWdt = new QTreeWidget( this);
     m_treeWdt->setHeaderLabel("*. Job");
-    //m_treeWdt->setHeaderHidden(true);
     m_treeWdt->setContextMenuPolicy(Qt::CustomContextMenu);
-    //m_treeWdt->setContextMenuPolicy(Qt::ActionsContextMenu);
     m_treeWdt->setWindowTitle("Job Tree");
 
     m_addBlockAct = new QAction("Add Block", m_treeWdt);
     m_copyBlockAct = new QAction("Copy Block", m_treeWdt);
     m_deleteBlockAct = new QAction("Delete Block", m_treeWdt);
 
-    //QGroupBox *gbox = new QGroupBox(this);
     QVBoxLayout *main_hlyt = new QVBoxLayout(this);
     main_hlyt->addWidget(m_treeWdt);
     setLayout(main_hlyt);
@@ -168,10 +165,14 @@ void JobTree::slotBlockDoubleClicked(QTreeWidgetItem *item, int column)
     {
         return;
     }
-
     emit sglBlockDoubleClicked(item);
+
 }
 
 void JobTree::slotNotifyJobEditView()
 {
 }
+
+
+
+
