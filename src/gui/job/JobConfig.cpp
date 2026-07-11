@@ -101,8 +101,8 @@ void JobConfig::updateWidget(BlockData block)
     m_ledit_position_y->setText(QString::number(block.getYpos(), 'f'));
     m_ledit_roi_x->setText(QString::number(block.getROIData()->pix_x, 'f'));
     m_ledit_roi_y->setText(QString::number(block.getROIData()->pix_y, 'f'));
-    m_ledit_roi_width->setText(QString::number(block.getROIData()->width, 'f'));
-    m_ledit_roi_height->setText(QString::number(block.getROIData()->height, 'f'));
+    m_ledit_roi_width->setText(QString::number(block.getROIData()->pix_width, 'f'));
+    m_ledit_roi_height->setText(QString::number(block.getROIData()->pix_height, 'f'));
     m_ledit_template_file->setText(block.getTempPicturePath());
     m_ledit_mask_file->setText(block.getMaskPicturePath());
     m_check_enable_mask->setChecked(block.getMaskEnable());
@@ -133,6 +133,17 @@ bool JobConfig::setMainGroubBoxTitle(const QString &title)
     }
 }
 
+void JobConfig::setCurrentBlockIndex(int index)
+{
+    m_current_block_index = index;
+}
+
+int JobConfig::getCurrentBlockIndex()
+{
+    int i = m_current_block_index;
+    return m_current_block_index;
+}
+
 QString JobConfig::get_cbox_method()
 {
     return m_cbox_match_method->currentText();
@@ -146,7 +157,12 @@ QString JobConfig::get_cbox_template_match_method()
 QString JobConfig::get_ledit_template_file()
 {
     return m_ledit_template_file->text();
-}   
+}
+
+bool JobConfig::get_checkbox_mask_enable()
+{
+    return m_check_enable_mask->isChecked();
+}
 
 QString JobConfig::get_ledit_mask_file()
 {

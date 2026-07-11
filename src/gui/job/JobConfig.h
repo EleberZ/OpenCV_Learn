@@ -30,6 +30,7 @@ public:
     QString get_cbox_method();
     QString get_cbox_template_match_method();
     QString get_ledit_template_file();
+    bool get_checkbox_mask_enable();
     QString get_ledit_mask_file();
     double get_ledit_roi_x();
     double get_ledit_roi_y();

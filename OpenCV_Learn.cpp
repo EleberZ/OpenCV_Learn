@@ -506,14 +506,15 @@ void OpenCV::slot_JobTree_BlockDoubleClicked(QTreeWidgetItem *item)
     QString str = item->text(0);
     QString str_tmp = str;
     str.remove("Block");
-
+    int index;
     bool btmp = m_jobConfig->setMainGroubBoxTitle(str_tmp);
     if (!btmp)
     {
+        index = str.toInt();
         //双击没有被打开Block
         //m_BlockConfig_dockWdt->setWindowTitle(str_tmp);
-        m_jobEditModel.get()->setCurrentBlockIndex(str.toInt());
-        BlockData block_data = m_jobEditModel.get()->getBlockData(str.toInt());
+        m_jobConfig->setCurrentBlockIndex(index);
+        BlockData block_data = m_jobEditModel.get()->getBlockData(index);
         m_jobConfig->updateWidget(block_data);
     }
     //TODO
@@ -543,6 +544,17 @@ void OpenCV::slot_JonConfig_SaveSingleBlock()
     block.setYpos(m_jobConfig->get_ledit_position_y());
     block.setMethod(m_jobConfig->get_cbox_method());
     block.setTemplateMatchType(m_jobConfig->get_cbox_template_match_method());
+    block.setMaskEnable(m_jobConfig->get_checkbox_mask_enable());
+
+    ROIData roi_data;
+    roi_data.pix_x = m_jobConfig->get_ledit_roi_x();
+    roi_data.pix_y = m_jobConfig->get_ledit_roi_y();
+    roi_data.pix_width = m_jobConfig->get_ledit_roi_width();
+    roi_data.pix_height = m_jobConfig->get_ledit_roi_height();
+    block.setROIData(roi_data);
+
+    int i = m_jobConfig->getCurrentBlockIndex();
+    m_jobEditModel.get()->setBlockData(i, block);
     //m_jobEditModel.get()->setBlockData(,block);
 }
 

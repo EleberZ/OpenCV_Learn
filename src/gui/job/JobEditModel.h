@@ -14,8 +14,8 @@
 
 struct ROIData
 {
-    double width = 0.0;
-    double height = 0.0;
+    double pix_width = 0.0;
+    double pix_height = 0.0;
     double pix_x = 0.0;
     double pix_y = 0.0;
     double stride = 0.0;
@@ -98,7 +98,7 @@ public:
     BlockData getBlockData(int index);
     void setBlockData(int index, BlockData);
     int getBlockCount();
-    void setCurrentBlockIndex(int index);
+
 
     QString getJobId();
     void setJobId(QString job_id);

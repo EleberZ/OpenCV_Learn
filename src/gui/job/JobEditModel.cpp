@@ -128,8 +128,8 @@ void BlockData::setROIData(double pix_x, double piy_y, double width, double heig
 {
     m_roi_data->pix_x = pix_x;
     m_roi_data->pix_y = piy_y;
-    m_roi_data->width = width;
-    m_roi_data->height = height;
+    m_roi_data->pix_width = width;
+    m_roi_data->pix_height = height;
     m_roi_data->stride = stride; 
     m_roi_data->threshold = threshold;
     m_roi_data->overlapThreshold = overlapThreshold;
@@ -270,15 +270,7 @@ int JobEditModel::getBlockCount()
     return m_blocks_data1.size();
 }
 
-void JobEditModel::setCurrentBlockIndex(int index)
-{
-    m_current_block_index = index;
-}
 
-int JobConfig::getCurrentBlockIndex()
-{
-    return 0;
-}
 
 QString JobEditModel::getJobId()
 {
@@ -414,8 +406,8 @@ bool JobEditModel::WriteTemplateMatchXml()
                     m_job_xml_writer.writeAttribute("id", "roi_data" + QString::number(i));
                     m_job_xml_writer .writeAttribute("pix_x", QString::number(roi_data.pix_x, 'f'));
                     m_job_xml_writer.writeAttribute("pix_y", QString::number(roi_data.pix_y, 'f'));
-                    m_job_xml_writer.writeAttribute("width", QString::number(roi_data.width, 'f'));
-                    m_job_xml_writer.writeAttribute("height", QString::number(roi_data.height, 'f'));
+                    m_job_xml_writer.writeAttribute("width", QString::number(roi_data.pix_width, 'f'));
+                    m_job_xml_writer.writeAttribute("height", QString::number(roi_data.pix_height, 'f'));
                     m_job_xml_writer.writeAttribute("stride", QString::number(roi_data.stride, 'f'));
                     m_job_xml_writer.writeAttribute("threshold", QString::number(roi_data.threshold));   //匹配分数阈值
                     m_job_xml_writer.writeAttribute("overlapThreshold", QString::number(roi_data.overlapThreshold, 'f'));       //重叠阈值
